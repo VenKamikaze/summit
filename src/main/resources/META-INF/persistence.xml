@@ -3,7 +3,6 @@
 <persistence-unit name="persistenceUnit" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <properties>
-<!--            <property name="hibernate.dialect" value="org.hibernate.dialect.OracleDialect"/> -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/> 
             <!-- value="create" to build a new database on each run; value="update" to modify an existing database; value="create-drop" means the same as "create" but also drops tables when Hibernate closes; value="validate" makes no changes to the database -->
             <property name="hibernate.hbm2ddl.auto" value="validate"/>
@@ -13,19 +12,24 @@
             <!-- property name="hibernate.validator.apply_to_ddl" value="false" /-->
             <!-- property name="hibernate.validator.autoregister_listeners" value="false" /-->
             
-            
             <property name="show_sql" value="true" />
             <property name="format_sql" value="true" />
             <property name="use_sql_comments" value="true" />
             
-
             <property name="hibernate.cache.use_second_level_cache" value="false" />
             <property name="hibernate.cache.use_query_cache" value="false" />
             <property name="hibernate.generate_statistics" value="false" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/asthma_nt_apps"/>
+            <property name="javax.persistence.jdbc.user" value="asthma_nt"/>
+            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <!--            <property name="hibernate.cache.region.factory_class" value="net.sf.ehcache.hibernate.EhCacheRegionFactory" /> -->
             <!--       net.sf.ehcache.hibernate.EhCacheRegionFactory
             </property> -->
 
+            <!-- Helps prevent JODA timezone mismatch when persisted in DB -->
+            <property name="jadira.usertype.autoRegisterUserTypes" value="true" />
+            <property name="jadira.usertype.databaseZone" value="jvm" />
+            <property name="jadira.usertype.javaZone" value="jvm" />
       
         </properties>
     </persistence-unit>

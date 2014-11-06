@@ -1,0 +1,113 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page"
+  xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+  xmlns:c="http://java.sun.com/jsp/jstl/core"
+  xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+  xmlns:spring="http://www.springframework.org/tags"
+  xmlns:f="http://www.springframework.org/tags/form" version="2.0">
+
+  <jsp:directive.page contentType="text/html;charset=UTF-8" />
+  <jsp:output omit-xml-declaration="yes" />
+
+  <link href="${ctx_path}/styles/table.css" media="all" rel="stylesheet" type="text/css" />
+
+  <c:set var="count" scope="request" value="0" />
+  <c:set var="tClass" scope="request" value="none" />
+
+  <script type="text/javascript">
+  //<![CDATA[
+      function select(id) {
+        parent.window.location.href="${ctx_path}/entry/" + id;
+      };
+  //]]>
+  </script>
+
+  <c:url var="prevPage" value="/list/${pageNum - 1}" />
+  <c:url var="nextPage" value="/list/${pageNum + 1}" />
+
+  <div style="clear: both;"><!-- x --></div>
+  <div class="searchBar">
+    <div class="search">
+      <f:form method="post" modelAttribute="wrapperDto" action="${ctx_path}/list/search">
+      <div class="search-image"><!-- x --></div>
+      <div class="fieldgroup">
+        <div class="field">
+          <label for="search">Search:</label>
+          <input id="search" type="text" name="search" />
+          <div class="searchButton">
+            <input id="searchButton" type="submit" name="action" value="Go" />
+            <input id="clearSearchButton" type="submit" name="action" value="Clear" />
+          </div>
+        </div>
+
+      </div>
+      </f:form>
+    </div>
+  </div>
+  
+  <div class="listContent">
+  <table id="rounded-corner" summary="${tableTitle}">
+    <thead>
+      <tr>
+
+        <c:forEach items="${headings}" var="heading">
+          <c:choose>
+            <c:when test="${count eq 0}">
+
+              <c:set var="tClass" value="rounded-start" />
+
+            </c:when>
+            <c:when test="${count eq fn:length(headings)-1}">
+
+              <c:set var="tClass" value="rounded-end" />
+            
+            </c:when>
+            <c:otherwise>
+
+              <c:set var="tClass" value="rounded-mid" />
+
+            </c:otherwise>
+          </c:choose>  
+          <c:set var="count" value="${count + 1}" />
+
+          <th scope="col" class="${tClass}">${heading}</th>
+
+        </c:forEach>
+      </tr>
+    </thead>
+    <tfoot>
+      <tr>
+        <td colspan="3" class="rounded-foot-left">
+          <c:if test="${pageNum > 1}">
+            <a href="${prevPage}">&lt;&lt;</a>
+          </c:if>
+        </td>
+
+        <td class="rounded-foot-right">
+          <em>Page ${pageNum} of ${pageTotalNum}</em>
+          <c:if test="${pageTotalNum > pageNum}">
+            <span style="padding-left:1em;"><a href="${nextPage}">&gt;&gt;</a></span>
+          </c:if>
+        </td>
+
+      </tr>
+      <tr>
+        <td colspan="2" class="table-buttons-left"><!-- x --></td>
+        <td colspan="2" class="table-buttons-right"><a href="${ctx_path}/entry">Create</a></td>
+      </tr>
+    </tfoot>
+    <tbody>
+      <c:set var="count" value="0" />
+      <c:forEach items="${items}" var="wrapperDto">
+        <tr class="row-${count % 2}" onclick="select(${wrapperDto.controlPack.id});">
+          <td>${wrapperDto.person.firstName} ${wrapperDto.person.lastName}</td>
+          <td>${wrapperDto.address.suburb}</td>
+          <td>${wrapperDto.controlPack.dateRequested}</td>
+          <td>${wrapperDto.controlPack.wantsFollowUp}</td>
+        </tr>    
+        <c:set var="count" value="${count + 1}" />
+      </c:forEach>
+    </tbody>
+  </table>
+  </div>
+
+</jsp:root>

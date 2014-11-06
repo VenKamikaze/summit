@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+  <configuration>
+    <stop-on-errors>true</stop-on-errors>
+    <date-format>dd/MM/yyyy HH:mm</date-format>
+    <wildcard>true</wildcard>
+
+    <custom-converters> <!-- these are always bi-directional -->
+      <converter type="org.awiki.kamikaze.summit.util.YesNoEnumToBooleanConverter" >
+        <class-a>java.lang.Boolean</class-a>
+        <class-b>org.awiki.kamikaze.summit.util.YesNoEnum</class-b>
+      </converter>
+      <converter type="org.awiki.kamikaze.summit.util.YesNoEnumToStringConverter" >
+        <class-a>java.lang.String</class-a>
+        <class-b>org.awiki.kamikaze.summit.util.YesNoEnum</class-b>
+      </converter>
+    </custom-converters>
+
+   <!-- This makes all JODA time types copy by reference
+        which in turn fixes the problem with it mapping dates -->
+   <copy-by-references>
+     <copy-by-reference>
+       org.joda.time.*
+     </copy-by-reference>
+   </copy-by-references>
+
+  </configuration>
+
+</mappings>
