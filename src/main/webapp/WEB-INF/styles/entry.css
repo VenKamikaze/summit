@@ -1,0 +1,46 @@
+.entryForm {
+  font-size: 10pt !important;
+}
+
+.fieldgroup {
+  width: 40em;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  /* border: 1px solid black; */
+  padding: 1em;
+  padding-top: 0em;
+  font-size: 10pt;
+  display: block;
+}
+
+.fieldgroup h2 {
+  font-size: 12pt;
+  font-weight: bold;
+  background-color: #005293;
+  color: white;
+  padding: 2px;
+  padding-left: 4px;
+}
+
+.fieldgroup .field {
+  padding-left: 1em;
+}
+
+.fieldgroup .field label {
+  padding-left: 1em;
+  padding-right: 1em;
+  width: 13em;
+  float: left;
+  font-weight: bold;
+  text-align: left;
+}
+
+.field .fielderror {
+  position: absolute;
+  left: 50em;
+  font-weight: bold;
+  color: darkorange;
+  padding-top: 3pt;
+  text-decoration: underline;
+}
+

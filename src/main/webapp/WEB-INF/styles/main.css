@@ -1,0 +1,122 @@
+html, body {
+    margin: 0px;
+    padding: 0px;
+    min-height: 100%;
+    height: 100%;
+    font-family: arial, 'Open Sans', sans-serif;
+}
+
+a:visited {
+  color: #1E90FF;
+}
+
+#header-content-wrapper {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -50px; /* the bottom margin is the negative value of the footer's height */
+    position: relative
+}
+
+#footer {
+    height: 50px;
+}
+
+#footer-content {
+    border: 1px solid #005293;
+    background-color:#005293;
+    height: 32px; /* height + top/bottom paddding + top/bottom border must add up to footer height */
+    padding: 8px;
+    color: #fff;
+}
+
+.push-footer {
+    height: 50px;
+    clear: both;
+}
+
+#header {
+    height: 50px;
+}
+
+#header-content {
+    /* background-color: #005293; */
+    background-color: white;
+    height: 6em; /* height + top/bottom paddding + top/bottom border must add up to footer height */
+    padding: 8px;
+    color: #fff;
+}
+
+#content {
+    height: 100%;
+}
+
+.entryContent {
+  margin: 3em;
+  margin-left: 4em;
+  width: 40em;
+}
+
+#main {
+    margin-left: 9em;
+}
+
+.listContent {
+  margin-left: 4em;
+  width: 40em;
+}
+
+.searchBar {
+  margin-top: 3em;
+  margin-bottom: 1em;
+  margin-left: 4em;
+  margin-right: 3em;
+
+  width: 40em;
+}
+
+.search {
+	font-size: 10pt;
+	border-bottom: 1px solid #dcdcdc;
+	width: 28em;
+    height: 2.3em;
+
+}
+
+.search-image {
+	float: left;
+    content:url('images/search24.png');
+	/* thanks to http://www.aha-soft.com/ for the magnifying glass icon */
+    margin-right: 1em;
+}
+
+.search #search {
+	margin-left: 1em;
+}
+
+.searchButton {
+	display: inline;
+	float: right;
+}
+
+#clearSearchButton {
+	margin-left:0.2em;
+}
+
+.page-header {
+  font-weight: bolder;
+  font-size: 16pt;
+  text-align: center; 
+}
+
+.page-header img {
+  width: 22em;
+  height: auto;
+}
+
+.page-footer {
+  text-align: center;
+  font-size: 9pt;
+  font-weight: bold;
+}
+

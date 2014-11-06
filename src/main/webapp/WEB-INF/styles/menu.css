@@ -1,0 +1,107 @@
+#sidebar {
+    /* border: 1px solid #005293; */
+    background-color: #00649e;
+    width: 10em;
+    position: absolute;
+    left: 1em;
+    top: 6em;
+    bottom: 7em;
+}
+
+div#sidebar .menu-h1
+{
+  float:left;
+  text-transform: uppercase;
+  font-size: 0.92em;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  padding-left: 0.5em;
+}
+
+div#sidebar .menu-h2
+{
+  clear:both;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  color: #fff;
+  font-weight: bold;
+  border-top: 1px dotted #fff;
+  border-bottom: 1px dotted #fff;
+  padding-top: 1.2em;
+  padding-left: 0.3em;
+}
+
+div#sidebar .menu-nav
+{
+  text-transform: none;
+  padding-bottom: 0.3em;
+}
+
+div#sidebar .menu-nav ul
+{
+  list-style: none;
+  margin: 1em 0;
+  padding: 0;
+}
+
+.menu-nav li
+{
+  font-weight: bold;
+  margin: 0;
+  padding: 3px 10px 5px 20px;
+  border-bottom: 1px solid #fff;
+  color: #ccc;  
+}
+
+.menu-nav li:hover
+{
+  color: #fff !important;
+  background-color: #1163a4;
+}
+
+.menu .menu-top-left
+{
+	float: left;
+	margin:0;
+	padding:0;
+	width:11px;
+	height:15px;
+	background: #00649e url('images/left.png') left -1px no-repeat;
+}
+.menu .menu-top-right
+{
+	float:right;
+	margin:0;
+	padding:0;
+	width:11px;
+	height:15px;
+	background: #00649e url('images/right.png') right -1px no-repeat;
+}
+
+.menu-bot-left
+{
+	position:absolute;
+	bottom:0px;
+	left:0;
+	margin:0;
+    width:11px;
+	height:15px;
+	background: #00649e url('images/botleft-menu.png') left 4px no-repeat;
+}
+
+.menu-bot-right
+{
+	float: right;
+	position: absolute;
+	bottom:0;
+	right:0;
+	float: right;
+	margin:0;
+	width:11px;
+	height:15px;
+	background: #00649e url('images/botright-menu.png') right 4px no-repeat;
+}
+
