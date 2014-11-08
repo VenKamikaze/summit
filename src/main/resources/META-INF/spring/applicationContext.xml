@@ -85,14 +85,7 @@
         </list>
       </property>
     </bean>
-<!--
-<bean id="org.dozer.Mapper" class="org.dozer.DozerBeanMapper">
-  <property name="mappingFiles">
-    <list>
-    </list>
-  </property>
-</bean>
--->
+
 <!--
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="maxUploadSize" value="10500000"/>
@@ -107,18 +100,4 @@
   <bean class="org.awiki.kamikaze.summit.exception.LoggingSimpleMappingExceptionResolver"
     p:defaultErrorView="uncaughtException" p:message="Exception caught in handler processing" />
 
-
-
-  
-  <!--    <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-         <property name="mappings">
-
-  -->          <!--     /forms_post_action=ControllerToHandleIt  -->
-  <!--          <value>
-                /someMapping/somepage.someSection=local.SomeController
-            </value>
-
-         </property>
-     </bean>
-  -->
 </beans>

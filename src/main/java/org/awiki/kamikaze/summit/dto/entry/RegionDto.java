@@ -14,6 +14,7 @@ public class RegionDto {
   
   @NotBlank(message = "Must not be empty.")
   private String                name;
+  
   private Set<PageRegionDto>    pageRegions  = new HashSet<>(0);
   private Set<RegionFieldDto>   regionFields = new HashSet<>(0);
   
