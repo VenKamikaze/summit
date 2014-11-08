@@ -1,0 +1,13 @@
+* Render:
+
+* Picks up wanted page by ${applicationId}/${pageId}
+* Controller hands off to PageService
+* PageService pulls in:
+** Page Domain, linked domain objects such as Regions, RegionField, Fields.
+** Linked templates
+
+* First pass in rendering then grabs the template and puts it into an object that is manipulated.
+* A pass is then done on the Fields, executing any SQL to bring in values.
+* A pass is then done on Regions, inserting the post processed Fields into the Regions
+* A pass is then done on the template, inserting regions into appropriate areas
+* Full page is then returned to the client requesting it.
