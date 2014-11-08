@@ -21,8 +21,7 @@ public class Page implements java.io.Serializable
   private int                  id;
   private Set<PageRegion>      pageRegions      = new HashSet<PageRegion>(0);
   private Set<PageProcessing>  pageProcessings  = new HashSet<PageProcessing>(0);
-  private Set<ApplicationPage> applicationPages = new HashSet<ApplicationPage>(
-                                                    0);
+  private Set<ApplicationPage> applicationPages = new HashSet<ApplicationPage>(0);
 
   public Page()
   {

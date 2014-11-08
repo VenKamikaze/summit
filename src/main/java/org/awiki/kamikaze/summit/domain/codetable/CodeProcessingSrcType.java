@@ -29,7 +29,7 @@ public class CodeProcessingSrcType implements java.io.Serializable
   private String              code;
   private String              description;
   private Integer             sortOrder;
-  private Set<PageProcessing> pageProcessings = new HashSet<PageProcessing>(0);
+  //private Set<PageProcessing> pageProcessings = new HashSet<PageProcessing>(0);
 
   public CodeProcessingSrcType()
   {
@@ -42,12 +42,12 @@ public class CodeProcessingSrcType implements java.io.Serializable
   }
 
   public CodeProcessingSrcType(String code, String description,
-      Integer sortOrder, Set<PageProcessing> pageProcessings)
+      Integer sortOrder/*, Set<PageProcessing> pageProcessings*/)
   {
     this.code = code;
     this.description = description;
     this.sortOrder = sortOrder;
-    this.pageProcessings = pageProcessings;
+    //this.pageProcessings = pageProcessings;
   }
 
   @Id
@@ -83,7 +83,7 @@ public class CodeProcessingSrcType implements java.io.Serializable
   {
     this.sortOrder = sortOrder;
   }
-
+/*
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "codeProcessingSrcType")
   public Set<PageProcessing> getPageProcessings()
   {
@@ -94,5 +94,5 @@ public class CodeProcessingSrcType implements java.io.Serializable
   {
     this.pageProcessings = pageProcessings;
   }
-
+*/
 }
