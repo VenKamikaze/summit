@@ -25,6 +25,9 @@ public class FieldDto {
   private String                notes;
   private Set<RegionFieldDto>   regionFields = new HashSet<>(0);
   
+  private PostProcessedFieldContentDto postProcessedSource;
+  private PostProcessedFieldContentDto postProcessedDefaultValue;
+  
   public Integer getId() {
     return id;
   }
@@ -73,6 +76,57 @@ public class FieldDto {
   }
   public void setRegionFields(Set<RegionFieldDto> regionFields) {
     this.regionFields = regionFields;
+  }
+
+
+  public PostProcessedFieldContentDto getPostProcessedSource() {
+    return postProcessedSource;
+  }
+  public void setPostProcessedSource(
+      PostProcessedFieldContentDto postProcessedSource) {
+    this.postProcessedSource = postProcessedSource;
+  }
+  public PostProcessedFieldContentDto getPostProcessedDefaultValue() {
+    return postProcessedDefaultValue;
+  }
+  public void setPostProcessedDefaultValue(
+      PostProcessedFieldContentDto postProcessedDefaultValue) {
+    this.postProcessedDefaultValue = postProcessedDefaultValue;
+  }
+  
+  public class PostProcessedFieldContentDto 
+  {
+    private String postProcessedContent;
+
+    public String getPostProcessedContent() {
+      return postProcessedContent;
+    }
+
+    public void setPostProcessedContent(String postProcessedContent) {
+      this.postProcessedContent = postProcessedContent;
+    }
+    
+    @Override
+    public String toString() {
+      return postProcessedContent;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+      if (obj instanceof PostProcessedFieldContentDto)
+      {
+        PostProcessedFieldContentDto target = (PostProcessedFieldContentDto) obj;
+        if(null != target.toString() && null != this.toString())
+        {
+          return this.toString().equals(target.toString());
+        }
+        else
+        {
+          return (null == target.toString() && null == this.toString());
+        }
+      }
+      return false;
+    }
   }
   
 }
