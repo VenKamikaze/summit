@@ -1,18 +1,14 @@
 package org.awiki.kamikaze.summit.dto.entry;
 
 
-import javax.validation.constraints.Size;
 
-import org.awiki.kamikaze.summit.domain.Application;
-import org.awiki.kamikaze.summit.domain.Page;
 import org.hibernate.validator.constraints.NotBlank;
 
 public class ApplicationPageDto 
 {
 	private Integer id;
 	
-	//@Size(max = 200)
-	//private PageDto page;
+	private PageDto page;
 	
 	//@Size(max = 200)
 	//@NotBlank(message = "Must not be empty.")
@@ -54,6 +50,14 @@ public class ApplicationPageDto
 
   public void setPageNum(int pageNum) {
     this.pageNum = pageNum;
+  }
+
+  public PageDto getPage() {
+    return page;
+  }
+
+  public void setPage(PageDto page) {
+    this.page = page;
   }
 
 }

@@ -29,7 +29,7 @@ public class CodeRegionPosition implements java.io.Serializable
   private String      code;
   private String      description;
   private Integer     sortOrder;
-  private Set<Region> regions = new HashSet<Region>(0);
+  //private Set<Region> regions = new HashSet<Region>(0);
 
   public CodeRegionPosition()
   {
@@ -41,13 +41,13 @@ public class CodeRegionPosition implements java.io.Serializable
     this.description = description;
   }
 
-  public CodeRegionPosition(String code, String description, Integer sortOrder,
-      Set<Region> regions)
+  public CodeRegionPosition(String code, String description, Integer sortOrder
+      /*Set<Region> regions*/)
   {
     this.code = code;
     this.description = description;
     this.sortOrder = sortOrder;
-    this.regions = regions;
+    //this.regions = regions;
   }
 
   @Id
@@ -83,7 +83,7 @@ public class CodeRegionPosition implements java.io.Serializable
   {
     this.sortOrder = sortOrder;
   }
-
+/*
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "codeRegionPosition")
   public Set<Region> getRegions()
   {
@@ -94,5 +94,6 @@ public class CodeRegionPosition implements java.io.Serializable
   {
     this.regions = regions;
   }
+  */
 
 }
