@@ -10,4 +10,6 @@ public interface FieldService {
   
   public FieldDto load(FieldDto fieldDto);
   
+  public FieldDto.PostProcessedFieldContentDto processFieldSource(FieldDto fieldDto);
+  
 }

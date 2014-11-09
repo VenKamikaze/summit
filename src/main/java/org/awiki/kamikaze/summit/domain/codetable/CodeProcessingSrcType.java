@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -29,6 +30,7 @@ public class CodeProcessingSrcType implements java.io.Serializable
   private String              code;
   private String              description;
   private Integer             sortOrder;
+  private CodeSourceType      codeSourceProcessor;  // CODE_SOURCE_CODE.CODE
   //private Set<PageProcessing> pageProcessings = new HashSet<PageProcessing>(0);
 
   public CodeProcessingSrcType()
@@ -42,11 +44,12 @@ public class CodeProcessingSrcType implements java.io.Serializable
   }
 
   public CodeProcessingSrcType(String code, String description,
-      Integer sortOrder/*, Set<PageProcessing> pageProcessings*/)
+      Integer sortOrder, CodeSourceType codeSourceProcessor)
   {
     this.code = code;
     this.description = description;
     this.sortOrder = sortOrder;
+    this.codeSourceProcessor = codeSourceProcessor;
     //this.pageProcessings = pageProcessings;
   }
 
@@ -83,6 +86,18 @@ public class CodeProcessingSrcType implements java.io.Serializable
   {
     this.sortOrder = sortOrder;
   }
+
+  @ManyToOne(fetch=FetchType.EAGER)
+  @Column(name = "code_source_processor")
+  public CodeSourceType getCodeSourceProcessor() {
+    return codeSourceProcessor;
+  }
+
+  public void setCodeSourceProcessor(CodeSourceType codeSourceType) {
+    this.codeSourceProcessor = codeSourceType;
+  }
+
+  
 /*
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "codeProcessingSrcType")
   public Set<PageProcessing> getPageProcessings()
