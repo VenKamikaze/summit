@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -26,11 +27,12 @@ public class CodeFieldSourceType implements java.io.Serializable
    */
   private static final long serialVersionUID = 3888121341827987520L;
   
-  private String     code;
-  private String     description;
-  private Integer    sortOrder;
-  private Set<Field> fieldsForDefaultValueType = new HashSet<Field>(0);
-  private Set<Field> fieldsForSourceType       = new HashSet<Field>(0);
+  private String          code;
+  private String          description;
+  private Integer         sortOrder;
+  private CodeSourceType  codeSourceProcessor;  // CODE_SOURCE_CODE.CODE
+  //private Set<Field> fieldsForDefaultValueType = new HashSet<Field>(0);
+  //private Set<Field> fieldsForSourceType       = new HashSet<Field>(0);
 
   public CodeFieldSourceType()
   {
@@ -43,14 +45,14 @@ public class CodeFieldSourceType implements java.io.Serializable
   }
 
   public CodeFieldSourceType(String code, String description,
-      Integer sortOrder, Set<Field> fieldsForDefaultValueType,
-      Set<Field> fieldsForSourceType)
+      Integer sortOrder, CodeSourceType codeSourceProcessor)
   {
     this.code = code;
     this.description = description;
     this.sortOrder = sortOrder;
-    this.fieldsForDefaultValueType = fieldsForDefaultValueType;
-    this.fieldsForSourceType = fieldsForSourceType;
+    this.codeSourceProcessor = codeSourceProcessor;
+    //this.fieldsForDefaultValueType = fieldsForDefaultValueType;
+    //this.fieldsForSourceType = fieldsForSourceType;
   }
 
   @Id
@@ -87,6 +89,17 @@ public class CodeFieldSourceType implements java.io.Serializable
     this.sortOrder = sortOrder;
   }
 
+  @ManyToOne(fetch=FetchType.EAGER)
+  @Column(name = "code_source_processor")
+  public CodeSourceType getCodeSourceProcessor() {
+    return codeSourceProcessor;
+  }
+
+  public void setCodeSourceProcessor(CodeSourceType codeSourceType) {
+    this.codeSourceProcessor = codeSourceType;
+  }
+
+  /*
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "codeFieldSourceTypeByDefaultValueType")
   public Set<Field> getFieldsForDefaultValueType()
   {
@@ -108,5 +121,5 @@ public class CodeFieldSourceType implements java.io.Serializable
   {
     this.fieldsForSourceType = fieldsForSourceType;
   }
-
+  */
 }
