@@ -32,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -52,24 +53,11 @@ public class ControlPackController {
 	private static final Logger logger = LoggerFactory.getLogger(ControlPackController.class);
 	private static final String ACTION_DELETE = "Delete";
 	private static final String ACTION_CLEAR  = "Clear";
+
+	@Service
 	
-	@Autowired
-	private CountryRepository countryRepo; 
 	
-	@Autowired
-  private StateRepository stateRepo;
 	
-	@Autowired
-  private AgeGroupRepository ageGroupRepo;
-	
-	@Autowired
-  private SuburbRepository suburbRepo; 
-	
-	@Autowired
-	private ControlPackService controlPackService;
-	
-  @Autowired
-  private ControlPackWrapperValidator wrapperValidator;
    
   @InitBinder
   private void initBinder(WebDataBinder binder) {

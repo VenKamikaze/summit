@@ -1,4 +1,4 @@
-package org.awiki.kamikaze.asthmacontrolpack.controller;
+package org.awiki.kamikaze.summit.controller;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -18,26 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class HomeController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
-	
-	/**
-	 * Simply selects the home view to render by returning its name.
-	 */
-	/*
-	@RequestMapping(value = "/home", method = RequestMethod.GET)
-	public String home(Locale locale, Model model) {
-		logger.info("Welcome home! The client locale is {}.", locale);
-		
-		Date date = new Date();
-		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-		
-		String formattedDate = dateFormat.format(date);
-		
-		model.addAttribute("serverTime", formattedDate );
-		
-		return "entry/main"; // direct mapping to a .jspx... just for an example
-	}
-	*/
-	
+
 	/**
 	 * Maps /entry request path to "entry" tile definition
 	 */
