@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface ApplicationPageRepository extends JpaRepository<ApplicationPage, Long> {
 
   public List<ApplicationPage> findAllOrderByPageNum();
+  
+  public ApplicationPage findByApplicationIdAndPageId(long applicationId, long pageid);
 }
