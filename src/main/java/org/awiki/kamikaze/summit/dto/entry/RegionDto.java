@@ -8,20 +8,22 @@ import org.hibernate.validator.constraints.NotBlank;
 
 public class RegionDto {
 
-  private Integer               id;
+  private Long               id;
   private String                codeRegionPosition; // e.g. header,bodyX,footer
   private String                codeRegionType;     // e.g. HTML,SQL,JSP
   
   @NotBlank(message = "Must not be empty.")
   private String                name;
   
+  private String             source;
+  
   private Set<PageRegionDto>    pageRegions  = new HashSet<>(0);
   private Set<RegionFieldDto>   regionFields = new HashSet<>(0);
   
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
-  public void setId(Integer id) {
+  public void setId(Long id) {
     this.id = id;
   }
   public String getCodeRegionPosition() {
@@ -41,6 +43,12 @@ public class RegionDto {
   }
   public void setName(String name) {
     this.name = name;
+  }
+  public String getSource() {
+    return source;
+  }
+  public void setSource(String source) {
+    this.source = source;
   }
   public Set<PageRegionDto> getPageRegions() {
     return pageRegions;

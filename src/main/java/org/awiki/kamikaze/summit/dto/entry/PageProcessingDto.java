@@ -5,10 +5,10 @@ import org.hibernate.validator.constraints.NotBlank;
 
 public class PageProcessingDto {
   
-  private Integer               id;
+  private Long               id;
   
-  @NotBlank(message = "Must not be empty.")
-  private String                codeProcessingSrcType;
+  //@NotBlank(message = "Must not be empty.")
+  //private String                codeProcessingSrcType;
   
   private PageDto               page;
   
@@ -16,21 +16,15 @@ public class PageProcessingDto {
   private String                codeProcessingType;
   
   @NotBlank(message = "Must not be empty.")
-  private Integer               processingNum;
+  private Long               processingNum;
   
   private String                source;
   
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
-  public void setId(Integer id) {
+  public void setId(Long id) {
     this.id = id;
-  }
-  public String getCodeProcessingSrcType() {
-    return codeProcessingSrcType;
-  }
-  public void setCodeProcessingSrcType(String codeProcessingSrcType) {
-    this.codeProcessingSrcType = codeProcessingSrcType;
   }
   public PageDto getPage() {
     return page;
@@ -44,10 +38,10 @@ public class PageProcessingDto {
   public void setCodeProcessingType(String codeProcessingType) {
     this.codeProcessingType = codeProcessingType;
   }
-  public Integer getProcessingNum() {
+  public Long getProcessingNum() {
     return processingNum;
   }
-  public void setProcessingNum(Integer processingNum) {
+  public void setProcessingNum(Long processingNum) {
     this.processingNum = processingNum;
   }
   public String getSource() {

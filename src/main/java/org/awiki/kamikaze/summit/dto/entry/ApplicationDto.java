@@ -10,32 +10,31 @@ import org.hibernate.validator.constraints.NotBlank;
 
 public class ApplicationDto 
 {
-	private int id;
+	private Long id;
 	 
   @NotBlank(message = "Must not be empty.")
-  private int applicationNum;
+  private Long applicationNum;
   
   @NotBlank(message = "Must not be empty.")
   @Size(max = 200)
   private String name;
 
   private Set<ApplicationPageDto> applicationPages = new LinkedHashSet<ApplicationPageDto>();
-  
   //private Set<ApplicationSchemasDto> applicationSchemas = new HashSet<ApplicationSchemasDto>();
   
-  public int getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
-  public int getApplicationNum() {
+  public Long getApplicationNum() {
     return applicationNum;
   }
 
-  public void setApplicationNum(int applicationNum) {
+  public void setApplicationNum(Long applicationNum) {
     this.applicationNum = applicationNum;
   }
 

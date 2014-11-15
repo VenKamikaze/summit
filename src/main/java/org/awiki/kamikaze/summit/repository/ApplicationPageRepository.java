@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ApplicationPageRepository extends JpaRepository<ApplicationPage, Integer> {
+public interface ApplicationPageRepository extends JpaRepository<ApplicationPage, Long> {
 
   public List<ApplicationPage> findAllOrderByPageNum();
 }
