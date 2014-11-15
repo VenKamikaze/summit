@@ -24,7 +24,12 @@ import org.awiki.kamikaze.summit.domain.codetable.CodeFieldType;
 public class Field implements java.io.Serializable
 {
 
-  private int                 id;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -7419252566793513396L;
+  
+  private long                id;
   private CodeFieldSourceType codeFieldSourceTypeBySourceType;
   private CodeFieldType       codeFieldType;
   private CodeFieldSourceType codeFieldSourceTypeByDefaultValueType;
@@ -37,7 +42,7 @@ public class Field implements java.io.Serializable
   {
   }
 
-  public Field(int id, CodeFieldSourceType codeFieldSourceTypeBySourceType,
+  public Field(long id, CodeFieldSourceType codeFieldSourceTypeBySourceType,
       CodeFieldType codeFieldType,
       CodeFieldSourceType codeFieldSourceTypeByDefaultValueType, String source)
   {
@@ -48,7 +53,7 @@ public class Field implements java.io.Serializable
     this.source = source;
   }
 
-  public Field(int id, CodeFieldSourceType codeFieldSourceTypeBySourceType,
+  public Field(long id, CodeFieldSourceType codeFieldSourceTypeBySourceType,
       CodeFieldType codeFieldType,
       CodeFieldSourceType codeFieldSourceTypeByDefaultValueType, String source,
       String defaultValue, String notes, Set<RegionField> regionFields)
@@ -65,12 +70,12 @@ public class Field implements java.io.Serializable
 
   @Id
   @Column(name = "id", unique = true, nullable = false)
-  public int getId()
+  public long getId()
   {
     return this.id;
   }
 
-  public void setId(int id)
+  public void setId(long id)
   {
     this.id = id;
   }

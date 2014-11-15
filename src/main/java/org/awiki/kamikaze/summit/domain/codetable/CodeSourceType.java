@@ -24,7 +24,10 @@ public class CodeSourceType implements java.io.Serializable
   
   private String     code;
   private String     description;
-  private String     processorServiceClass; // actual Class name
+  private Long       sortOrder;
+  private String     sourceIdentifier;
+  
+  // xx //TODO changed definition private String     processorServiceClass; // actual Class name
                                             // used in reflection to instantiate the class
                                             // that will process the field source into rendered content.
   //private Set<Field> fieldsForDefaultValueType = new HashSet<Field>(0);
@@ -34,11 +37,13 @@ public class CodeSourceType implements java.io.Serializable
   {
   }
 
-  public CodeSourceType(String code, String description, String processorServiceClass)
+  public CodeSourceType(String code, String description, Long sortOrder, String sourceIdentifier)
   {
     this.code = code;
     this.description = description;
-    this.processorServiceClass = processorServiceClass;
+    this.setSortOrder(sortOrder);
+    this.setSourceIdentifier(sourceIdentifier);
+    //this.processorServiceClass = processorServiceClass;
     //this.fieldsForDefaultValueType = fieldsForDefaultValueType;
     //this.fieldsForSourceType = fieldsForSourceType;
   }
@@ -67,13 +72,23 @@ public class CodeSourceType implements java.io.Serializable
   }
 
   @NotNull
-  @Column(name = "processor_service_class")
-  public String getProcessorServiceClass() {
-    return processorServiceClass;
+  @Column(name = "sort_order")
+  public Long getSortOrder() {
+    return sortOrder;
   }
 
-  public void setProcessorServiceClass(String processorServiceClass) {
-    this.processorServiceClass = processorServiceClass;
+  public void setSortOrder(Long sortOrder) {
+    this.sortOrder = sortOrder;
+  }
+
+  @NotNull
+  @Column(name = "source_identifier")
+  public String getSourceIdentifier() {
+    return sourceIdentifier;
+  }
+
+  public void setSourceIdentifier(String sourceIdentifier) {
+    this.sourceIdentifier = sourceIdentifier;
   }
 
 }

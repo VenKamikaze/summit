@@ -24,10 +24,17 @@ import org.awiki.kamikaze.summit.domain.codetable.CodeRegionType;
 public class Region implements java.io.Serializable
 {
 
-  private int                id;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -4342338136016395303L;
+  
+  
+  private long                id;
   private CodeRegionPosition codeRegionPosition;
   private CodeRegionType     codeRegionType;
   private String             name;
+  private String             source;
   private Set<PageRegion>    pageRegions  = new HashSet<PageRegion>(0);
   private Set<RegionField>   regionFields = new HashSet<RegionField>(0);
 
@@ -35,32 +42,33 @@ public class Region implements java.io.Serializable
   {
   }
 
-  public Region(int id, String name)
+  public Region(long id, String name)
   {
     this.id = id;
     this.name = name;
   }
 
-  public Region(int id, CodeRegionPosition codeRegionPosition,
-      CodeRegionType codeRegionType, String name, Set<PageRegion> pageRegions,
+  public Region(long id, CodeRegionPosition codeRegionPosition,
+      CodeRegionType codeRegionType, String name, final String source, Set<PageRegion> pageRegions,
       Set<RegionField> regionFields)
   {
     this.id = id;
     this.codeRegionPosition = codeRegionPosition;
     this.codeRegionType = codeRegionType;
     this.name = name;
+    this.source = source;
     this.pageRegions = pageRegions;
     this.regionFields = regionFields;
   }
 
   @Id
   @Column(name = "id", unique = true, nullable = false)
-  public int getId()
+  public long getId()
   {
     return this.id;
   }
 
-  public void setId(int id)
+  public void setId(long id)
   {
     this.id = id;
   }
@@ -98,6 +106,14 @@ public class Region implements java.io.Serializable
   public void setName(String name)
   {
     this.name = name;
+  }
+
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
   }
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "region")

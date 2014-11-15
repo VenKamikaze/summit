@@ -20,16 +20,21 @@ import javax.persistence.UniqueConstraint;
 public class PageRegion implements java.io.Serializable
 {
 
-  private int    id;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 7071227548283247644L;
+  
+  private long    id;
   private Page   page;
   private Region region;
-  private int    regionNum;
+  private long    regionNum;
 
   public PageRegion()
   {
   }
 
-  public PageRegion(int id, Page page, Region region, int regionNum)
+  public PageRegion(long id, Page page, Region region, long regionNum)
   {
     this.id = id;
     this.page = page;
@@ -39,12 +44,12 @@ public class PageRegion implements java.io.Serializable
 
   @Id
   @Column(name = "id", unique = true, nullable = false)
-  public int getId()
+  public long getId()
   {
     return this.id;
   }
 
-  public void setId(int id)
+  public void setId(long id)
   {
     this.id = id;
   }
@@ -74,12 +79,12 @@ public class PageRegion implements java.io.Serializable
   }
 
   @Column(name = "region_num", nullable = false)
-  public int getRegionNum()
+  public long getRegionNum()
   {
     return this.regionNum;
   }
 
-  public void setRegionNum(int regionNum)
+  public void setRegionNum(long regionNum)
   {
     this.regionNum = regionNum;
   }

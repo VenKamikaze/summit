@@ -23,37 +23,36 @@ public class PageProcessing implements java.io.Serializable
   /**
    * This domain stores the request processing details of a particular summit page.
    * E.g. you could have page processing function written in SQL that inserts values
-   * into a database table.
+   * longo a database table.
    */
   private static final long serialVersionUID = -4307936142895462501L;
   
-  private int                   id;
-  private CodeProcessingSrcType codeProcessingSrcType; // e.g. SQL, pg/sql
+  private long                   id;
+  //private CodeProcessingSrcType codeProcessingSrcType; // e.g. SQL, pg/sql
   private Page                  page;
   private CodeProcessingType    codeProcessingType;    // e.g. clear session state, DML, redirect to another page
-  private int                   processingNum;         // in which order this processing occurs.
+  private long                   processingNum;         // in which order this processing occurs.
   private String                source;
 
   public PageProcessing()
   {
   }
 
-  public PageProcessing(int id, CodeProcessingSrcType codeProcessingSrcType,
-      Page page, CodeProcessingType codeProcessingType, int processingNum)
+  public PageProcessing(long id, Page page, CodeProcessingType codeProcessingType, long processingNum)
   {
     this.id = id;
-    this.codeProcessingSrcType = codeProcessingSrcType;
+    //this.codeProcessingSrcType = codeProcessingSrcType;
     this.page = page;
     this.codeProcessingType = codeProcessingType;
     this.processingNum = processingNum;
   }
 
-  public PageProcessing(int id, CodeProcessingSrcType codeProcessingSrcType,
-      Page page, CodeProcessingType codeProcessingType, int processingNum,
+  public PageProcessing(long id,
+      Page page, CodeProcessingType codeProcessingType, long processingNum,
       String source)
   {
     this.id = id;
-    this.codeProcessingSrcType = codeProcessingSrcType;
+//    this.codeProcessingSrcType = codeProcessingSrcType;
     this.page = page;
     this.codeProcessingType = codeProcessingType;
     this.processingNum = processingNum;
@@ -62,16 +61,16 @@ public class PageProcessing implements java.io.Serializable
 
   @Id
   @Column(name = "id", unique = true, nullable = false)
-  public int getId()
+  public long getId()
   {
     return this.id;
   }
 
-  public void setId(int id)
+  public void setId(long id)
   {
     this.id = id;
   }
-
+/*
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "source_type", nullable = false)
   public CodeProcessingSrcType getCodeProcessingSrcType()
@@ -84,7 +83,7 @@ public class PageProcessing implements java.io.Serializable
   {
     this.codeProcessingSrcType = codeProcessingSrcType;
   }
-
+*/
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "page_id", nullable = false)
   public Page getPage()
@@ -110,12 +109,12 @@ public class PageProcessing implements java.io.Serializable
   }
 
   @Column(name = "processing_num", nullable = false)
-  public int getProcessingNum()
+  public long getProcessingNum()
   {
     return this.processingNum;
   }
 
-  public void setProcessingNum(int processingNum)
+  public void setProcessingNum(long processingNum)
   {
     this.processingNum = processingNum;
   }

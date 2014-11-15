@@ -18,11 +18,19 @@ import javax.persistence.Table;
 public class Page implements java.io.Serializable
 {
 
-  private int                  id;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -2500329708942281643L;
+  
+  private long                  id;
   private Set<PageRegion>      pageRegions      = new HashSet<PageRegion>(0);
   private Set<PageProcessing>  pageProcessings  = new HashSet<PageProcessing>(0);
   private Set<ApplicationPage> applicationPages = new HashSet<ApplicationPage>(0);
 
+  //changed definition
+  private String               name;
+  
   public Page()
   {
   }
@@ -32,10 +40,11 @@ public class Page implements java.io.Serializable
     this.id = id;
   }
 
-  public Page(int id, Set<PageRegion> pageRegions,
+  public Page(long id, final String name, Set<PageRegion> pageRegions,
       Set<PageProcessing> pageProcessings, Set<ApplicationPage> applicationPages)
   {
     this.id = id;
+    this.name = name;
     this.pageRegions = pageRegions;
     this.pageProcessings = pageProcessings;
     this.applicationPages = applicationPages;
@@ -43,12 +52,12 @@ public class Page implements java.io.Serializable
 
   @Id
   @Column(name = "id", unique = true, nullable = false)
-  public int getId()
+  public long getId()
   {
     return this.id;
   }
 
-  public void setId(int id)
+  public void setId(long id)
   {
     this.id = id;
   }
@@ -84,6 +93,14 @@ public class Page implements java.io.Serializable
   public void setApplicationPages(Set<ApplicationPage> applicationPages)
   {
     this.applicationPages = applicationPages;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
 }
