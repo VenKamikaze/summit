@@ -3,10 +3,13 @@ package org.awiki.kamikaze.summit.domain;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -30,6 +33,7 @@ public class Page implements java.io.Serializable
 
   //changed definition
   private String               name;
+  private Template             template;
   
   public Page()
   {
@@ -101,6 +105,16 @@ public class Page implements java.io.Serializable
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "template_id", nullable = false)
+  public Template getTemplate() {
+    return template;
+  }
+
+  public void setTemplate(Template template) {
+    this.template = template;
   }
 
 }
