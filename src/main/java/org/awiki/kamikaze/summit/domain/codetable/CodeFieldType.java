@@ -29,7 +29,7 @@ public class CodeFieldType implements java.io.Serializable
   private String     code;
   private String     description;
   private Integer    sortOrder;
-  private Set<Field> fields = new HashSet<Field>(0);
+  //private Set<Field> fields = new HashSet<Field>(0);
 
   public CodeFieldType()
   {
@@ -41,13 +41,13 @@ public class CodeFieldType implements java.io.Serializable
     this.description = description;
   }
 
-  public CodeFieldType(String code, String description, Integer sortOrder,
-      Set<Field> fields)
+  public CodeFieldType(String code, String description, Integer sortOrder
+      /*,Set<Field> fields*/)
   {
     this.code = code;
     this.description = description;
     this.sortOrder = sortOrder;
-    this.fields = fields;
+    //this.fields = fields;
   }
 
   @Id
@@ -83,7 +83,7 @@ public class CodeFieldType implements java.io.Serializable
   {
     this.sortOrder = sortOrder;
   }
-
+/*
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "codeFieldType")
   public Set<Field> getFields()
   {
@@ -94,5 +94,5 @@ public class CodeFieldType implements java.io.Serializable
   {
     this.fields = fields;
   }
-
+*/
 }

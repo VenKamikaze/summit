@@ -17,16 +17,16 @@ import javax.persistence.Table;
 public class RegionField implements java.io.Serializable
 {
 
-  private int    id;
+  private long    id;
   private Field  field;
   private Region region;
-  private int    fieldNum;
+  private long    fieldNum;
 
   public RegionField()
   {
   }
 
-  public RegionField(int id, Field field, Region region, int fieldNum)
+  public RegionField(long id, Field field, Region region, long fieldNum)
   {
     this.id = id;
     this.field = field;
@@ -36,12 +36,12 @@ public class RegionField implements java.io.Serializable
 
   @Id
   @Column(name = "id", unique = true, nullable = false)
-  public int getId()
+  public long getId()
   {
     return this.id;
   }
 
-  public void setId(int id)
+  public void setId(long id)
   {
     this.id = id;
   }
@@ -71,12 +71,12 @@ public class RegionField implements java.io.Serializable
   }
 
   @Column(name = "field_num", nullable = false)
-  public int getFieldNum()
+  public long getFieldNum()
   {
     return this.fieldNum;
   }
 
-  public void setFieldNum(int fieldNum)
+  public void setFieldNum(long fieldNum)
   {
     this.fieldNum = fieldNum;
   }

@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -28,9 +29,11 @@ public class CodeRegionType implements java.io.Serializable
   
   private String      code;
   private String      description;
-  private Integer     sortOrder;
+  private Long        sortOrder;
+  private CodeSourceType codeSourceType;
   //private Set<Region> regions = new HashSet<Region>(0);
-
+  // xx // TODO changed definition
+  
   public CodeRegionType()
   {
   }
@@ -41,12 +44,13 @@ public class CodeRegionType implements java.io.Serializable
     this.description = description;
   }
 
-  public CodeRegionType(String code, String description, Integer sortOrder
+  public CodeRegionType(String code, String description, Long sortOrder, CodeSourceType codeSourceType 
       /*Set<Region> regions*/)
   {
     this.code = code;
     this.description = description;
     this.sortOrder = sortOrder;
+    this.codeSourceType = codeSourceType;
     //this.regions = regions;
   }
 
@@ -74,15 +78,27 @@ public class CodeRegionType implements java.io.Serializable
   }
 
   @Column(name = "sort_order")
-  public Integer getSortOrder()
+  public Long getSortOrder()
   {
     return this.sortOrder;
   }
 
-  public void setSortOrder(Integer sortOrder)
+  public void setSortOrder(Long sortOrder)
   {
     this.sortOrder = sortOrder;
   }
+  
+  @ManyToOne(fetch=FetchType.EAGER)
+  @Column(name = "source_type_code")
+  public CodeSourceType getCodeSourceType() {
+    return codeSourceType;
+  }
+
+  public void setCodeSourceProcessor(CodeSourceType codeSourceType) {
+    this.codeSourceType = codeSourceType;
+  }
+  
+  
 /*
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "codeRegionType")
   public Set<Region> getRegions()

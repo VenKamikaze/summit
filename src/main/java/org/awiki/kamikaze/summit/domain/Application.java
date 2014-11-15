@@ -24,8 +24,8 @@ public class Application implements java.io.Serializable
    */
   private static final long serialVersionUID = -4781215033779957877L;
   
-  private int                     id;
-  private int                     applicationNum;
+  private long                     id;
+  private long                     applicationNum;
   private String                  name;
   private Set<ApplicationPage>    applicationPages     = new HashSet<ApplicationPage>(
                                                            0);
@@ -36,14 +36,14 @@ public class Application implements java.io.Serializable
   {
   }
 
-  public Application(int id, int applicationNum, String name)
+  public Application(long id, long applicationNum, String name)
   {
     this.id = id;
     this.applicationNum = applicationNum;
     this.name = name;
   }
 
-  public Application(int id, int applicationNum, String name,
+  public Application(long id, long applicationNum, String name,
       Set<ApplicationPage> applicationPages,
       Set<ApplicationSchemas> applicationSchemases)
   {
@@ -56,23 +56,23 @@ public class Application implements java.io.Serializable
 
   @Id
   @Column(name = "id", unique = true, nullable = false)
-  public int getId()
+  public long getId()
   {
     return this.id;
   }
 
-  public void setId(int id)
+  public void setId(long id)
   {
     this.id = id;
   }
 
   @Column(name = "application_num", unique = true, nullable = false)
-  public int getApplicationNum()
+  public long getApplicationNum()
   {
     return this.applicationNum;
   }
 
-  public void setApplicationNum(int applicationNum)
+  public void setApplicationNum(long applicationNum)
   {
     this.applicationNum = applicationNum;
   }

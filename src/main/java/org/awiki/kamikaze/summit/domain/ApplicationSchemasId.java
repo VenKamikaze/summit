@@ -16,26 +16,26 @@ public class ApplicationSchemasId implements java.io.Serializable
    */
   private static final long serialVersionUID = 1030444283435841329L;
   
-  private int    applicationId;
+  private long    applicationId;
   private String schemaName;
 
   public ApplicationSchemasId()
   {
   }
 
-  public ApplicationSchemasId(int applicationId, String schemaName)
+  public ApplicationSchemasId(long applicationId, String schemaName)
   {
     this.applicationId = applicationId;
     this.schemaName = schemaName;
   }
 
   @Column(name = "application_id", nullable = false)
-  public int getApplicationId()
+  public long getApplicationId()
   {
     return this.applicationId;
   }
 
-  public void setApplicationId(int applicationId)
+  public void setApplicationId(long applicationId)
   {
     this.applicationId = applicationId;
   }
@@ -71,7 +71,7 @@ public class ApplicationSchemasId implements java.io.Serializable
   {
     int result = 17;
 
-    result = 37 * result + this.getApplicationId();
+    result = 37 * result + (int) this.getApplicationId();
     result = 37 * result
         + (getSchemaName() == null ? 0 : this.getSchemaName().hashCode());
     return result;

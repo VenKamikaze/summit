@@ -25,19 +25,19 @@ public class ApplicationPage implements java.io.Serializable
    */
   private static final long serialVersionUID = 4306085506056915445L;
   
-  private int         id;
+  private long         id;
   private Page        page;
   private Application application;
-  //private int         applicationNum;
-  private int         pageNum;
+  //private long         applicationNum;
+  private long         pageNum;
 
   public ApplicationPage()
   {
   }
 
-  public ApplicationPage(int id, Page page, Application application,
-      //int applicationNum,
-      int pageNum)
+  public ApplicationPage(long id, Page page, Application application,
+      //long applicationNum,
+      long pageNum)
   {
     this.id = id;
     this.page = page;
@@ -48,12 +48,12 @@ public class ApplicationPage implements java.io.Serializable
 
   @Id
   @Column(name = "id", unique = true, nullable = false)
-  public int getId()
+  public long getId()
   {
     return this.id;
   }
 
-  public void setId(int id)
+  public void setId(long id)
   {
     this.id = id;
   }
@@ -83,23 +83,23 @@ public class ApplicationPage implements java.io.Serializable
   }
 
 /*  @Column(name = "application_num", unique = true, nullable = false)
-  public int getApplicationNum()
+  public long getApplicationNum()
   {
     return this.applicationNum;
   }
 
-  public void setApplicationNum(int applicationNum)
+  public void setApplicationNum(long applicationNum)
   {
     this.applicationNum = applicationNum;
   }
 */
   @Column(name = "page_num", nullable = false)
-  public int getPageNum()
+  public long getPageNum()
   {
     return this.pageNum;
   }
 
-  public void setPageNum(int pageNum)
+  public void setPageNum(long pageNum)
   {
     this.pageNum = pageNum;
   }
