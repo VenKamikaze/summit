@@ -80,9 +80,19 @@ create table APPLICATION_SCHEMAS
 );
 
 
+create table TEMPLATE
+(
+  ID bigint primary key,
+  NAME character varying(200) not null,
+  HEADER_SOURCE character varying(32000),
+  BODY_SOURCE character varying(32000),
+  FOOTER_SOURCE character varying(32000)
+);
+
 create table PAGE
 (
   ID bigint primary key,
+  TEMPLATE_ID bigint not null references TEMPLATE(ID),
   NAME character varying(200)
 );
 
@@ -150,4 +160,5 @@ create sequence page_seq start 1;
 create sequence region_seq start 1;
 create sequence field_seq start 1;
 create sequence spare_seq start 1;
+
 
