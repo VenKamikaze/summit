@@ -5,17 +5,17 @@ import org.hibernate.validator.constraints.NotBlank;
 
 public class PageRegionDto {
 
-  private Integer    id;
+  private Long    id;
   private PageDto    pageDto;
   private RegionDto  regionDto;
   
   @NotBlank(message = "Must not be empty.")
-  private Integer    regionNum;
+  private Long    regionNum;
   
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
-  public void setId(Integer id) {
+  public void setId(Long id) {
     this.id = id;
   }
   public PageDto getPageDto() {
@@ -30,10 +30,10 @@ public class PageRegionDto {
   public void setRegionDto(RegionDto regionDto) {
     this.regionDto = regionDto;
   }
-  public Integer getRegionNum() {
+  public Long getRegionNum() {
     return regionNum;
   }
-  public void setRegionNum(Integer regionNum) {
+  public void setRegionNum(Long regionNum) {
     this.regionNum = regionNum;
   }
   

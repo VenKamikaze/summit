@@ -3,15 +3,15 @@ package org.awiki.kamikaze.summit.dto.entry;
 
 public class RegionFieldDto {
 
-  private Integer      id;
+  private Long      id;
   private FieldDto     field;
   private RegionDto    region;
-  private Integer      fieldNum;
+  private Long      fieldNum;
   
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
-  public void setId(Integer id) {
+  public void setId(Long id) {
     this.id = id;
   }
   public FieldDto getField() {
@@ -26,10 +26,10 @@ public class RegionFieldDto {
   public void setRegion(RegionDto region) {
     this.region = region;
   }
-  public Integer getFieldNum() {
+  public Long getFieldNum() {
     return fieldNum;
   }
-  public void setFieldNum(Integer fieldNum) {
+  public void setFieldNum(Long fieldNum) {
     this.fieldNum = fieldNum;
   }
   

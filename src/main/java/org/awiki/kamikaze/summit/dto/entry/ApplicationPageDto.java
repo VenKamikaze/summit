@@ -6,7 +6,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 public class ApplicationPageDto 
 {
-	private Integer id;
+	private Long id;
 	
 	private PageDto page;
 	
@@ -14,17 +14,17 @@ public class ApplicationPageDto
 	//@NotBlank(message = "Must not be empty.")
 	private ApplicationDto application;
 	
-	@NotBlank(message = "Must not be empty.")
-	private Integer applicationNum;
+	//@NotBlank(message = "Must not be empty.")
+	//private Long applicationNum;
 
 	@NotBlank(message = "Must not be empty.")
-  private Integer pageNum;
+  private Long pageNum;
 
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(long id) {
     this.id = id;
   }
 
@@ -36,19 +36,21 @@ public class ApplicationPageDto
     this.application = application;
   }
 
-  public Integer getApplicationNum() {
+  /*
+  public Long getApplicationNum() {
     return applicationNum;
   }
 
-  public void setApplicationNum(int applicationNum) {
+  public void setApplicationNum(long applicationNum) {
     this.applicationNum = applicationNum;
   }
+  */
 
-  public Integer getPageNum() {
+  public Long getPageNum() {
     return pageNum;
   }
 
-  public void setPageNum(int pageNum) {
+  public void setPageNum(long pageNum) {
     this.pageNum = pageNum;
   }
 

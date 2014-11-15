@@ -11,3 +11,6 @@
 * A pass is then done on Regions, inserting the post processed Fields into the Regions
 * A pass is then done on the template, inserting regions into appropriate areas
 * Full page is then returned to the client requesting it.
+
+
+Passes should be done in the above order, to stop people inserting textual values that look like replacement region strings and them being replaced by the parser.

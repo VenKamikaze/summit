@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 public class FieldDto {
   
-  private Integer               id;
+  private Long               id;
   
   @NotBlank(message = "Must not be empty.")
   @Size(max = 10)
@@ -28,10 +28,10 @@ public class FieldDto {
   private PostProcessedFieldContentDto postProcessedSource;
   private PostProcessedFieldContentDto postProcessedDefaultValue;
   
-  public Integer getId() {
+  public Long getId() {
     return id;
   }
-  public void setId(Integer id) {
+  public void setId(Long id) {
     this.id = id;
   }
   public String getCodeFieldType() {
