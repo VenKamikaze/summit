@@ -30,13 +30,13 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   private static final String REGION_TYPE_REPORT = "Report";
   
   @Autowired
-  ApplicationPageRepository appPageStore;
+  private ApplicationPageRepository appPageStore;
   
   @Autowired
-  ProxySourceProcessorServiceImpl sourceProcessors;
+  private ProxySourceProcessorServiceImpl sourceProcessors;
   
   @Autowired
-  Mapper mapper;
+  private Mapper mapper;
   
   @Override
   public PageDto renderPage(long applicationPageId) {
@@ -119,12 +119,12 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     //List<FieldDto> processedFields = new ArrayList<>(regionFieldDtos.size());
     
     for(RegionFieldDto regionFieldDto : regionFieldDtos) {
-      FieldDto fieldDto = regionFieldDto.getField();
+      final FieldDto fieldDto = regionFieldDto.getField();
       FieldDto.PostProcessedFieldContentDto processedContent = fieldDto.new PostProcessedFieldContentDto();
       FieldDto.PostProcessedFieldContentDto processedDefaultContent = fieldDto.new PostProcessedFieldContentDto();
       SourceProcessorService processor = sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
       processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource()));
-      processedDefaultContent.setPostProcessedContent(processor.querySource(fieldDto.getDefaultValueSource()));
+      processedDefaultContent.setPostProcessedContent(processor.querySource( new ArrayList<String>() {{ add(fieldDto.getDefaultValueSource()); }} ) );
       fieldDto.setPostProcessedSource(processedContent);
       fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
       

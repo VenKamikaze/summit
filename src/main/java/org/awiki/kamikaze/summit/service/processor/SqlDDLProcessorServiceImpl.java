@@ -23,20 +23,22 @@ public class SqlDDLProcessorServiceImpl implements SourceProcessorService {
   }
 
   @Override
-  public String executeSource(final String ddl) {
+  public String executeSource(final List<String> ddls) {
     try {
-      jdbc.execute(ddl);
+      for(String ddl : ddls) {
+        jdbc.execute(ddl);
+      }
     } 
     catch(DataAccessException e) {
       final String error = "Unable to execute DDL source type";
       log.error(error, e);
-      return error;
+      throw e;
     }
-    return ddl;
+    return null;
   }
   
   @Override
-  public String querySource(final String ddl) {
+  public String querySource(final List<String> ddl) {
     throw new NotImplementedException("Cannot querySource with DDL! Maybe you want SqlDMLProcessor?");
   }
 }
