@@ -20,8 +20,8 @@ public class SetSourceToListStringConverter  implements CustomConverter {
     }
 
     if (src instanceof java.util.Set<?>) {
-      List<String> sources = new ArrayList<>( ((Set) src).size() );
-      for(Object o : (Set) src) {
+      List<String> sources = new ArrayList<>( ((Set<?>) src).size() );
+      for(Object o : (Set<?>) src) {
         if(o instanceof org.awiki.kamikaze.summit.domain.Source) {
           sources.add( ((org.awiki.kamikaze.summit.domain.Source)o).getSource() );  
         }
@@ -29,8 +29,8 @@ public class SetSourceToListStringConverter  implements CustomConverter {
       return sources;
     }
     else if (src instanceof java.util.List<?>) {
-      Set<Source> sourceDomains = new HashSet<Source>(  ((List)src).size()  );
-      for(Object o : (List) src) {
+      Set<Source> sourceDomains = new HashSet<Source>(  ((List<?>)src).size()  );
+      for(Object o : (List<?>) src) {
         if(o instanceof String) {
           sourceDomains.add( (Source) o );
         }
