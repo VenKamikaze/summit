@@ -2,6 +2,7 @@ package org.awiki.kamikaze.summit.domain;
 // Generated Oct 31, 2013 9:11:16 PM by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -9,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -33,7 +36,9 @@ public class Field implements java.io.Serializable
   private CodeFieldSourceType codeFieldSourceTypeBySourceType;
   private CodeFieldType       codeFieldType;
   private CodeFieldSourceType codeFieldSourceTypeByDefaultValueType;
-  private String              source;
+  
+  private Set<Source>              source;
+  
   private String              defaultValue;
   private String              notes;
   private Set<RegionField>    regionFields = new HashSet<RegionField>(0);
@@ -44,7 +49,7 @@ public class Field implements java.io.Serializable
 
   public Field(long id, CodeFieldSourceType codeFieldSourceTypeBySourceType,
       CodeFieldType codeFieldType,
-      CodeFieldSourceType codeFieldSourceTypeByDefaultValueType, String source)
+      CodeFieldSourceType codeFieldSourceTypeByDefaultValueType, Set<Source> source)
   {
     this.id = id;
     this.codeFieldSourceTypeBySourceType = codeFieldSourceTypeBySourceType;
@@ -55,7 +60,7 @@ public class Field implements java.io.Serializable
 
   public Field(long id, CodeFieldSourceType codeFieldSourceTypeBySourceType,
       CodeFieldType codeFieldType,
-      CodeFieldSourceType codeFieldSourceTypeByDefaultValueType, String source,
+      CodeFieldSourceType codeFieldSourceTypeByDefaultValueType, Set<Source> source,
       String defaultValue, String notes, Set<RegionField> regionFields)
   {
     this.id = id;
@@ -118,13 +123,14 @@ public class Field implements java.io.Serializable
     this.codeFieldSourceTypeByDefaultValueType = codeFieldSourceTypeByDefaultValueType;
   }
 
-  @Column(name = "source", nullable = false, length = 10000)
-  public String getSource()
+  @ManyToMany
+  @JoinTable(name="FIELD_SOURCE")
+  public Set<Source> getSource()
   {
     return this.source;
   }
 
-  public void setSource(String source)
+  public void setSource(Set<Source> source)
   {
     this.source = source;
   }

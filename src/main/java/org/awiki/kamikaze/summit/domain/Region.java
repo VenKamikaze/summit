@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -34,7 +36,9 @@ public class Region implements java.io.Serializable
   private CodeRegionPosition codeRegionPosition;
   private CodeRegionType     codeRegionType;
   private String             name;
-  private String             source;
+  
+  private Set<Source>        source;
+  
   private Set<PageRegion>    pageRegions  = new HashSet<PageRegion>(0);
   private Set<RegionField>   regionFields = new HashSet<RegionField>(0);
 
@@ -49,7 +53,7 @@ public class Region implements java.io.Serializable
   }
 
   public Region(long id, CodeRegionPosition codeRegionPosition,
-      CodeRegionType codeRegionType, String name, final String source, Set<PageRegion> pageRegions,
+      CodeRegionType codeRegionType, String name, final Set<Source> source, Set<PageRegion> pageRegions,
       Set<RegionField> regionFields)
   {
     this.id = id;
@@ -108,14 +112,17 @@ public class Region implements java.io.Serializable
     this.name = name;
   }
 
-  public String getSource() {
+  @ManyToMany
+  @JoinTable(name="REGION_SOURCE")
+  public Set<Source> getSource() {
     return source;
   }
 
-  public void setSource(String source) {
+  public void setSource(Set<Source> source) {
     this.source = source;
   }
 
+  
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "region")
   public Set<PageRegion> getPageRegions()
   {

@@ -1,15 +1,18 @@
 package org.awiki.kamikaze.summit.domain;
 // Generated Oct 31, 2013 9:11:16 PM by Hibernate Tools 3.4.0.CR1
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.awiki.kamikaze.summit.domain.codetable.CodeProcessingSrcType;
 import org.awiki.kamikaze.summit.domain.codetable.CodeProcessingType;
 
 /**
@@ -32,7 +35,8 @@ public class PageProcessing implements java.io.Serializable
   private Page                  page;
   private CodeProcessingType    codeProcessingType;    // e.g. clear session state, DML, redirect to another page
   private long                   processingNum;         // in which order this processing occurs.
-  private String                source;
+  
+  private Set<Source>        source;
 
   public PageProcessing()
   {
@@ -49,7 +53,7 @@ public class PageProcessing implements java.io.Serializable
 
   public PageProcessing(long id,
       Page page, CodeProcessingType codeProcessingType, long processingNum,
-      String source)
+      Set<Source> source)
   {
     this.id = id;
 //    this.codeProcessingSrcType = codeProcessingSrcType;
@@ -119,13 +123,14 @@ public class PageProcessing implements java.io.Serializable
     this.processingNum = processingNum;
   }
 
-  @Column(name = "source", length = 10000)
-  public String getSource()
+  @ManyToMany
+  @JoinTable(name="PAGE_PROCESSING_SOURCE")
+  public Set<Source> getSource()
   {
     return this.source;
   }
 
-  public void setSource(String source)
+  public void setSource(Set<Source> source)
   {
     this.source = source;
   }

@@ -106,20 +106,36 @@ create table APPLICATION_PAGE
 );
 
 
+-- e.g. actual source is stored in here
+create table SOURCE
+(
+  ID bigint primary key,
+  SOURCE character varying(32000)
+);
+
+
 -- e.g. the request processing objects on a page.
 create table PAGE_PROCESSING
 (
   ID bigint primary key,
   PAGE_ID bigint not null references PAGE(ID),
   PROCESSING_TYPE_CODE character varying(10) not null references CODE_PROCESSING_TYPE(CODE),
-  PROCESSING_NUM bigint not null,
-  SOURCE character varying(32000)
+  PROCESSING_NUM bigint not null
+  --SOURCE character varying(32000)
+);
+
+create table PAGE_PROCESSING_SOURCE
+(
+  ID bigint primary key,
+  PAGE_PROCESSING_ID bigint not null references PAGE_PROCESSING(ID),
+  SOURCE_ID bigint not null references SOURCE(ID)
 );
 
 -- e.g. each field in a region
 create table FIELD
 (
   ID bigint primary key,
+  NAME character varying(200),
   SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE),
   FIELD_TYPE_CODE character varying(10) references CODE_FIELD_TYPE(CODE),
   DEFAULT_SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE),
@@ -128,14 +144,30 @@ create table FIELD
   NOTES character varying(4000)
 );
 
+create table FIELD_SOURCE
+(
+  ID bigint primary key,
+  FIELD_ID bigint not null references FIELD(ID),
+  SOURCE_ID bigint not null references SOURCE(ID),
+  FLAG_DEFAULT_VALUE character varying(1)
+);
+
 -- Regions may be a report region, hence needing source.
 create table REGION
 (
   ID bigint primary key,
-  NAME character varying(200),
+  NAME character varying(1000),
   CODE_REGION_POSITION character varying(10) references CODE_REGION_POSITION(CODE),
   CODE_REGION_TYPE character varying(10) references CODE_REGION_TYPE(CODE),
-  SOURCE character varying(32000)
+  SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE)
+  --SOURCE character varying(32000)
+);
+
+create table REGION_SOURCE
+(
+  ID bigint primary key,
+  REGION_ID bigint not null references REGION(ID),
+  SOURCE_ID bigint not null references SOURCE(ID)
 );
 
 create table PAGE_REGION

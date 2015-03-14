@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class SqlDMLProcessorServiceImpl implements SourceProcessorService {
   
   @Autowired
-  JdbcTemplate jdbc;
+  private JdbcTemplate jdbc;
   
   @Override
   public boolean isResponsibleFor(String sourceType) {
@@ -24,13 +24,17 @@ public class SqlDMLProcessorServiceImpl implements SourceProcessorService {
   }
 
   @Override
-  public String executeSource(final String sql) {
-    int result = jdbc.update(sql);
-    return String.valueOf(result);
+  public String executeSource(final List<String> sqls) {
+    int changedRows = 0;
+    for(String sql : sqls) {
+      changedRows += jdbc.update(sql);
+    }
+    return String.valueOf(changedRows); 
   }
   
   @Override
-  public String querySource(final String sql) {
+  public String querySource(final List<String> sqls) {
+    /*
     List<String> results = jdbc.queryForList(sql, String.class);
     String result = "";
     for (String row: results)
@@ -38,5 +42,7 @@ public class SqlDMLProcessorServiceImpl implements SourceProcessorService {
       result += row;
     }
     return result;
+    */
+    return "evaluate if this makes sense here.";
   }
 }

@@ -10,13 +10,9 @@
     <wildcard>true</wildcard>
 
     <custom-converters> <!-- these are always bi-directional -->
-      <converter type="org.awiki.kamikaze.summit.util.YesNoEnumToBooleanConverter" >
-        <class-a>java.lang.Boolean</class-a>
-        <class-b>org.awiki.kamikaze.summit.util.YesNoEnum</class-b>
-      </converter>
-      <converter type="org.awiki.kamikaze.summit.util.YesNoEnumToStringConverter" >
-        <class-a>java.lang.String</class-a>
-        <class-b>org.awiki.kamikaze.summit.util.YesNoEnum</class-b>
+      <converter type="org.awiki.kamikaze.summit.util.converter.SetSourceToListStringConverter" >
+        <class-a>java.lang.Set</class-a>
+        <class-b>java.lang.List</class-b>
       </converter>
     </custom-converters>
 
