@@ -11,9 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SqlDDLProcessorServiceImpl implements SingularSourceProcessorService {
+public class BatchSqlDDLProcessorServiceImpl implements SingularSourceProcessorService {
 
-  private Logger log = Logger.getLogger(SqlDDLProcessorServiceImpl.class);
+  private Logger log = Logger.getLogger(BatchSqlDDLProcessorServiceImpl.class);
   
   @Autowired
   JdbcTemplate jdbc;
@@ -24,9 +24,11 @@ public class SqlDDLProcessorServiceImpl implements SingularSourceProcessorServic
   }
 
   @Override
-  public SourceProcessorResult executeSource(final String ddl) {
+  public SourceProcessorResult executeSource(final List<String> ddls) {
     try {
-      jdbc.execute(ddl);
+      for(String ddl : ddls) {
+        jdbc.execute(ddl);
+      }
     } 
     catch(DataAccessException e) {
       final String error = "Unable to execute DDL source type";
