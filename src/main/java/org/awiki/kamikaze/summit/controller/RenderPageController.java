@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * Handles requests for the application home page.
  */
 @Controller
-public class ControlPackController {
+public class RenderPageController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(ControlPackController.class);
+	private static final Logger logger = LoggerFactory.getLogger(RenderPageController.class);
 
 	@Autowired
 	PageRenderingService renderService;
-
 	
 	 /**
    * This renders the application pages to a String
+   * TODO FIXME obviously this needs to be improved greatly, but will do for testing.
    */
-  @RequestMapping(value = "/application/${applicationId}/${pageId}", method = RequestMethod.GET)
+  @RequestMapping(value = "/run/${applicationId}/${pageId}", method = RequestMethod.GET)
   public String view(@PathVariable String applicationId, @PathVariable String pageId) {
-    logger.info("Hit page /application/" + applicationId + "/" + pageId);
+    logger.info("Hit page /run/" + applicationId + "/" + pageId);
     return renderService.renderPageAsString(Long.parseLong(applicationId), Long.parseLong(pageId));
   }
   
