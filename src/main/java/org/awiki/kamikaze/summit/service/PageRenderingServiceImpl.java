@@ -33,7 +33,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   private ApplicationPageRepository appPageStore;
   
   @Autowired
-  private ProxySourceProcessorServiceImpl sourceProcessors;
+  private ProxySourceProcessorService sourceProcessors;
   
   @Autowired
   private Mapper mapper;

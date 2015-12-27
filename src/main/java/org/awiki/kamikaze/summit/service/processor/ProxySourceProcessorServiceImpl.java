@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProxySourceProcessorServiceImpl {
+public class ProxySourceProcessorServiceImpl implements ProxySourceProcessorService {
 
   private Logger log = Logger.getLogger(ProxySourceProcessorServiceImpl.class);
   
