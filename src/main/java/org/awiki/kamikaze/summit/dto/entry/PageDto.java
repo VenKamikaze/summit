@@ -3,11 +3,6 @@ package org.awiki.kamikaze.summit.dto.entry;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.awiki.kamikaze.summit.domain.Template;
-import org.awiki.kamikaze.summit.dto.entry.ApplicationPageDto;
-import org.awiki.kamikaze.summit.dto.entry.PageProcessingDto;
-import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
-
 public class PageDto {
   
   private Long                 id;

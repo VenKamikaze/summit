@@ -2,7 +2,6 @@ package org.awiki.kamikaze.summit.domain;
 // Generated Oct 31, 2013 9:11:16 PM by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;

@@ -6,7 +6,7 @@ import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
 
 public interface BatchSourceProcessorService extends SourceProcessorService {
   public static final String BUILT_IN_SQL_DML_BATCH_TYPE = "text/plain; sql; dml; batch";
-  public static final String BUILT_IN_SQL_DDL_TYPE = "text/plain; sql; ddl";
+  public static final String BUILT_IN_SQL_DDL_BATCH_TYPE = "text/plain; sql; ddl; batch";
   public static final String BUILT_IN_SQL_STORED_PROC = "text/plain; sql; code";
   
   //public static final String BUILT_IN_PYTHON2_TYPE = "text/plain; python2";

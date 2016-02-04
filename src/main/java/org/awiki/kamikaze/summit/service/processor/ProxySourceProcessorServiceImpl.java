@@ -6,15 +6,15 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.xml.crypto.NoSuchMechanismException;
 
-import org.apache.log4j.Logger;
-import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProxySourceProcessorServiceImpl implements ProxySourceProcessorService {
 
-  private Logger log = Logger.getLogger(ProxySourceProcessorServiceImpl.class);
+  private Logger log = LoggerFactory.getLogger(ProxySourceProcessorServiceImpl.class);
   
   @Autowired
   List<SingularSourceProcessorService> singularSourceServices; // TODO: review, may not make sense to split these

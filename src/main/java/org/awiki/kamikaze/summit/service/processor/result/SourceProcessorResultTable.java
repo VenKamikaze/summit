@@ -100,6 +100,8 @@ public class SourceProcessorResultTable
   public class Row {
     private List<Cell> cells = new ArrayList<>();
 
+    public Row() { }
+    
     public Row(List<Cell> cells)
     {
       this.cells = cells;

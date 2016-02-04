@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
 import org.awiki.kamikaze.summit.dto.entry.FieldDto;
 import org.awiki.kamikaze.summit.dto.entry.PageDto;
@@ -14,7 +15,7 @@ import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.entry.RegionDto;
 import org.awiki.kamikaze.summit.dto.entry.RegionFieldDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
-import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorServiceImpl;
+import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.dozer.Mapper;
@@ -25,7 +26,7 @@ import org.springframework.util.StringUtils;
 @Service
 public class PageRenderingServiceImpl implements PageRenderingService {
   
-  private static final Logger log = Logger.getLogger(PageRenderingServiceImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(PageRenderingServiceImpl.class);
   
   private static final String REGION_TYPE_REPORT = "Report";
   
@@ -138,8 +139,8 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       FieldDto.PostProcessedFieldContentDto processedContent = fieldDto.new PostProcessedFieldContentDto();
       FieldDto.PostProcessedFieldContentDto processedDefaultContent = fieldDto.new PostProcessedFieldContentDto();
       SingularSourceProcessorService processor = (SingularSourceProcessorService) sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
-      processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource()).getResultValue());
-      processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() ).getResultValue() );
+      processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource(), null).getResultValue()); // TODO FIXME handle bind vars
+      processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() , null ).getResultValue() );  // TODO FIXME handle bind vars
       fieldDto.setPostProcessedSource(processedContent);
       fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
       
