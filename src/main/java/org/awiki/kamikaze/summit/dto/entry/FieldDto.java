@@ -1,7 +1,6 @@
 package org.awiki.kamikaze.summit.dto.entry;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.validation.constraints.Size;

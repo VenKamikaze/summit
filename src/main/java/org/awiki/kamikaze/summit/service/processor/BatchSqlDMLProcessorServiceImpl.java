@@ -1,7 +1,12 @@
 package org.awiki.kamikaze.summit.service.processor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.NotImplementedException;
+import org.awiki.kamikaze.summit.service.processor.BatchSourceProcessorService;
+import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -13,37 +18,28 @@ import org.springframework.stereotype.Service;
  * @author msaun
  */
 @Service
-public class BatchSqlDMLProcessorServiceImpl implements SingularSourceProcessorService {
+public class BatchSqlDMLProcessorServiceImpl implements BatchSourceProcessorService {
   
   @Autowired
   private JdbcTemplate jdbc;
-  
-  @Override
-  public boolean isResponsibleFor(String sourceType) {
-    return (BUILT_IN_SQL_DML_TYPE.equals(sourceType));
-  }
 
   @Override
-  public SourceProcessorResult executeSource(final List<String> sqls) {
+  public SourceProcessorResult executeBatch(final List<String> sqls) {
+    SourceProcessorResult result = new SourceProcessorResult();
     int changedRows = 0;
     for(String sql : sqls) {
       changedRows += jdbc.update(sql);
     }
-    return String.valueOf(changedRows); 
+    result.setRowsAffected(changedRows);
+    result.setReturnCode(SourceProcessorResult.STANDARD_SUCCESS_CODE);
+    result.setOutputMessage(SourceProcessorResult.STANDARD_SUCCESS_MESSAGE);
+    return result; 
   }
-  
+
   @Override
-  public SourceProcessorResult querySource(final String sqls) {
-    /*
-    List<String> results = jdbc.queryForList(sql, String.class);
-    String result = "";
-    for (String row: results)
-    {
-      result += row;
-    }
-    return result;
-    */
-    //return "evaluate if this makes sense here.";
-    throw new NotImplementedException("You cannot batch query.");
+  public List<String> getResponsibilities()
+  {
+    return new ArrayList<String>(Arrays.asList(BatchSourceProcessorService.BUILT_IN_SQL_DML_BATCH_TYPE));
   }
+
 }
