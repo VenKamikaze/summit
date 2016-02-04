@@ -5,8 +5,13 @@ import java.util.List;
 
 public class SourceProcessorResultTable
 {
+  /*
+   * This class only knows about the list of rows it contains.
+   * Each Row knows about it's Cells
+   * Each Cell knows it's value, parent row and a parent Column
+   */
+  
   private Long pages;
-  private Long count;
   
   private List<Row> rows = new ArrayList<Row>();
   
@@ -20,14 +25,9 @@ public class SourceProcessorResultTable
     this.pages = pages;
   }
 
-  public Long getCount()
+  public int getCount()
   {
-    return count;
-  }
-
-  public void setCount(Long count)
-  {
-    this.count = count;
+    return this.rows.size();
   }
 
   public List<Row> getRows()
