@@ -132,6 +132,7 @@ create table PAGE_PROCESSING_SOURCE
 );
 
 -- e.g. each field in a region
+-- Seems like this should not need SOURCE as a field since it joins off with FIELD_SOURCE?
 create table FIELD
 (
   ID bigint primary key,
