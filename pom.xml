@@ -358,7 +358,7 @@
         <configuration>
           <url>http://localhost:8080/manager/text</url>
           <server>ms-tomcat7</server>
-          <path>/controlpack</path>
+          <path>/summit</path>
         </configuration>
       </plugin>
 
