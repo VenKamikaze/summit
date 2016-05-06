@@ -19,8 +19,8 @@
             <property name="hibernate.cache.use_second_level_cache" value="false" />
             <property name="hibernate.cache.use_query_cache" value="false" />
             <property name="hibernate.generate_statistics" value="false" />
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/asthma_nt_apps"/>
-            <property name="javax.persistence.jdbc.user" value="asthma_nt"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/summit"/>
+            <property name="javax.persistence.jdbc.user" value="summit"/>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <!--            <property name="hibernate.cache.region.factory_class" value="net.sf.ehcache.hibernate.EhCacheRegionFactory" /> -->
             <!--       net.sf.ehcache.hibernate.EhCacheRegionFactory

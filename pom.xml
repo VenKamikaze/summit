@@ -357,7 +357,7 @@
         <version>2.2</version>
         <configuration>
           <url>http://localhost:8080/manager/text</url>
-          <server>ms-tomcat7</server>
+          <server>tomcat7</server>
           <path>/summit</path>
         </configuration>
       </plugin>
