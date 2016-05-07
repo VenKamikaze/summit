@@ -107,4 +107,10 @@ public class Template  implements java.io.Serializable {
     return this.pages;
   }
 
+  public void setPages(Set<Page> pages)
+  {
+    this.pages = pages;
+  }
+
+  
 }

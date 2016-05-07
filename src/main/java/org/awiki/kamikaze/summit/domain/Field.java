@@ -38,7 +38,8 @@ public class Field implements java.io.Serializable
   
   private Set<Source>              source;
   
-  private String              defaultValue;
+  // TODO: change to ManyToMany 
+  //private String              defaultValue;
   private String              notes;
   private Set<RegionField>    regionFields = new HashSet<RegionField>(0);
 
@@ -60,14 +61,14 @@ public class Field implements java.io.Serializable
   public Field(long id, CodeFieldSourceType codeFieldSourceTypeBySourceType,
       CodeFieldType codeFieldType,
       CodeFieldSourceType codeFieldSourceTypeByDefaultValueType, Set<Source> source,
-      String defaultValue, String notes, Set<RegionField> regionFields)
+      /*String defaultValue,*/ String notes, Set<RegionField> regionFields)
   {
     this.id = id;
     this.codeFieldSourceTypeBySourceType = codeFieldSourceTypeBySourceType;
     this.codeFieldType = codeFieldType;
     this.codeFieldSourceTypeByDefaultValueType = codeFieldSourceTypeByDefaultValueType;
     this.source = source;
-    this.defaultValue = defaultValue;
+    //this.defaultValue = defaultValue;
     this.notes = notes;
     this.regionFields = regionFields;
   }
@@ -85,7 +86,7 @@ public class Field implements java.io.Serializable
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "source_type", nullable = false)
+  @JoinColumn(name = "source_type_code", nullable = false)
   public CodeFieldSourceType getCodeFieldSourceTypeBySourceType()
   {
     return this.codeFieldSourceTypeBySourceType;
@@ -98,7 +99,7 @@ public class Field implements java.io.Serializable
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "type", nullable = false)
+  @JoinColumn(name = "field_type_code", nullable = false)
   public CodeFieldType getCodeFieldType()
   {
     return this.codeFieldType;
@@ -110,7 +111,7 @@ public class Field implements java.io.Serializable
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "default_value_type", nullable = false)
+  @JoinColumn(name = "default_source_type_code", nullable = false)
   public CodeFieldSourceType getCodeFieldSourceTypeByDefaultValueType()
   {
     return this.codeFieldSourceTypeByDefaultValueType;
@@ -121,9 +122,11 @@ public class Field implements java.io.Serializable
   {
     this.codeFieldSourceTypeByDefaultValueType = codeFieldSourceTypeByDefaultValueType;
   }
-
+  
   @ManyToMany
-  @JoinTable(name="FIELD_SOURCE")
+  @JoinTable(name="FIELD_SOURCE",
+             joinColumns = { @JoinColumn(name="FIELD_ID", referencedColumnName="ID") },
+             inverseJoinColumns = { @JoinColumn(name="SOURCE_ID", referencedColumnName="ID") })
   public Set<Source> getSource()
   {
     return this.source;
@@ -134,6 +137,7 @@ public class Field implements java.io.Serializable
     this.source = source;
   }
 
+  /*
   @Column(name = "default_value", length = 10000)
   public String getDefaultValue()
   {
@@ -144,6 +148,7 @@ public class Field implements java.io.Serializable
   {
     this.defaultValue = defaultValue;
   }
+  */
 
   @Column(name = "notes", length = 4000)
   public String getNotes()
