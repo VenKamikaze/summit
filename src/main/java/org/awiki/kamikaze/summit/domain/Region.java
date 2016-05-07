@@ -78,7 +78,7 @@ public class Region implements java.io.Serializable
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "region_position")
+  @JoinColumn(name = "code_region_position")
   public CodeRegionPosition getCodeRegionPosition()
   {
     return this.codeRegionPosition;
@@ -90,7 +90,7 @@ public class Region implements java.io.Serializable
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "region_type")
+  @JoinColumn(name = "code_region_type")
   public CodeRegionType getCodeRegionType()
   {
     return this.codeRegionType;
@@ -113,7 +113,9 @@ public class Region implements java.io.Serializable
   }
 
   @ManyToMany
-  @JoinTable(name="REGION_SOURCE")
+  @JoinTable(name="REGION_SOURCE",
+          joinColumns = { @JoinColumn(name="REGION_ID", referencedColumnName="ID") },
+          inverseJoinColumns = { @JoinColumn(name="SOURCE_ID", referencedColumnName="ID") })
   public Set<Source> getSource() {
     return source;
   }

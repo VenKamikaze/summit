@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -25,7 +26,7 @@ public class CodeFieldSourceType implements java.io.Serializable
   
   private String          code;
   private String          description;
-  private Integer         sortOrder;
+  private Long         sortOrder;
   private CodeSourceType  codeSourceProcessor;  // CODE_SOURCE_CODE.CODE
   //private Set<Field> fieldsForDefaultValueType = new HashSet<Field>(0);
   //private Set<Field> fieldsForSourceType       = new HashSet<Field>(0);
@@ -41,7 +42,7 @@ public class CodeFieldSourceType implements java.io.Serializable
   }
 
   public CodeFieldSourceType(String code, String description,
-      Integer sortOrder, CodeSourceType codeSourceProcessor)
+          Long sortOrder, CodeSourceType codeSourceProcessor)
   {
     this.code = code;
     this.description = description;
@@ -75,23 +76,23 @@ public class CodeFieldSourceType implements java.io.Serializable
   }
 
   @Column(name = "sort_order")
-  public Integer getSortOrder()
+  public Long getSortOrder()
   {
     return this.sortOrder;
   }
 
-  public void setSortOrder(Integer sortOrder)
+  public void setSortOrder(Long sortOrder)
   {
     this.sortOrder = sortOrder;
   }
 
   @ManyToOne(fetch=FetchType.EAGER)
-  @Column(name = "code_source_processor")
-  public CodeSourceType getCodeSourceProcessor() {
+  @JoinColumn(name = "source_type_code")
+  public CodeSourceType getCodeSourceType() {
     return codeSourceProcessor;
   }
 
-  public void setCodeSourceProcessor(CodeSourceType codeSourceType) {
+  public void setCodeSourceType(CodeSourceType codeSourceType) {
     this.codeSourceProcessor = codeSourceType;
   }
 

@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -83,12 +84,12 @@ public class CodeRegionType implements java.io.Serializable
   }
   
   @ManyToOne(fetch=FetchType.EAGER)
-  @Column(name = "source_type_code")
+  @JoinColumn(name = "source_type_code")
   public CodeSourceType getCodeSourceType() {
     return codeSourceType;
   }
 
-  public void setCodeSourceProcessor(CodeSourceType codeSourceType) {
+  public void setCodeSourceType(CodeSourceType codeSourceType) {
     this.codeSourceType = codeSourceType;
   }
   

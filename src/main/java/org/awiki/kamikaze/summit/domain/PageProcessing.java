@@ -101,7 +101,7 @@ public class PageProcessing implements java.io.Serializable
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "type", nullable = false)
+  @JoinColumn(name = "processing_type_code", nullable = false)
   public CodeProcessingType getCodeProcessingType()
   {
     return this.codeProcessingType;
@@ -124,7 +124,9 @@ public class PageProcessing implements java.io.Serializable
   }
 
   @ManyToMany
-  @JoinTable(name="PAGE_PROCESSING_SOURCE")
+  @JoinTable(name="PAGE_PROCESSING_SOURCE",
+          joinColumns = { @JoinColumn(name="PAGE_PROCESSING_ID", referencedColumnName="ID") },
+          inverseJoinColumns = { @JoinColumn(name="SOURCE_ID", referencedColumnName="ID") })
   public Set<Source> getSource()
   {
     return this.source;

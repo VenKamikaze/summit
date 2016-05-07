@@ -10,14 +10,16 @@
     <java-version>1.7</java-version>
     <org.springframework-version>4.2.5.RELEASE</org.springframework-version>
     <spring.version>${org.springframework-version}</spring.version>
-    <spring-jpa.version>1.9.2.RELEASE</spring-jpa.version>
+    <spring-jpa.version>1.10.1.RELEASE</spring-jpa.version>
+    <!-- <spring-jpa.version>1.9.2.RELEASE</spring-jpa.version> -->
     <!--    <spring-security.version>3.2.4.RELEASE</spring-security.version> -->
     <spring-security.version>4.1.0.RELEASE</spring-security.version>
+    <!-- <hibernate-orm.version>4.3.5.Final</hibernate-orm.version> -->
     <hibernate-orm.version>5.0.7.Final</hibernate-orm.version>
-    <!--		<hibernate-orm.version>3.6.10.Final</hibernate-orm.version> -->
     <org.aspectj-version>1.6.10</org.aspectj-version>
     <org.slf4j-version>1.7.2</org.slf4j-version>
     <tiles.version>2.2.2</tiles.version>
+    <jadira.version>5.0.0.GA</jadira.version>
   </properties>
   <dependencies>
     <!-- Spring -->
@@ -310,7 +312,7 @@
     <dependency>
       <groupId>org.jadira.usertype</groupId>
       <artifactId>usertype.core</artifactId>
-      <version>3.2.0.GA</version>
+      <version>${jadira.version}</version>
     </dependency>
 
     <!-- Test -->

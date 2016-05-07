@@ -21,7 +21,7 @@ public class CodeFieldType implements java.io.Serializable
   
   private String     code;
   private String     description;
-  private Integer    sortOrder;
+  private Long       sortOrder;
   //private Set<Field> fields = new HashSet<Field>(0);
 
   public CodeFieldType()
@@ -34,7 +34,7 @@ public class CodeFieldType implements java.io.Serializable
     this.description = description;
   }
 
-  public CodeFieldType(String code, String description, Integer sortOrder
+  public CodeFieldType(String code, String description, Long sortOrder
       /*,Set<Field> fields*/)
   {
     this.code = code;
@@ -67,12 +67,12 @@ public class CodeFieldType implements java.io.Serializable
   }
 
   @Column(name = "sort_order")
-  public Integer getSortOrder()
+  public Long getSortOrder()
   {
     return this.sortOrder;
   }
 
-  public void setSortOrder(Integer sortOrder)
+  public void setSortOrder(Long sortOrder)
   {
     this.sortOrder = sortOrder;
   }
