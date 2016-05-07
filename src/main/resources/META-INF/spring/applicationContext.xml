@@ -44,11 +44,12 @@
         The most commonly used annotation is @Autowired, which instructs Spring to
         dependency inject an object into your class.
     -->
+    <jpa:repositories base-package="org.awiki.kamikaze.summit.repository" repository-impl-postfix="CustomImpl" />
+
     <context:component-scan base-package="org.awiki.kamikaze.summit">
         <context:exclude-filter expression="org.springframework.stereotype.Controller" type="annotation"/>
     </context:component-scan>
 
-    <jpa:repositories base-package="org.awiki.kamikaze.summit.repository" repository-impl-postfix="CustomImpl" />
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${database.driverClassName}" />
