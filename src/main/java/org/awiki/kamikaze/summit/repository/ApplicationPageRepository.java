@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ApplicationPageRepository extends JpaRepository<ApplicationPage, Long> {
 
-  public List<ApplicationPage> findAllOrderByPageNum();
+  public List<ApplicationPage> findAllByOrderByPageNum();
   
   public ApplicationPage findByApplicationIdAndPageId(long applicationId, long pageid);
 }
