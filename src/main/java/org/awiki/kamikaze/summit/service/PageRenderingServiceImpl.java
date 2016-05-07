@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
 import org.awiki.kamikaze.summit.dto.entry.FieldDto;
 import org.awiki.kamikaze.summit.dto.entry.PageDto;
@@ -14,8 +15,8 @@ import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.entry.RegionDto;
 import org.awiki.kamikaze.summit.dto.entry.RegionFieldDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
-import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorServiceImpl;
-import org.awiki.kamikaze.summit.service.processor.SourceProcessorService;
+import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
+import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import org.springframework.util.StringUtils;
 @Service
 public class PageRenderingServiceImpl implements PageRenderingService {
   
-  private static final Logger log = Logger.getLogger(PageRenderingServiceImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(PageRenderingServiceImpl.class);
   
   private static final String REGION_TYPE_REPORT = "Report";
   
@@ -33,7 +34,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   private ApplicationPageRepository appPageStore;
   
   @Autowired
-  private ProxySourceProcessorServiceImpl sourceProcessors;
+  private ProxySourceProcessorService sourceProcessors;
   
   @Autowired
   private Mapper mapper;
@@ -45,6 +46,10 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   }
 
   @Override
+  /**
+   * Overarching method that begins the page rendering
+   * Maps the page domain to the dto, .... nothing else yet implemented!
+   */
   public PageDto renderPage(long applicationId, long pageId) {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     PageDto pageDto = mapper.map(appPage.getPage(), PageDto.class);
@@ -54,6 +59,16 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     return pageDto;
   }
   
+  /**
+   * Overarching method that handles the page rendering
+   * This one is mainly used for testing, renders the entire page and all it's contents to a String
+   * 1. Maps Page domain and linked objects to a PageDto
+   * 2. Calls ProcessTemplateForRender, which pulls down the template, and begins processing its components
+   * (in processTemplateForRender) 3. (Should) pulls header, body and footer and processes these components
+   * (in processBodyForRender) 4. Passes unprocessed region content to be processed, in order of sort order
+   * (in processRegionsForRender) 5. Processes either the region source (ie. report regions) or calls method to process all field content
+   * (in processFieldsForRender) 6. Processes each field source into processed content, ordered by sort order
+   */
   public String renderPageAsString(long applicationId, long pageId) {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     PageDto pageDto = mapper.map(appPage.getPage(), PageDto.class);
@@ -103,6 +118,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       RegionDto regionDto = pageRegionDto.getRegionDto();
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) )
       {
+        // use a ReportProcessorService!
         // sb.append(
         // process the source of the region first.
         // )
@@ -122,9 +138,9 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       final FieldDto fieldDto = regionFieldDto.getField();
       FieldDto.PostProcessedFieldContentDto processedContent = fieldDto.new PostProcessedFieldContentDto();
       FieldDto.PostProcessedFieldContentDto processedDefaultContent = fieldDto.new PostProcessedFieldContentDto();
-      SourceProcessorService processor = sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
-      processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource()));
-      processedDefaultContent.setPostProcessedContent(processor.querySource( new ArrayList<String>() {{ add(fieldDto.getDefaultValueSource()); }} ) );
+      SingularSourceProcessorService processor = (SingularSourceProcessorService) sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
+      processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource(), null).getResultValue()); // TODO FIXME handle bind vars
+      processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() , null ).getResultValue() );  // TODO FIXME handle bind vars
       fieldDto.setPostProcessedSource(processedContent);
       fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
       

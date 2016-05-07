@@ -1,7 +1,6 @@
 package org.awiki.kamikaze.summit.dto.entry;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.validation.constraints.Size;
@@ -20,7 +19,7 @@ public class FieldDto {
   @NotBlank(message = "Must not be empty.")
   @Size(max = 10)
   private String                codeFieldSourceType;  // e.g. HTML, SQL, JSP
-  private List<String>          source; // actual SQL/HTML/JSP code
+  private String                source; // actual SQL/HTML/JSP code
   private String                codeFieldDefaultValueSourceType; // e.g. HTML, SQL, JSP
   private String                defaultValueSource; // actual SQL/HTML/JSP code
   private String                notes;
@@ -47,10 +46,10 @@ public class FieldDto {
   public void setCodeFieldSourceType(String codeFieldSourceType) {
     this.codeFieldSourceType = codeFieldSourceType;
   }
-  public List<String> getSource() {
+  public String getSource() {
     return source;
   }
-  public void setSource(List<String> source) {
+  public void setSource(String source) {
     this.source = source;
   }
   public String getCodeFieldDefaultValueSourceType() {

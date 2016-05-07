@@ -15,8 +15,8 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Table(name = "application_page", schema = "public", uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "application_num", "page_num" }),
-    @UniqueConstraint(columnNames = "application_num") })
+    @UniqueConstraint(columnNames = { "application_id", "page_num" }),
+    @UniqueConstraint(columnNames = "application_id") })
 public class ApplicationPage implements java.io.Serializable
 {
 
@@ -28,7 +28,6 @@ public class ApplicationPage implements java.io.Serializable
   private long         id;
   private Page        page;
   private Application application;
-  //private long         applicationNum;
   private long         pageNum;
 
   public ApplicationPage()
@@ -36,13 +35,11 @@ public class ApplicationPage implements java.io.Serializable
   }
 
   public ApplicationPage(long id, Page page, Application application,
-      //long applicationNum,
       long pageNum)
   {
     this.id = id;
     this.page = page;
     this.application = application;
-    //this.applicationNum = applicationNum;
     this.pageNum = pageNum;
   }
 
@@ -82,17 +79,6 @@ public class ApplicationPage implements java.io.Serializable
     this.application = application;
   }
 
-/*  @Column(name = "application_num", unique = true, nullable = false)
-  public long getApplicationNum()
-  {
-    return this.applicationNum;
-  }
-
-  public void setApplicationNum(long applicationNum)
-  {
-    this.applicationNum = applicationNum;
-  }
-*/
   @Column(name = "page_num", nullable = false)
   public long getPageNum()
   {

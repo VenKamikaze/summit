@@ -1,8 +1,9 @@
 package org.awiki.kamikaze.summit.dto.entry;
 
-
-
 import org.hibernate.validator.constraints.NotBlank;
+
+
+
 
 public class ApplicationPageDto 
 {

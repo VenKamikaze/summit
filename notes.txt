@@ -14,3 +14,13 @@
 
 
 Passes should be done in the above order, to stop people inserting textual values that look like replacement region strings and them being replaced by the parser.
+
+
+* Reports?
+** Summit developer enters in a query
+** Query should be run when saved to pull out resulting columns
+** Manipulation of column names can be handled by the summit developer at SQL level, saves us needing to manipulate the columns etc after query has been produced
+** Standard page produced with table containing results.
+** Down the track we can look at adding virtual columns etc
+
+Due to design, reports should be handled by the same process as standard page render. The only difference is the type of Region selected... this implies the region render service will need to have some conditional logic when a 'report type' vs a 'form type' region is selected.

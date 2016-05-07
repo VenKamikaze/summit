@@ -1,9 +1,19 @@
 package org.awiki.kamikaze.summit.service.processor;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
+import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,27 +23,33 @@ import org.springframework.stereotype.Service;
  * @author msaun
  */
 @Service
-public class SqlDMLProcessorServiceImpl implements SourceProcessorService {
+public class SqlDMLProcessorServiceImpl implements SingularSourceProcessorService {
   
   @Autowired
-  private JdbcTemplate jdbc;
+  private NamedParameterJdbcTemplate jdbc;
   
   @Override
-  public boolean isResponsibleFor(String sourceType) {
-    return (BUILT_IN_SQL_DML_TYPE.equals(sourceType));
-  }
-
-  @Override
-  public String executeSource(final List<String> sqls) {
-    int changedRows = 0;
-    for(String sql : sqls) {
-      changedRows += jdbc.update(sql);
-    }
-    return String.valueOf(changedRows); 
+  public List<String> getResponsibilities()
+  {
+    return new ArrayList<String>(Arrays.asList(SingularSourceProcessorService.BUILT_IN_SQL_DML_TYPE));
   }
   
   @Override
-  public String querySource(final List<String> sqls) {
+  public SourceProcessorResult executeSource(final String sql, List<BindVar<Types>> bindVars) {
+    SqlParameterSource params = mapBindVars(bindVars);
+    int changedRows = jdbc.update(sql,params);
+    return new SourceProcessorResult((long) changedRows, SourceProcessorResult.STANDARD_SUCCESS_CODE, SourceProcessorResult.STANDARD_SUCCESS_MESSAGE, null);
+  }
+  
+  @Override
+  public SourceProcessorResult querySource(final String sql, List<BindVar<Types>> bindVars) {
+    SqlParameterSource params = mapBindVars(bindVars);
+    
+    SourceProcessorResult result = new SourceProcessorResult();
+    result.setResultValue(jdbc.queryForObject(sql, params, String.class));
+    result.setReturnCode(SourceProcessorResult.STANDARD_SUCCESS_CODE);
+    result.setOutputMessage(SourceProcessorResult.STANDARD_SUCCESS_MESSAGE);
+    return result;
     /*
     List<String> results = jdbc.queryForList(sql, String.class);
     String result = "";
@@ -43,6 +59,16 @@ public class SqlDMLProcessorServiceImpl implements SourceProcessorService {
     }
     return result;
     */
-    return "evaluate if this makes sense here.";
+    //return "evaluate if this makes sense here.";
+  }
+
+  protected SqlParameterSource mapBindVars(List<BindVar<Types>> bindVars)
+  {
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    for(BindVar var : bindVars)
+    {
+      params.addValue(var.getBindParameter(), var.getValue());
+    }
+    return params;
   }
 }

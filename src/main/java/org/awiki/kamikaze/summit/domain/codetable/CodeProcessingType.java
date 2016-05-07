@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -23,7 +24,7 @@ public class CodeProcessingType implements java.io.Serializable
   
   private String              code;
   private String              description;
-  private Integer             sortOrder;
+  private Long                sortOrder;
   private CodeSourceType      codeSourceType;
   
   //private Set<PageProcessing> pageProcessings = new HashSet<PageProcessing>(0);
@@ -39,7 +40,7 @@ public class CodeProcessingType implements java.io.Serializable
     this.description = description;
   }
 
-  public CodeProcessingType(String code, String description, Integer sortOrder, CodeSourceType sourceTypes
+  public CodeProcessingType(String code, String description, Long sortOrder, CodeSourceType sourceTypes
       /*Set<PageProcessing> pageProcessings*/)
   {
     this.code = code;
@@ -73,23 +74,23 @@ public class CodeProcessingType implements java.io.Serializable
   }
 
   @Column(name = "sort_order")
-  public Integer getSortOrder()
+  public Long getSortOrder()
   {
     return this.sortOrder;
   }
 
-  public void setSortOrder(Integer sortOrder)
+  public void setSortOrder(Long sortOrder)
   {
     this.sortOrder = sortOrder;
   }
   
   @ManyToOne(fetch=FetchType.EAGER)
-  @Column(name = "source_type_code")
+  @JoinColumn(name = "source_type_code")
   public CodeSourceType getCodeSourceType() {
     return codeSourceType;
   }
 
-  public void setCodeSourceProcessor(CodeSourceType codeSourceType) {
+  public void setCodeSourceType(CodeSourceType codeSourceType) {
     this.codeSourceType = codeSourceType;
   }
   
