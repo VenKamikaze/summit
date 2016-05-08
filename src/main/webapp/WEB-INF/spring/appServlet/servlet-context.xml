@@ -38,15 +38,15 @@
 	    </beans:property>
 	</beans:bean>
 	
-	<context:component-scan base-package="org.awiki.kamikaze.asthmacontrolpack" use-default-filters="false">
-          <context:include-filter expression="org.springframework.stereotype.Controller" type="annotation"/>
-          <context:include-filter expression="org.springframework.stereotype.Component" type="annotation"/>
-        </context:component-scan>
+	<context:component-scan base-package="org.awiki.kamikaze.summit" use-default-filters="false">
+    <context:include-filter expression="org.springframework.stereotype.Controller" type="annotation"/>
+    <context:include-filter expression="org.springframework.stereotype.Component" type="annotation"/>
+  </context:component-scan>
 
-        <beans:bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-          <beans:property name="basename">
-            <beans:value>META-INF/spring/messages</beans:value> 
-          </beans:property>
-        </beans:bean>
+  <beans:bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+    <beans:property name="basename">
+      <beans:value>META-INF/spring/messages</beans:value> 
+    </beans:property>
+  </beans:bean>
 	
 </beans:beans>

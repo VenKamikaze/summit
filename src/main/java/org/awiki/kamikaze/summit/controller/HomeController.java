@@ -33,7 +33,7 @@ public class HomeController {
 		
 		model.addAttribute("serverTime", formattedDate );
 		 
-		return "basic";  // basic is the name of a tiles definition.
+		return "test";  // basic is the name of a tiles definition.
 	}
 	
 }
