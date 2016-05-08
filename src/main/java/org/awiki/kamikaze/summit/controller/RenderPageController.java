@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Handles requests for the application home page.
@@ -25,6 +26,7 @@ public class RenderPageController {
    * TODO FIXME obviously this needs to be improved greatly, but will do for testing.
    */
   @RequestMapping(value = "/run/{applicationId}/{pageId}", method = RequestMethod.GET)
+  @ResponseBody
   public String view(@PathVariable String applicationId, @PathVariable String pageId) {
     logger.info("Hit page /run/" + applicationId + "/" + pageId);
     return renderService.renderPageAsString(Long.parseLong(applicationId), Long.parseLong(pageId));

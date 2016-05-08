@@ -71,10 +71,14 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    */
   public String renderPageAsString(long applicationId, long pageId) {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
-    PageDto pageDto = mapper.map(appPage.getPage(), PageDto.class);
-    
-    DebugUtils.debugObjectGetters(pageDto);
-    return processTemplateForRender(pageDto);
+    if(appPage != null)
+    {
+      PageDto pageDto = mapper.map(appPage.getPage(), PageDto.class);
+      
+      DebugUtils.debugObjectGetters(pageDto);
+      return processTemplateForRender(pageDto);
+    }
+    return "Application " + applicationId + " does not exist.";
   }
   
   private String processTemplateForRender(final PageDto pageDto) {
