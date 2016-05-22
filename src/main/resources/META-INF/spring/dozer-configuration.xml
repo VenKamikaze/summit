@@ -11,8 +11,8 @@
 
     <custom-converters> <!-- these are always bi-directional -->
       <converter type="org.awiki.kamikaze.summit.util.converter.SetSourceToListStringConverter" >
-        <class-a>java.lang.Set</class-a>
-        <class-b>java.lang.List</class-b>
+        <class-a>java.util.Set</class-a>
+        <class-b>java.util.List</class-b>
       </converter>
     </custom-converters>
 
