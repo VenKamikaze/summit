@@ -12,6 +12,7 @@ public class RegionDto {
   private Long               id;
   private String                codeRegionPosition; // e.g. header,bodyX,footer
   private String                codeRegionType;     // e.g. HTML,SQL,JSP
+  private String                codeSourceType;     // e.g. dml_report
   
   @NotBlank(message = "Must not be empty.")
   private String                name;
@@ -63,5 +64,12 @@ public class RegionDto {
   public void setRegionFields(Set<RegionFieldDto> regionFields) {
     this.regionFields = regionFields;
   }
-
+  public String getCodeSourceType()
+  {
+    return codeSourceType;
+  }
+  public void setCodeSourceType(String codeSourceType)
+  {
+    this.codeSourceType = codeSourceType;
+  }
 }

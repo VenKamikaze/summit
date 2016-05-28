@@ -16,7 +16,9 @@ import org.awiki.kamikaze.summit.dto.entry.RegionDto;
 import org.awiki.kamikaze.summit.dto.entry.RegionFieldDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
+import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
+import org.awiki.kamikaze.summit.service.processor.SourceProcessorService;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
@@ -128,6 +130,8 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) )
       {
         log.error("Found a " + regionDto.getCodeRegionType() + " ! FIXME: implement the processor!");
+        ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
+        sb.append(reportService.querySource(regionDto.getSource().iterator().next(), null));
         // use a ReportProcessorService!
         // sb.append(
         // process the source of the region first.

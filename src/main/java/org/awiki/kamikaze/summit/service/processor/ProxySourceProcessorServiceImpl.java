@@ -22,6 +22,9 @@ public class ProxySourceProcessorServiceImpl implements ProxySourceProcessorServ
   @Autowired
   List<BatchSourceProcessorService> batchSourceServices; // TODO: review, may not make sense to split these
   
+  @Autowired
+  List<ReportSourceProcessorService> reportSourceServices; // TODO: review, may not make sense to split these
+  
   HashMap<String, SourceProcessorService> sourceServiceCache;
 
   @PostConstruct
@@ -38,6 +41,15 @@ public class ProxySourceProcessorServiceImpl implements ProxySourceProcessorServ
     }
     
     for(BatchSourceProcessorService service : batchSourceServices)
+    {
+      for(String responsibility : service.getResponsibilities()){
+        if (sourceServiceCache.containsKey(responsibility))
+          log.warn("Found " + responsibility + " in service cache already. It is served by: " + sourceServiceCache.get(responsibility).getClass().getCanonicalName() + ". Overriding with: " + service.getClass().getCanonicalName());
+        sourceServiceCache.put(responsibility, service);
+      }
+    }
+    
+    for(ReportSourceProcessorService service : reportSourceServices)
     {
       for(String responsibility : service.getResponsibilities()){
         if (sourceServiceCache.containsKey(responsibility))
