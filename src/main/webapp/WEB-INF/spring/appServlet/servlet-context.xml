@@ -43,6 +43,16 @@
     <context:include-filter expression="org.springframework.stereotype.Component" type="annotation"/>
   </context:component-scan>
 
+  <!-- not using springconverter
+  <beans:bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+    <beans:property name="converters">
+      <beans:list>
+        <beans:bean class="org.awiki.kamikaze.summit.util.mapper.CodeTableToStringConverter"/>
+      </beans:list>
+    </beans:property>
+  </beans:bean>
+  -->
+
   <beans:bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
     <beans:property name="basename">
       <beans:value>META-INF/spring/messages</beans:value> 

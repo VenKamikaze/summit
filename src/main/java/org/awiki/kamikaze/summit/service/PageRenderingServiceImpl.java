@@ -127,6 +127,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       RegionDto regionDto = pageRegionDto.getRegionDto();
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) )
       {
+        log.error("Found a " + regionDto.getCodeRegionType() + " ! FIXME: implement the processor!");
         // use a ReportProcessorService!
         // sb.append(
         // process the source of the region first.

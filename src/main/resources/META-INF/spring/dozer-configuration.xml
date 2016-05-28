@@ -14,6 +14,10 @@
         <class-a>java.util.Set</class-a>
         <class-b>java.util.List</class-b>
       </converter>
+      <converter type="org.awiki.kamikaze.summit.util.converter.CodeTableToStringConverter" >
+        <class-a>org.awiki.kamikaze.summit.domain.codetable.CodeTable</class-a>
+        <class-b>java.lang.String</class-b>
+      </converter>
     </custom-converters>
 
    <!-- This makes all JODA time types copy by reference

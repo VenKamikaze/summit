@@ -1,4 +1,4 @@
-package org.awiki.kamikaze.summit.util.mapper;
+package org.awiki.kamikaze.summit.util.converter;
 
 import org.awiki.kamikaze.summit.domain.codetable.CodeTable;
 import org.dozer.Mapper;
