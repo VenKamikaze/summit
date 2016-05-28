@@ -14,7 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "code_processing_type", schema = "public")
-public class CodeProcessingType implements java.io.Serializable
+public class CodeProcessingType implements java.io.Serializable, CodeTable
 {
 
   /**

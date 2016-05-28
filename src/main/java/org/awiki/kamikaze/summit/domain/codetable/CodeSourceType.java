@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "code_source_type", schema = "public")
-public class CodeSourceType implements java.io.Serializable
+public class CodeSourceType implements java.io.Serializable, CodeTable
 {
 
   private static final long serialVersionUID = 3888121341827987520L;

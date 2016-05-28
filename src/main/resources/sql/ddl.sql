@@ -145,6 +145,7 @@ create table FIELD
   NOTES character varying(4000)
 );
 
+-- TODO: this seems like the better method than including Source on FIELD and REGION
 create table FIELD_SOURCE
 (
   ID bigint primary key,

@@ -18,6 +18,7 @@ import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.awiki.kamikaze.summit.util.DebugUtils;
+import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,9 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   @Autowired
   private Mapper mapper;
   
+  @Autowired
+  private PageToPageDtoMapper pageMapper;
+  
   @Override
   public PageDto renderPage(long applicationPageId) {
     // TODO Auto-generated method stub
@@ -52,7 +56,8 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    */
   public PageDto renderPage(long applicationId, long pageId) {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
-    PageDto pageDto = mapper.map(appPage.getPage(), PageDto.class);
+    //PageDto pageDto = mapper.map(appPage.getPage(), PageDto.class);
+    PageDto pageDto = pageMapper.map(appPage.getPage());
     
     DebugUtils.debugObjectGetters(pageDto);
     
@@ -73,7 +78,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     if(appPage != null)
     {
-      PageDto pageDto = mapper.map(appPage.getPage(), PageDto.class);
+      PageDto pageDto = pageMapper.map(appPage.getPage());
       
       DebugUtils.debugObjectGetters(pageDto);
       return processTemplateForRender(pageDto);

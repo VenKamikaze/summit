@@ -16,7 +16,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "code_field_source_type", schema = "public")
-public class CodeFieldSourceType implements java.io.Serializable
+public class CodeFieldSourceType implements java.io.Serializable, CodeTable
 {
 
   /**

@@ -14,7 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "code_region_type", schema = "public")
-public class CodeRegionType implements java.io.Serializable
+public class CodeRegionType implements java.io.Serializable, CodeTable
 {
 
   /**

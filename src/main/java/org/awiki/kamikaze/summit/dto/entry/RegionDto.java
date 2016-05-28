@@ -1,6 +1,7 @@
 package org.awiki.kamikaze.summit.dto.entry;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -15,10 +16,10 @@ public class RegionDto {
   @NotBlank(message = "Must not be empty.")
   private String                name;
   
-  private String             source;
+  private Set<String>           source = new LinkedHashSet<>(0);
   
   private Set<PageRegionDto>    pageRegions  = new HashSet<>(0);
-  private Set<RegionFieldDto>   regionFields = new HashSet<>(0);
+  private Set<RegionFieldDto>   regionFields = new LinkedHashSet<>(0);
   
   public Long getId() {
     return id;
@@ -44,10 +45,10 @@ public class RegionDto {
   public void setName(String name) {
     this.name = name;
   }
-  public String getSource() {
+  public Set<String> getSource() {
     return source;
   }
-  public void setSource(String source) {
+  public void setSource(Set<String> source) {
     this.source = source;
   }
   public Set<PageRegionDto> getPageRegions() {
