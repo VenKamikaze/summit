@@ -6,12 +6,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.awiki.kamikaze.summit.service.processor.SQLReportSourceProcessorServiceImpl;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
+import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Column;
 
 public class SourceProcessorResultTableExtractor implements ResultSetExtractor<SourceProcessorResultTable>
 {
+  private static final Logger logger = LoggerFactory.getLogger(SQLReportSourceProcessorServiceImpl.class);
+  
   
   /** 
    * Missing source, rename this to match ResultSetExtractor public method to process results from RS
@@ -36,11 +42,19 @@ public class SourceProcessorResultTableExtractor implements ResultSetExtractor<S
       if(rsm != null) {
         final SourceProcessorResultTable.Row row = results.new Row();
         row.setCells(new ArrayList<SourceProcessorResultTable.Cell>(rsm.getColumnCount()) {{
+          logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "rsm.getColumnCount=" + rsm.getColumnCount());
+          logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "cols.size=" + cols.size());
+          logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "rsm.getColumnLabel(1)=" + rsm.getColumnLabel(1));
+
           for(int i = 0; i < rsm.getColumnCount(); ++i) {
-            add(results.new Cell(row, cols.get(i), rsm.getColumnLabel(i)) );
+            if(cols.size() != rsm.getColumnCount())
+            {
+              logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "new Col(\""+rsm.getColumnLabel(i+1)+"\","+i+");");
+              cols.add(results.new Column(rsm.getColumnLabel(i+1), i));
+            }
+            add(results.new Cell(row, cols.get(i), (rsm.getColumnLabel(i+1)) ));
           }
-          }}
-        );
+        }});
         rows.add(row);
       }
 
@@ -48,7 +62,7 @@ public class SourceProcessorResultTableExtractor implements ResultSetExtractor<S
         SourceProcessorResultTable.Row row = results.new Row();
         List<SourceProcessorResultTable.Cell> rowOfCells = new ArrayList<SourceProcessorResultTable.Cell>(rsm.getColumnCount());
         for(int i = 0; i < rsm.getColumnCount(); ++i) {
-          SourceProcessorResultTable.Cell cell = results.new Cell(row, cols.get(i), rs.getString(i));
+          SourceProcessorResultTable.Cell cell = results.new Cell(row, cols.get(i), rs.getString(i+1));
           cols.get(i).addCell(cell);
           rowOfCells.add(cell);
         }

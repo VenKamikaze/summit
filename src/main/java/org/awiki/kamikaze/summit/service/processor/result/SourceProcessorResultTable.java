@@ -60,6 +60,13 @@ public class SourceProcessorResultTable
     
     private List<Cell> cellsInColumn = new ArrayList<>();
 
+
+    public Column(String name, int order)
+    {
+      this.name = name;
+      this.order = order;
+    }
+    
     public String getName()
     {
       return name;

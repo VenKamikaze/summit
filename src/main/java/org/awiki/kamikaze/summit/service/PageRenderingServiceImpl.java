@@ -19,6 +19,7 @@ import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SourceProcessorService;
+import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
@@ -107,7 +108,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       {
         sb.append(content);
       }
-      templateBody.replace(e.getKey(), sb.toString());
+      templateBody = templateBody.replace(e.getKey(), sb.toString());
     }
     //removeUnusedRegions();
     return templateBody;
@@ -131,14 +132,21 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       {
         log.error("Found a " + regionDto.getCodeRegionType() + " ! FIXME: implement the processor!");
         ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
-        sb.append(reportService.querySource(regionDto.getSource().iterator().next(), null));
-        // use a ReportProcessorService!
-        // sb.append(
-        // process the source of the region first.
-        // )
+        
+        // TODO, split+call out to a formatter here to apply styling & formatting as needed to the results.
+        SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getSource().iterator().next(), null);
+        for(int y = 0; y < resultTable.getCount(); y++)
+        {
+          final SourceProcessorResultTable.Row row = resultTable.getRowByY(y);
+          for(SourceProcessorResultTable.Cell cell : row.getCells())
+          {
+            sb.append(cell.getValue());
+          }
+        }
       }
       sb.append(processFieldsForRender(regionDto.getRegionFields()));
       content.add(sb.toString());
+      renderedRegions.put(pageRegionDto.getRegionDto().getCodeRegionPosition(), content);
     }
     return renderedRegions;
   }
