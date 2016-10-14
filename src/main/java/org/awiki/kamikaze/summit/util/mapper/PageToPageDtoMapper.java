@@ -33,7 +33,7 @@ public class PageToPageDtoMapper
     PageDto pageDto = mapper.map(page, PageDto.class);
     pageDto.getApplicationPages().addAll(mapSet(page.getApplicationPages(), ApplicationPageDto.class));
     pageDto.getPageProcessings().addAll(mapSet(page.getPageProcessings(), PageProcessingDto.class));
-    pageDto.getPageRegions().addAll(mapSet(page.getPageRegions(), PageRegionDto.class));
+    //not required. duplicated by getApplicationPages. pageDto.getPageRegions().addAll(mapSet(page.getPageRegions(), PageRegionDto.class));
 
     DebugUtils.debugObjectGetters(pageDto);
     
