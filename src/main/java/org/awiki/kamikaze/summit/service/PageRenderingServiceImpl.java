@@ -27,6 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+/**
+ * This is a top level service that co-ordinates the other sub-services to build up a full page.
+ * @author msaun
+ *
+ */
 @Service
 public class PageRenderingServiceImpl implements PageRenderingService {
   
@@ -130,7 +135,6 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       RegionDto regionDto = pageRegionDto.getRegionDto();
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) )
       {
-        log.error("Found a " + regionDto.getCodeRegionType() + " ! FIXME: implement the processor!");
         ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
         
         // TODO, split+call out to a formatter here to apply styling & formatting as needed to the results.
@@ -143,6 +147,10 @@ public class PageRenderingServiceImpl implements PageRenderingService {
             sb.append(cell.getValue());
           }
         }
+      }
+      else
+      {
+        log.error("Found a " + regionDto.getCodeRegionType() + " ! FIXME: implement the processor!");
       }
       sb.append(processFieldsForRender(regionDto.getRegionFields()));
       content.add(sb.toString());

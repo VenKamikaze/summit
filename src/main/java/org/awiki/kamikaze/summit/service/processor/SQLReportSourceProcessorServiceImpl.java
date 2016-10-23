@@ -20,6 +20,12 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+/**
+ * This service handles SQL Source Types that return a table of information.
+ * It then returns them in a {@link SourceProcessorResultTable}
+ * @author msaun
+ *
+ */
 @Service
 public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcessorService
 {

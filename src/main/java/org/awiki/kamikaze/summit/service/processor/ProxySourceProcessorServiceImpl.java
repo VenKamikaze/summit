@@ -30,7 +30,7 @@ public class ProxySourceProcessorServiceImpl implements ProxySourceProcessorServ
   @PostConstruct
   private void initializeCache()
   {
-    sourceServiceCache = new HashMap<>(singularSourceServices.size() + batchSourceServices.size());
+    sourceServiceCache = new HashMap<>(singularSourceServices.size() + batchSourceServices.size() + reportSourceServices.size());
     for(SingularSourceProcessorService service : singularSourceServices)
     {
       for(String responsibility : service.getResponsibilities()){

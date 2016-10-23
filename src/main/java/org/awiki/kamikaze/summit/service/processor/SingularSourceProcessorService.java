@@ -8,7 +8,7 @@ import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
 
 public interface SingularSourceProcessorService extends SourceProcessorService {
   public static final String BUILT_IN_SQL_DML_TYPE = "text/plain; sql; dml";
-  public static final String BUILT_IN_SQL_DML_BATCH_TYPE = "text/plain; sql; dml; batch";
+  public static final String BUILT_IN_SQL_DML_BATCH_TYPE = "text/plain; sql; dml; batch"; // wrong service??
   public static final String BUILT_IN_SQL_DDL_TYPE = "text/plain; sql; ddl";
   public static final String BUILT_IN_SQL_STORED_PROC = "text/plain; sql; code";
   

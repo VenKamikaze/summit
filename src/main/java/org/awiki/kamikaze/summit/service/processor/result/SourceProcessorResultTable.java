@@ -3,6 +3,19 @@ package org.awiki.kamikaze.summit.service.processor.result;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.awiki.kamikaze.summit.service.formatter.Formattable;
+
+/**
+ * When our source returns a table of information, this class is what is used to store the results.
+ * It consists of {@link Column}s, {@link Row}s and {@link Cell}s.
+ * Cells know about their parent column and row. Each Cell should know what x and y position it has within the table.
+ *  
+ * (NOTE: ignore the following -- removed the implements Formattable while I decide how this should work) The whole table is {@link Formattable}, but further to that, each Row and Cell is also {@link Formattable}
+ * This allows dynamic styling of reports, which means you can produce HTML style reports or CSV style reports
+ * easily.
+ * @author msaun
+ *
+ */
 public class SourceProcessorResultTable
 {
   /*
@@ -51,6 +64,24 @@ public class SourceProcessorResultTable
   
   public Row getRowByY(int y) {
     return this.rows.get(y);
+  }
+
+  public Row getHeader()
+  {
+    return getRowByY(0);
+  }
+  
+  public List<Row> getBody()
+  {
+    List<Row> bodyRows = new ArrayList<>(getRows());
+    bodyRows.remove(getHeader());
+    return bodyRows;
+  }
+  
+  public Row getFooter()
+  {
+    // TODO: FIXME: not implemented.
+    return null;
   }
 
 

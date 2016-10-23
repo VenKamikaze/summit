@@ -14,13 +14,19 @@ import org.awiki.kamikaze.summit.service.processor.SQLReportSourceProcessorServi
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Column;
 
+/**
+ * This class implements required methods to transform and populate a SourceProcessorResultTable from a
+ * standard SQL ResultSet.
+ * @author msaun
+ *
+ */
 public class SourceProcessorResultTableExtractor implements ResultSetExtractor<SourceProcessorResultTable>
 {
   private static final Logger logger = LoggerFactory.getLogger(SQLReportSourceProcessorServiceImpl.class);
   
   
   /** 
-   * Missing source, rename this to match ResultSetExtractor public method to process results from RS
+   * This extracts data from a standard SQL ResultSet and stores it in a SourceProcessorResultTable.
    * @param rs
    */
   @SuppressWarnings("serial")
