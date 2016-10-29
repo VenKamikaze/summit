@@ -12,6 +12,8 @@ public class TemplateDto {
   private String     footerSource;
   
   private Set<PageDto> pages = new HashSet<>(0);
+  
+  private Set<TemplateForListsDto> listTemplates = new HashSet<>(0);
 
   public long getId() {
     return id;
@@ -61,4 +63,11 @@ public class TemplateDto {
     this.pages = pages;
   }
   
+  public Set<TemplateForListsDto> getTemplatesForLists() {
+    return listTemplates;
+  }
+
+  public void setTemplatesForLists(Set<TemplateForListsDto> listTemplates) {
+    this.listTemplates = listTemplates;
+  }
 }

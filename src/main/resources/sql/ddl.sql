@@ -89,6 +89,20 @@ create table TEMPLATE
   FOOTER_SOURCE character varying(32000)
 );
 
+create table TEMPLATE_FOR_LISTS
+(
+  ID bigint primary key,
+  TEMPLATE_ID bigint not null references TEMPLATE(ID),
+  NAME character varying(200) not null,
+  HEADER_PRE character varying(32000),
+  HEADER_POST character varying(32000),
+  BODY_PRE character varying(32000),
+  BODY_POST character varying(32000),
+  FOOTER_PRE character varying(32000),
+  FOOTER_POST character varying(32000)
+);
+
+
 create table PAGE
 (
   ID bigint primary key,

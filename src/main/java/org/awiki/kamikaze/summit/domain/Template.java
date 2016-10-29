@@ -27,6 +27,8 @@ public class Template  implements java.io.Serializable {
   
   private Set<Page>  pages = new HashSet<>(0);
 
+  private Set<TemplateForLists>  templatesForLists = new HashSet<>(0);
+
   public Template()
   {
   }
@@ -42,10 +44,11 @@ public class Template  implements java.io.Serializable {
   }
 
   public Template(long id, final String name, final String headerSource,
-      final String bodySource,final String footerSource, Set<Page> pages)
+      final String bodySource,final String footerSource, Set<Page> pages, Set<TemplateForLists> templatesForLists)
   {
     this(id, name, headerSource, bodySource, footerSource);
     this.pages = pages;
+    this.templatesForLists = templatesForLists;
   }
 
   @Id
@@ -112,5 +115,14 @@ public class Template  implements java.io.Serializable {
     this.pages = pages;
   }
 
-  
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "template")
+  public Set<TemplateForLists> getTemplatesForLists()
+  {
+    return this.templatesForLists;
+  }
+
+  public void setTemplatesForLists(Set<TemplateForLists> templateLists)
+  {
+    this.templatesForLists = templateLists;
+  }
 }

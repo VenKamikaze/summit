@@ -1,9 +1,14 @@
 package org.awiki.kamikaze.summit.service.processor.result;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.collections.iterators.ArrayListIterator;
 import org.awiki.kamikaze.summit.service.formatter.Formattable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * When our source returns a table of information, this class is what is used to store the results.
@@ -16,8 +21,10 @@ import org.awiki.kamikaze.summit.service.formatter.Formattable;
  * @author msaun
  *
  */
-public class SourceProcessorResultTable
-{
+public class SourceProcessorResultTable implements Formattable<org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Row>
+{  
+  private static final Logger logger = LoggerFactory.getLogger(SourceProcessorResultTable.class);
+  
   /*
    * This class only knows about the list of rows it contains.
    * Each Row knows about it's Cells
@@ -135,7 +142,7 @@ public class SourceProcessorResultTable
   }
   
   
-  public class Row {
+  public class Row implements Iterable<Cell>, Formattable<String> {
     private List<Cell> cells = new ArrayList<>();
 
     public Row() { }
@@ -163,7 +170,45 @@ public class SourceProcessorResultTable
     {
       this.cells = cells;
     }
+
+    @Override
+    public Iterator<Cell> iterator()
+    {
+      return new ArrayListIterator(this.cells);
+    }
+
+    @Override
+    public Collection<String> getHeaderElements()
+    {
+      logger.debug("getHeaderElements called on row(), but row() cannot have non-body elements"); 
+      return new ArrayList<String>(0);
+    }
+
+    @Override
+    public Collection<String> getBodyElements()
+    {
+      return convertToStringCollection(this);
+    }
+
+    @Override
+    public Collection<String> getFooterElements()
+    {
+      logger.debug("getFooterElements called on row(), but row() cannot have non-body elements");
+      return new ArrayList<String>(0);
+    }
+
+    private Collection<String> convertToStringCollection(final Row row)
+    {
+      final Collection<String> elements = new ArrayList<>(row.getCells().size());
+      for(final Cell c : row)
+      {
+        elements.add(c.getValue());
+      }
+      return elements;
+    }
+    
   }
+
   
   public class Cell {
     private Row parentRow;
@@ -201,5 +246,25 @@ public class SourceProcessorResultTable
     {
       this.value = value;
     }
+  }
+  
+  @SuppressWarnings("serial")
+  @Override
+  public Collection<Row> getHeaderElements()
+  {
+    return new ArrayList<Row>(1) {{ add(getHeader()); }};
+  }
+
+  @Override
+  public Collection<Row> getBodyElements()
+  {
+    return this.getBody();
+  }
+
+  @SuppressWarnings("serial")
+  @Override
+  public Collection<Row> getFooterElements()
+  {
+    return new ArrayList<Row>(1) {{ add(getFooter()); }};
   }
 }

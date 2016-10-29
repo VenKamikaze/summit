@@ -1,5 +1,7 @@
 package org.awiki.kamikaze.summit.service.formatter;
 
+import java.util.Collection;
+
 /**
  * Indicates an object (e.g. a SourceProcessorResultTable) is formattable.
  * 
@@ -7,12 +9,12 @@ package org.awiki.kamikaze.summit.service.formatter;
  * 
  * Should this be database driven via a table of className -> Template?
  * @author msaun
+ * @param <E>
  *
  */
-public interface Formattable
+public interface Formattable<E>
 {
-  /*public String getHeader();
-  public String getBody();
-  public String getFooter(); */
-  public String format();
+  public Collection<E> getHeaderElements();
+  public Collection<E> getBodyElements();
+  public Collection<E> getFooterElements();
 }
