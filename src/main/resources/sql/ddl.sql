@@ -83,24 +83,36 @@ create table APPLICATION_SCHEMAS
 create table TEMPLATE
 (
   ID bigint primary key,
-  NAME character varying(200) not null,
-  HEADER_SOURCE character varying(32000),
-  BODY_SOURCE character varying(32000),
-  FOOTER_SOURCE character varying(32000)
+  CLASS_NAME character varying(32000) not null,
+  SOURCE character varying(32000)
 );
 
-create table TEMPLATE_FOR_LISTS
-(
-  ID bigint primary key,
-  TEMPLATE_ID bigint not null references TEMPLATE(ID),
-  NAME character varying(200) not null,
-  HEADER_PRE character varying(32000),
-  HEADER_POST character varying(32000),
-  BODY_PRE character varying(32000),
-  BODY_POST character varying(32000),
-  FOOTER_PRE character varying(32000),
-  FOOTER_POST character varying(32000)
-);
+/*
+ Template instances:
+  eg
+
+  TEMPLATE_PAGE_INSTANCE (
+  id,
+  page_id references page.id
+  template_id references template.id
+  mimetype  -- e.g. text/html, application/json, text/csv etc  
+)
+
+
+  TEMPLATE_REGION_INSTANCE (
+  id,
+  region_id references region.id
+  template_id references template.id
+  )
+
+
+  TEMPLATE_FIELD_INSTANCE (
+  id,
+  field_id references field.id
+  template_id references template.id
+  )
+*/
+
 
 /*
  Template ideas:

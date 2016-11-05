@@ -1,7 +1,6 @@
 package org.awiki.kamikaze.summit.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
 import org.awiki.kamikaze.summit.dto.entry.FieldDto;
 import org.awiki.kamikaze.summit.dto.entry.PageDto;
-import org.awiki.kamikaze.summit.dto.entry.PageItem;
 import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.entry.RegionDto;
 import org.awiki.kamikaze.summit.dto.entry.RegionFieldDto;
@@ -25,7 +23,6 @@ import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultT
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
-import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -36,9 +33,9 @@ import org.springframework.util.StringUtils;
  *
  */
 @Service
-public class PageRenderingServiceImpl implements PageRenderingService {
+public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRenderingService {
   
-  private static final Logger log = LoggerFactory.getLogger(PageRenderingServiceImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(OldPageRenderingServiceImplBeforeTemplateRefactor.class);
   
   private static final String REGION_TYPE_REPORT = "Report";
   
@@ -56,6 +53,12 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   @Autowired
   private PageToPageDtoMapper pageMapper;
   
+  @Override
+  public PageDto renderPage(long applicationPageId) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   @Override
   /**
    * Overarching method that begins the page rendering
@@ -93,29 +96,6 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     return "Application " + applicationId + " does not exist.";
   }
   
-
-  /**
-   * Gathers the collection of PageItems, then applies formatting to all of them.
-   * Renders this to a string. 
-   * @param pageDto
-   * @return
-   */
-  private String processPageItems(final PageDto pageDto) {
-    //StringBuilder sb = new StringBuilder();
-    //sb.append(pageDto.getTemplate().getHeaderSource());
-    //sb.append(processBodyForRender(pageDto));
-    //sb.append(pageDto.getTemplate().getFooterSource());
-    //return sb.toString();
-    
-    // Get the collection of pageItems in each region
-    Map<String, List<PageItem>> regionPageItems = processRegionsForRender(pageDto);
-    
-    //now run each page item through the formatters to apply each template
-    throw new NotYetImplementedException("Run each pageItem through the formatters here.");
-    
-  }
-  
-  
   private String processTemplateForRender(final PageDto pageDto) {
     StringBuilder sb = new StringBuilder();
     sb.append(pageDto.getTemplate().getHeaderSource());
@@ -142,16 +122,17 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   }
   
   // Map of REGION_POSITION_X to List<String (rendered content)>
-  private Map<String, List<PageItem>> processRegionsForRender(final PageDto pageDto) {
-    Map<String, List<PageItem>> processedRegions = new HashMap<>();
-    
+  private Map<String, List<String>> processRegionsForRender(final PageDto pageDto) {
+    Map<String, List<String>> renderedRegions = new HashMap<>();
     
     for(PageRegionDto pageRegionDto : pageDto.getPageRegions() ) {
-      List<PageItem> content = new ArrayList<>();
-      if (processedRegions.containsKey(pageRegionDto.getRegionDto().getCodeRegionPosition()))
+      List<String> content = new ArrayList<>();
+      if (renderedRegions.containsKey(pageRegionDto.getRegionDto().getCodeRegionPosition()))
       {
-        content = processedRegions.get(pageRegionDto.getRegionDto().getCodeRegionPosition());
+        content = renderedRegions.get(pageRegionDto.getRegionDto().getCodeRegionPosition());
       }
+      
+      StringBuffer sb = new StringBuffer();
       
       RegionDto regionDto = pageRegionDto.getRegionDto();
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) )
@@ -160,21 +141,30 @@ public class PageRenderingServiceImpl implements PageRenderingService {
         
         // TODO, split+call out to a formatter here to apply styling & formatting as needed to the results.
         SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getSource().iterator().next(), null);
-        content.add(resultTable);
+        for(int y = 0; y < resultTable.getCount(); y++)
+        {
+          final SourceProcessorResultTable.Row row = resultTable.getRowByY(y);
+          for(SourceProcessorResultTable.Cell cell : row.getCells())
+          {
+            sb.append(cell.getValue());
+          }
+        }
       }
       else
       {
         log.error("Found a " + regionDto.getCodeRegionType() + " ! FIXME: implement the processor!");
       }
-      content.addAll(processFieldsForRender(regionDto.getRegionFields()));
-      processedRegions.put(pageRegionDto.getRegionDto().getCodeRegionPosition(), content);
+      sb.append(processFieldsForRender(regionDto.getRegionFields()));
+      content.add(sb.toString());
+      renderedRegions.put(pageRegionDto.getRegionDto().getCodeRegionPosition(), content);
     }
-    return processedRegions;
+    return renderedRegions;
   }
   
   
-  private Collection<PageItem> processFieldsForRender(final Set<RegionFieldDto> regionFieldDtos) {
-    Collection<PageItem> fields = new ArrayList<>();
+  private String processFieldsForRender(final Set<RegionFieldDto> regionFieldDtos) {
+    StringBuilder sb = new StringBuilder();
+    //List<FieldDto> processedFields = new ArrayList<>(regionFieldDtos.size());
     
     for(RegionFieldDto regionFieldDto : regionFieldDtos) {
       final FieldDto fieldDto = regionFieldDto.getField();
@@ -186,17 +176,14 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       fieldDto.setPostProcessedSource(processedContent);
       fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
       
+      //processedFields.add(fieldDto);
       
-      fields.add(fieldDto);
+      if(StringUtils.isEmpty(processedContent.getPostProcessedContent()))
+        sb.append(processedDefaultContent.getPostProcessedContent());
+      else
+        sb.append(processedContent.getPostProcessedContent());
     }
-    return fields;
-  }
-
-  @Override
-  public String renderPageToString(long applicationId, long pageId)
-  {
-    // TODO Auto-generated method stub
-    return null;
+    return sb.toString();
   }
 
 }

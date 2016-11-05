@@ -20,35 +20,27 @@ public class Template  implements java.io.Serializable {
   private static final long serialVersionUID = -6184401135662692768L;
   
   private long       id;
-  private String     name;
-  private String     headerSource;
-  private String     bodySource;
-  private String     footerSource;
+  private String     className;
+  private String     source;
   
   private Set<Page>  pages = new HashSet<>(0);
-
-  private Set<TemplateForLists>  templatesForLists = new HashSet<>(0);
 
   public Template()
   {
   }
 
-  public Template(long id, final String name, final String headerSource,
-      final String bodySource,final String footerSource)
+  public Template(long id, final String name,final String bodySource)
   {
     this.id = id;
-    this.name = name;
-    this.headerSource = headerSource;
-    this.bodySource = bodySource;
-    this.footerSource = footerSource;
+    this.className = name;
+    this.source = bodySource;
   }
 
-  public Template(long id, final String name, final String headerSource,
-      final String bodySource,final String footerSource, Set<Page> pages, Set<TemplateForLists> templatesForLists)
+  public Template(long id, final String name,
+      final String bodySource,Set<Page> pages)
   {
-    this(id, name, headerSource, bodySource, footerSource);
+    this(id, name, bodySource);
     this.pages = pages;
-    this.templatesForLists = templatesForLists;
   }
 
   @Id
@@ -63,45 +55,25 @@ public class Template  implements java.io.Serializable {
     this.id = id;
   }
 
-  public String getName() {
-    return name;
+  @Column(name = "class_name", nullable = true)
+  public String getClassName() {
+    return className;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setClassName(String name) {
+    this.className = name;
   }
 
-  @Column(name = "header_source", nullable = true)
-  public String getHeaderSource()
+
+  @Column(name = "source", nullable = true)
+  public String getSource()
   {
-    return this.headerSource;
+    return this.source;
   }
 
-  public void setHeaderSource(final String headerSource)
+  public void setSource(final String bodySource)
   {
-    this.headerSource = headerSource;
-  }
-
-  @Column(name = "body_source", nullable = true)
-  public String getBodySource()
-  {
-    return this.bodySource;
-  }
-
-  public void setBodySource(final String bodySource)
-  {
-    this.bodySource = bodySource;
-  }
-
-  @Column(name = "footer_source", nullable = true)
-  public String getFooterSource()
-  {
-    return this.footerSource;
-  }
-
-  public void setFooterSource(final String footerSource)
-  {
-    this.footerSource = footerSource;
+    this.source = bodySource;
   }
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "template")
@@ -115,14 +87,4 @@ public class Template  implements java.io.Serializable {
     this.pages = pages;
   }
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "template")
-  public Set<TemplateForLists> getTemplatesForLists()
-  {
-    return this.templatesForLists;
-  }
-
-  public void setTemplatesForLists(Set<TemplateForLists> templateLists)
-  {
-    this.templatesForLists = templateLists;
-  }
 }

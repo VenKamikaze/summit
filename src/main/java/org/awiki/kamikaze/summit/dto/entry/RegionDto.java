@@ -7,7 +7,7 @@ import java.util.Set;
 import org.hibernate.validator.constraints.NotBlank;
 
 
-public class RegionDto {
+public class RegionDto implements PageItem {
 
   private Long               id;
   private String                codeRegionPosition; // e.g. header,bodyX,footer

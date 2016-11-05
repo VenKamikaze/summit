@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.collections.iterators.ArrayListIterator;
+import org.awiki.kamikaze.summit.dto.entry.PageItem;
 import org.awiki.kamikaze.summit.service.formatter.Formattable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +16,13 @@ import org.slf4j.LoggerFactory;
  * It consists of {@link Column}s, {@link Row}s and {@link Cell}s.
  * Cells know about their parent column and row. Each Cell should know what x and y position it has within the table.
  *  
- * (NOTE: ignore the following -- removed the implements Formattable while I decide how this should work) The whole table is {@link Formattable}, but further to that, each Row and Cell is also {@link Formattable}
+ * (NOTE: ignore the following -- removed the implements Formattable while I decide how this should work) The whole table is {@link Formattable}, but further to that, each Row is also {@link Formattable}
  * This allows dynamic styling of reports, which means you can produce HTML style reports or CSV style reports
  * easily.
  * @author msaun
  *
  */
-public class SourceProcessorResultTable implements Formattable<org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Row>
+public class SourceProcessorResultTable implements PageItem, Formattable<org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Row>
 {  
   private static final Logger logger = LoggerFactory.getLogger(SourceProcessorResultTable.class);
   
@@ -75,7 +76,7 @@ public class SourceProcessorResultTable implements Formattable<org.awiki.kamikaz
 
   public Row getHeader()
   {
-    return getRowByY(0);
+    return new HeaderRow(getRowByY(0).getCells());
   }
   
   public List<Row> getBody()
@@ -141,8 +142,14 @@ public class SourceProcessorResultTable implements Formattable<org.awiki.kamikaz
     }
   }
   
+  public class HeaderRow extends SourceProcessorResultTable.Row {
+    public HeaderRow(final List<Cell> cells) {
+      super(cells);
+    }
+  }
   
-  public class Row implements Iterable<Cell>, Formattable<String> {
+  
+  public class Row implements PageItem, Iterable<Cell>, Formattable<String> {
     private List<Cell> cells = new ArrayList<>();
 
     public Row() { }
@@ -210,7 +217,7 @@ public class SourceProcessorResultTable implements Formattable<org.awiki.kamikaz
   }
 
   
-  public class Cell {
+  public class Cell implements PageItem {
     private Row parentRow;
     private Column parentColumn;
     private String value;

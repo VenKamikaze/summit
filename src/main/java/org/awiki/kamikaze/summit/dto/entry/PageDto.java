@@ -3,7 +3,7 @@ package org.awiki.kamikaze.summit.dto.entry;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PageDto {
+public class PageDto implements PageItem {
   
   private Long                 id;
   private Set<PageRegionDto>      pageRegions      = new HashSet<>(0);

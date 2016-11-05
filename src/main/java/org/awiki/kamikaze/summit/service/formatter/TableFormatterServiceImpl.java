@@ -25,6 +25,13 @@ public class TableFormatterServiceImpl implements TableFormatterService
   
   final int assumedCellWidth = 12; // lets guess 12 characters per cell, to help estimating stringbuilder buffer size
   
+  /**
+   * This method takes in a SourceProcessorResultTable, it should add pre + post elements
+   * per row of the table. It then iterates over each Row and adds pre + post elements around each cell
+   * @param templateDto
+   * @param sourceTable
+   * @return
+   */
   @Override
   public String format(final TemplateDto templateDto, Formattable<Row> sourceTable) {
     final int cellsPerRow = sourceTable.getHeaderElements().iterator().next().getCells().size();
@@ -38,9 +45,9 @@ public class TableFormatterServiceImpl implements TableFormatterService
     StringBuilder formatted = new StringBuilder(formattedLength);
     if(true) throw new NotImplementedException("FIXME: implement me.");
     
-    formatRows(templateDto.getTemplatesForLists(), sourceTable.getHeaderElements());
-    formatRows(templateDto.getTemplatesForLists(), sourceTable.getBodyElements());
-    formatRows(templateDto.getTemplatesForLists(), sourceTable.getFooterElements());
+    formatRows(templateDto.getTemplatesForLists(), sourceTable.getHeaderElements(), HEADER_ROWS); // get the top row
+    formatRows(templateDto.getTemplatesForLists(), sourceTable.getBodyElements(), BODY_ROWS); // get the rest of the rows
+    formatRows(templateDto.getTemplatesForLists(), sourceTable.getFooterElements(), FOOTER_ROWS); 
     
     return formatted.toString();
   }
@@ -81,14 +88,16 @@ public class TableFormatterServiceImpl implements TableFormatterService
 
     StringBuilder rowsBuilder = new StringBuilder();
 
+    // Iterate over each row (Formattable<String>) within the rows, add appropriate pre+post elements 
+    // around each row, but also then wrap the cells too.
     for(Formattable<String> row: rows)
     {
-      rowsBuilder.append(preElement).append(formatRow(row)).append(postElement);
+      rowsBuilder.append(preElement).append(formatCells(row)).append(postElement);
     }
     return rowsBuilder.toString();
   }
 
-  private String formatRow(final TemplateForListsDto listTemplate, final Formattable<String> row)
+  private String formatCells(final TemplateForListsDto listTemplate, final Formattable<String> row)
   {
     StringBuilder rowBuilder = new StringBuilder();
     

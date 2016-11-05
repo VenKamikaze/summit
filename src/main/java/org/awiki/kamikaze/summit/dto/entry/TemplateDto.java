@@ -6,15 +6,11 @@ import java.util.Set;
 public class TemplateDto {
 
   private long       id;
-  private String     name;
-  private String     headerSource;
-  private String     bodySource;
-  private String     footerSource;
+  private String     className;
+  private String     source;
   
   private Set<PageDto> pages = new HashSet<>(0);
   
-  private Set<TemplateForListsDto> listTemplates = new HashSet<>(0);
-
   public long getId() {
     return id;
   }
@@ -23,36 +19,21 @@ public class TemplateDto {
     this.id = id;
   }
 
-  public String getName() {
-    return name;
+  public String getClassName() {
+    return className;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setClassName(String name) {
+    this.className = name;
   }
 
-  public String getHeaderSource() {
-    return headerSource;
+
+  public String getSource() {
+    return source;
   }
 
-  public void setHeaderSource(String headerSource) {
-    this.headerSource = headerSource;
-  }
-
-  public String getBodySource() {
-    return bodySource;
-  }
-
-  public void setBodySource(String bodySource) {
-    this.bodySource = bodySource;
-  }
-
-  public String getFooterSource() {
-    return footerSource;
-  }
-
-  public void setFooterSource(String footerSource) {
-    this.footerSource = footerSource;
+  public void setSource(String bodySource) {
+    this.source = bodySource;
   }
 
   public Set<PageDto> getPages() {
@@ -62,12 +43,5 @@ public class TemplateDto {
   public void setPages(Set<PageDto> pages) {
     this.pages = pages;
   }
-  
-  public Set<TemplateForListsDto> getTemplatesForLists() {
-    return listTemplates;
-  }
 
-  public void setTemplatesForLists(Set<TemplateForListsDto> listTemplates) {
-    this.listTemplates = listTemplates;
-  }
 }
