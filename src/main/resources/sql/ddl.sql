@@ -102,6 +102,35 @@ create table TEMPLATE_FOR_LISTS
   FOOTER_POST character varying(32000)
 );
 
+/*
+ Template ideas:
+
+ TEMPLATE (
+  id,
+  class_name,
+  pre_element,
+  post_element 
+)
+ 
+ table itself, <table> </table>
+ header row (needs its own class) <th> </th>
+ row <tr></tr>
+ cell <td></td>
+
+ OR:
+ TEMPLATE (
+  id,
+  class_name,
+  source
+)
+ where source like:
+ table itself, <table>#DATA#</table>
+ header row (needs its own class) <th>#DATA#</th>
+ row <tr>#DATA#</tr>
+ cell <td>#DATA#</td>
+  etc
+
+*/
 
 create table PAGE
 (
