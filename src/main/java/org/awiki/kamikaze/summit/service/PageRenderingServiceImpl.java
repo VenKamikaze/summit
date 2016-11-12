@@ -72,13 +72,14 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   
   /**
    * Overarching method that handles the page rendering
-   * This one is mainly used for testing, renders the entire page and all it's contents to a String
+   * This one renders the entire page and all it's contents to a String
    * 1. Maps Page domain and linked objects to a PageDto
-   * 2. Calls ProcessTemplateForRender, which pulls down the template, and begins processing its components
-   * (in processTemplateForRender) 3. (Should) pulls header, body and footer and processes these components
-   * (in processBodyForRender) 4. Passes unprocessed region content to be processed, in order of sort order
-   * (in processRegionsForRender) 5. Processes either the region source (ie. report regions) or calls method to process all field content
-   * (in processFieldsForRender) 6. Processes each field source into processed content, ordered by sort order
+   * 2. Calls processPageItems, which gathers the processed page items, and then calls the formatters
+   * (in processRegionsForRender) 3. Processes either the region source (ie. report regions) or calls method to process all field content
+   * (in processFieldsForRender) 4. Processes each field source into processed content, ordered by sort order
+   * (back in processPageItems) 5. Takes the processed content, and calls the appropriate formatter
+   * (formatters) 6. Each formatter gets the appropriate template, and builds up a text representation of the page
+   *                 appending content at the start of each format call.
    */
   public String renderPageToString(long applicationId, long pageId) {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
