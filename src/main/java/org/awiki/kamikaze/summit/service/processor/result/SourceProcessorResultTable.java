@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * @author msaun
  *
  */
-public class SourceProcessorResultTable implements PageItem, Formattable<org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Row>
+public class SourceProcessorResultTable implements PageItem<String>, Formattable<org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Row>
 {  
   private static final Logger logger = LoggerFactory.getLogger(SourceProcessorResultTable.class);
   
@@ -149,7 +149,7 @@ public class SourceProcessorResultTable implements PageItem, Formattable<org.awi
   }
   
   
-  public class Row implements PageItem, Iterable<Cell>, Formattable<String> {
+  public class Row implements PageItem<String>, Iterable<Cell>, Formattable<String> {
     private List<Cell> cells = new ArrayList<>();
 
     public Row() { }
@@ -213,11 +213,37 @@ public class SourceProcessorResultTable implements PageItem, Formattable<org.awi
       }
       return elements;
     }
+
+    @Override
+    public boolean hasSubPageItems()
+    {
+      return false;
+    }
+
+    @Override
+    public Collection<PageItem<String>> getSubPageItems()
+    {
+      return new ArrayList<PageItem<String>>(this.cells);
+    }
+
+    @Override
+    public void setProcessedSource(String t)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public String getProcessedSource()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
     
   }
 
   
-  public class Cell implements PageItem {
+  public class Cell implements PageItem<String> {
     private Row parentRow;
     private Column parentColumn;
     private String value;
@@ -253,6 +279,32 @@ public class SourceProcessorResultTable implements PageItem, Formattable<org.awi
     {
       this.value = value;
     }
+
+    @Override
+    public boolean hasSubPageItems()
+    {
+      return false;
+    }
+
+    @Override
+    public void setProcessedSource(String t)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public String getProcessedSource()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public Collection<PageItem<String>> getSubPageItems()
+    {
+      return new ArrayList<>(0);
+    }
   }
   
   @SuppressWarnings("serial")
@@ -273,5 +325,32 @@ public class SourceProcessorResultTable implements PageItem, Formattable<org.awi
   public Collection<Row> getFooterElements()
   {
     return new ArrayList<Row>(1) {{ add(getFooter()); }};
+  }
+
+  @Override
+  public boolean hasSubPageItems()
+  {
+    return this.rows.size() > 0;
+  }
+
+  @Override
+  public Collection<PageItem<String>> getSubPageItems()
+  {
+    return new ArrayList<PageItem<String>>(this.rows);
+  }
+
+
+  @Override
+  public void setProcessedSource(String t)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public String getProcessedSource()
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

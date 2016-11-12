@@ -7,7 +7,16 @@ set autocommit to off;
 
 insert into application select nextval('application_seq'), 1, 'Test Application';
 
-insert into template select nextval('spare_seq'), 'Test Report Template', 'header', 'body', 'footer';
+--insert into template select nextval('spare_seq'), 'Test Report Template', 'header', 'body', 'footer';
+
+insert into template select nextval('spare_seq'), 'org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable', '<table>##__DATA__##</table>';
+insert into template select nextval('spare_seq'), 'org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.HeaderRow', '<tr class="tablerowheader">##__DATA__##</tr>';
+insert into template select nextval('spare_seq'), 'org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Row', '<tr class="tablerowdata">##__DATA__##</tr>';
+insert into template select nextval('spare_seq'), 'org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Cell', '<td class="tablecell">##__DATA__##</td>';
+insert into template select nextval('spare_seq'), 'org.awiki.kamikaze.summit.dto.entry.PageDto', '<html><body>##__DATA__##</body></html>';
+insert into template select nextval('spare_seq'), 'org.awiki.kamikaze.summit.dto.entry.RegionDto', '<div class="region">##__DATA__##</div>';
+insert into template select nextval('spare_seq'), 'org.awiki.kamikaze.summit.dto.entry.FieldDto', '<div class="field">##__DATA__##</div>';
+
 
 insert into page (select nextval('page_seq'), id, 'Test Report Page' from template where name = 'Test Report Template');
 

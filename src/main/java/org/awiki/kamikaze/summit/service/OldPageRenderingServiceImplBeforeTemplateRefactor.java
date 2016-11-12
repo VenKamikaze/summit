@@ -32,7 +32,7 @@ import org.springframework.util.StringUtils;
  * @author msaun
  *
  */
-@Service
+//@Service
 public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRenderingService {
   
   private static final Logger log = LoggerFactory.getLogger(OldPageRenderingServiceImplBeforeTemplateRefactor.class);
@@ -53,7 +53,7 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRe
   @Autowired
   private PageToPageDtoMapper pageMapper;
   
-  @Override
+  
   public PageDto renderPage(long applicationPageId) {
     // TODO Auto-generated method stub
     return null;
@@ -98,9 +98,9 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRe
   
   private String processTemplateForRender(final PageDto pageDto) {
     StringBuilder sb = new StringBuilder();
-    sb.append(pageDto.getTemplate().getHeaderSource());
+    //sb.append(pageDto.getTemplate().getHeaderSource());
     sb.append(processBodyForRender(pageDto));
-    sb.append(pageDto.getTemplate().getFooterSource());
+    //sb.append(pageDto.getTemplate().getFooterSource());
     return sb.toString();
   }
   
@@ -184,6 +184,13 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRe
         sb.append(processedContent.getPostProcessedContent());
     }
     return sb.toString();
+  }
+
+  @Override
+  public String renderPageToString(long applicationId, long pageId)
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

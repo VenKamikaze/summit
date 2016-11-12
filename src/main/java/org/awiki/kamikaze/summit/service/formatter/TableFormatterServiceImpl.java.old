@@ -5,12 +5,17 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.awiki.kamikaze.summit.domain.Template;
+import org.awiki.kamikaze.summit.dto.entry.PageItem;
 import org.awiki.kamikaze.summit.dto.entry.TemplateDto;
 import org.awiki.kamikaze.summit.dto.entry.TemplateForListsDto;
+import org.awiki.kamikaze.summit.repository.TemplateRepository;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Row;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_VARIABLE;
 
 // TODO: FIXME: This must be data driven. Lets get the implementation going for now, then figure out how to 
 //      drive it from the DB. 2016-10-23
@@ -19,11 +24,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class TableFormatterServiceImpl implements TableFormatterService
 {
-  private static final int HEADER_ROWS = 1;
-  private static final int BODY_ROWS = 2;
-  private static final int FOOTER_ROWS = 3;
+  //private static final int HEADER_ROWS = 1;
+  //private static final int BODY_ROWS = 2;
+  //private static final int FOOTER_ROWS = 3;
   
-  final int assumedCellWidth = 12; // lets guess 12 characters per cell, to help estimating stringbuilder buffer size
+  //final int assumedCellWidth = 12; // lets guess 12 characters per cell, to help estimating stringbuilder buffer size
+  
+  @Autowired
+  private TemplateRepository repository;
   
   /**
    * This method takes in a SourceProcessorResultTable, it should add pre + post elements
@@ -32,8 +40,8 @@ public class TableFormatterServiceImpl implements TableFormatterService
    * @param sourceTable
    * @return
    */
-  @Override
-  public String format(final TemplateDto templateDto, Formattable<Row> sourceTable) {
+  /*@Override 
+  public String format(final TemplateDto templateDto, final SourceProcessorResultTable sourceTable) {
     final int cellsPerRow = sourceTable.getHeaderElements().iterator().next().getCells().size();
     int formattedLength = templateDto.getHeaderSource().length()
                         + templateDto.getBodySource().length() 
@@ -105,12 +113,22 @@ public class TableFormatterServiceImpl implements TableFormatterService
     {
       rowBuilder.append(listTemplate.getBodyPre()).append(
     }
-  }
+  }*/
   
   @SuppressWarnings("serial")
   @Override
   public List<String> getResponsibilities()
   {
     return new ArrayList<String>(1) {{ add(SourceProcessorResultTable.class.getCanonicalName()); }};
+  }
+
+  @Override
+  public StringBuilder format(final StringBuilder builder, final SourceProcessorResultTable item)
+  {
+    //FIXME: HACK: /* Change this to using template instance, once we have implemented it */
+    Template template = repository.findByClassName(item.getClass().getCanonicalName());
+    builder.append(template.getSource().replace(REPLACEMENT_VARIABLE, item.get))
+    
+    return builder;
   }
 }

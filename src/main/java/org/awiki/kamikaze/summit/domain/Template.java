@@ -23,7 +23,7 @@ public class Template  implements java.io.Serializable {
   private String     className;
   private String     source;
   
-  private Set<Page>  pages = new HashSet<>(0);
+  //private Set<Page>  pages = new HashSet<>(0);
 
   public Template()
   {
@@ -36,12 +36,6 @@ public class Template  implements java.io.Serializable {
     this.source = bodySource;
   }
 
-  public Template(long id, final String name,
-      final String bodySource,Set<Page> pages)
-  {
-    this(id, name, bodySource);
-    this.pages = pages;
-  }
 
   @Id
   @Column(name = "id", unique = true, nullable = false)
@@ -76,15 +70,5 @@ public class Template  implements java.io.Serializable {
     this.source = bodySource;
   }
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "template")
-  public Set<Page> getPages()
-  {
-    return this.pages;
-  }
-
-  public void setPages(Set<Page> pages)
-  {
-    this.pages = pages;
-  }
 
 }

@@ -17,15 +17,15 @@ public class ProxyFormatterServiceImpl implements ProxyFormatterService {
   private Logger log = LoggerFactory.getLogger(ProxyFormatterServiceImpl.class);
   
   @Autowired
-  List<FormatterService> formatterServices; // TODO: review, may not make sense to split these
+  List<FormatterService<?>> formatterServices; // TODO: review, may not make sense to split these
   
-  HashMap<String, FormatterService> formatterServiceCache;
+  HashMap<String, FormatterService<?>> formatterServiceCache;
 
   @PostConstruct
   private void initializeCache()
   {
     formatterServiceCache = new HashMap<>(formatterServices.size());
-    for(FormatterService service : formatterServices)
+    for(FormatterService<?> service : formatterServices)
     {
       for(String responsibility : service.getResponsibilities()){
         if (formatterServiceCache.containsKey(responsibility))
@@ -35,10 +35,10 @@ public class ProxyFormatterServiceImpl implements ProxyFormatterService {
     }
   }
   
-  public FormatterService getFormatterService(final String formatterType) {
-    if (formatterServiceCache.get(formatterType) == null)
-      throw new NoSuchMechanismException("No service found for formatter type=" + formatterType);
+  public FormatterService<?> getFormatterService(final String canonicalClassNameToFormat) {
+    if (formatterServiceCache.get(canonicalClassNameToFormat) == null)
+      throw new NoSuchMechanismException("No service found for formatter type=" + canonicalClassNameToFormat);
 
-    return formatterServiceCache.get(formatterType);
+    return formatterServiceCache.get(canonicalClassNameToFormat);
   }
 }

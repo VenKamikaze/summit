@@ -1,7 +1,10 @@
 package org.awiki.kamikaze.summit.dto.entry;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -71,5 +74,32 @@ public class RegionDto implements PageItem {
   public void setCodeSourceType(String codeSourceType)
   {
     this.codeSourceType = codeSourceType;
+  }
+  @Override
+  public boolean hasSubPageItems()
+  {
+    return regionFields.size() > 0;
+  }
+  @Override
+  public Collection<PageItem<String>> getSubPageItems()
+  {
+    Collection<PageItem<String>> fields = new ArrayList<>(regionFields.size());
+    for(RegionFieldDto regionField : regionFields) {
+      fields.add(regionField.getField());
+    }
+    return fields;
+  }
+  
+  @Override
+  public void setProcessedSource(Object t)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+  @Override
+  public Object getProcessedSource()
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

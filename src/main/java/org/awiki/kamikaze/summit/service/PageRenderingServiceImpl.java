@@ -3,6 +3,7 @@ package org.awiki.kamikaze.summit.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,8 @@ import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.entry.RegionDto;
 import org.awiki.kamikaze.summit.dto.entry.RegionFieldDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
+import org.awiki.kamikaze.summit.service.formatter.FormatterService;
+import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
@@ -51,6 +54,9 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   private ProxySourceProcessorService sourceProcessors;
   
   @Autowired
+  private ProxyFormatterService sourceFormatters;
+  
+  @Autowired
   private Mapper mapper;
   
   @Autowired
@@ -81,14 +87,15 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    * (in processRegionsForRender) 5. Processes either the region source (ie. report regions) or calls method to process all field content
    * (in processFieldsForRender) 6. Processes each field source into processed content, ordered by sort order
    */
-  public String renderPageAsString(long applicationId, long pageId) {
+  public String renderPageToString(long applicationId, long pageId) {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     if(appPage != null)
     {
       PageDto pageDto = pageMapper.map(appPage.getPage());
       
       DebugUtils.debugObjectGetters(pageDto);
-      return processTemplateForRender(pageDto);
+      
+      return processPageItems(pageDto);
     }
     return "Application " + applicationId + " does not exist.";
   }
@@ -101,21 +108,20 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    * @return
    */
   private String processPageItems(final PageDto pageDto) {
-    //StringBuilder sb = new StringBuilder();
-    //sb.append(pageDto.getTemplate().getHeaderSource());
-    //sb.append(processBodyForRender(pageDto));
-    //sb.append(pageDto.getTemplate().getFooterSource());
-    //return sb.toString();
-    
     // Get the collection of pageItems in each region
     Map<String, List<PageItem>> regionPageItems = processRegionsForRender(pageDto);
     
     //now run each page item through the formatters to apply each template
-    throw new NotYetImplementedException("Run each pageItem through the formatters here.");
+    final StringBuilder builder = new StringBuilder();
+    FormatterService service = sourceFormatters.getFormatterService(PageDto.class.getCanonicalName());
+    return service.format(builder, pageDto).toString();
+
     
+    //throw new NotYetImplementedException("Run each pageItem through the formatters here.");
   }
   
   
+  /*
   private String processTemplateForRender(final PageDto pageDto) {
     StringBuilder sb = new StringBuilder();
     sb.append(pageDto.getTemplate().getHeaderSource());
@@ -123,7 +129,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     sb.append(pageDto.getTemplate().getFooterSource());
     return sb.toString();
   }
-  
+  /*
   private String processBodyForRender(final PageDto pageDto) {
     StringBuilder sb = new StringBuilder();
     
@@ -137,13 +143,12 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       }
       templateBody = templateBody.replace(e.getKey(), sb.toString());
     }
-    //removeUnusedRegions();
     return templateBody;
   }
-  
+  */
   // Map of REGION_POSITION_X to List<String (rendered content)>
   private Map<String, List<PageItem>> processRegionsForRender(final PageDto pageDto) {
-    Map<String, List<PageItem>> processedRegions = new HashMap<>();
+    Map<String, List<PageItem>> processedRegions = new LinkedHashMap<>();
     
     
     for(PageRegionDto pageRegionDto : pageDto.getPageRegions() ) {
@@ -157,8 +162,6 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) )
       {
         ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
-        
-        // TODO, split+call out to a formatter here to apply styling & formatting as needed to the results.
         SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getSource().iterator().next(), null);
         content.add(resultTable);
       }
@@ -190,13 +193,6 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       fields.add(fieldDto);
     }
     return fields;
-  }
-
-  @Override
-  public String renderPageToString(long applicationId, long pageId)
-  {
-    // TODO Auto-generated method stub
-    return null;
   }
 
 }

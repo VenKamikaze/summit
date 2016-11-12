@@ -1,9 +1,12 @@
 package org.awiki.kamikaze.summit.dto.entry;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-public class PageDto implements PageItem {
+public class PageDto implements PageItem<String> {
   
   private Long                 id;
   private Set<PageRegionDto>      pageRegions      = new HashSet<>(0);
@@ -51,6 +54,32 @@ public class PageDto implements PageItem {
   }
   public void setApplicationPages(Set<ApplicationPageDto> applicationPages) {
     this.applicationPages = applicationPages;
+  }
+  @Override
+  public void setProcessedSource(String t)
+  {
+    // TODO Auto-generated method stub
+    
+  }
+  @Override
+  public String getProcessedSource()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  @Override
+  public boolean hasSubPageItems()
+  {
+    return pageRegions.size() > 0;
+  }
+  @Override
+  public Collection<PageItem<String>> getSubPageItems()
+  {
+    Collection<PageItem<String>> regions = new ArrayList<>(pageRegions.size());
+    for(PageRegionDto pageRegionDto : pageRegions) {
+      regions.add(pageRegionDto.getRegionDto());
+    }
+    return regions;
   }
   
   

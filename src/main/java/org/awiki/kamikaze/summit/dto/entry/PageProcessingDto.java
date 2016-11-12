@@ -3,7 +3,7 @@ package org.awiki.kamikaze.summit.dto.entry;
 import org.hibernate.validator.constraints.NotBlank;
 
 
-
+// 2016-11-12 what was this for again?
 public class PageProcessingDto {
   
   private Long               id;

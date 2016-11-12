@@ -1,6 +1,8 @@
 package org.awiki.kamikaze.summit.dto.entry;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.constraints.Size;
@@ -8,7 +10,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotBlank;
 
 
-public class FieldDto implements PageItem {
+public class FieldDto implements PageItem<String> {
   
   private Long               id;
   
@@ -127,6 +129,29 @@ public class FieldDto implements PageItem {
       }
       return false;
     }
+  }
+
+  @Override
+  public void setProcessedSource(String t)
+  {
+    // FIXME
+  }
+  @Override
+  public String getProcessedSource()
+  {
+    return postProcessedSource != null ? postProcessedSource.getPostProcessedContent() :
+                                         postProcessedDefaultValue.getPostProcessedContent();
+  }
+  
+  @Override
+  public boolean hasSubPageItems()
+  {
+    return false;
+  }
+  @Override
+  public List<PageItem<String>> getSubPageItems()
+  {
+    return new ArrayList<>(0);
   }
   
 }

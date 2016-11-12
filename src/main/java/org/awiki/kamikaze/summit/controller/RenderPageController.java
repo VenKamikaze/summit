@@ -29,7 +29,7 @@ public class RenderPageController {
   @ResponseBody
   public String view(@PathVariable String applicationId, @PathVariable String pageId) {
     logger.info("Hit page /run/" + applicationId + "/" + pageId);
-    return renderService.renderPageAsString(Long.parseLong(applicationId), Long.parseLong(pageId));
+    return renderService.renderPageToString(Long.parseLong(applicationId), Long.parseLong(pageId));
   }
   
 }

@@ -33,7 +33,7 @@ public class Page implements java.io.Serializable
 
   //changed definition
   private String               name;
-  private Template             template;
+  //private Template             template;
   
   public Page()
   {
@@ -107,6 +107,7 @@ public class Page implements java.io.Serializable
     this.name = name;
   }
 
+  /*
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "template_id", nullable = false)
   public Template getTemplate() {
@@ -116,5 +117,5 @@ public class Page implements java.io.Serializable
   public void setTemplate(Template template) {
     this.template = template;
   }
-
+*/
 }
