@@ -46,7 +46,7 @@ public class SourceProcessorResultTableExtractor implements ResultSetExtractor<S
       final List<SourceProcessorResultTable.Column> cols = new ArrayList<SourceProcessorResultTable.Column>(rsm.getColumnCount());
 
       if(rsm != null) {
-        final SourceProcessorResultTable.Row row = results.new Row();
+        final SourceProcessorResultTable.Row row = results.new HeaderRow();
         row.setCells(new ArrayList<SourceProcessorResultTable.Cell>(rsm.getColumnCount()) {{
           logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "rsm.getColumnCount=" + rsm.getColumnCount());
           logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "cols.size=" + cols.size());

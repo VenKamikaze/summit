@@ -26,7 +26,7 @@ public class PageProcessing implements java.io.Serializable
   /**
    * This domain stores the request processing details of a particular summit page.
    * E.g. you could have page processing function written in SQL that inserts values
-   * longo a database table.
+   * into a database table.
    */
   private static final long serialVersionUID = -4307936142895462501L;
   

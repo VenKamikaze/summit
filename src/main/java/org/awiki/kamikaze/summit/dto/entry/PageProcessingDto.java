@@ -3,7 +3,11 @@ package org.awiki.kamikaze.summit.dto.entry;
 import org.hibernate.validator.constraints.NotBlank;
 
 
-// 2016-11-12 what was this for again?
+/**
+* This DTO is mapped from PageProcessing domain, it stores the request processing details of a particular summit page.
+* E.g. you could have page processing function written in SQL that inserts values
+* into a database table.
+*/
 public class PageProcessingDto {
   
   private Long               id;

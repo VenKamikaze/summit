@@ -3,7 +3,10 @@ package org.awiki.kamikaze.summit.service.formatter;
 import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_VARIABLE;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import javax.swing.event.ListSelectionEvent;
 
 import org.awiki.kamikaze.summit.domain.Template;
 import org.awiki.kamikaze.summit.dto.entry.FieldDto;
@@ -14,6 +17,9 @@ import org.awiki.kamikaze.summit.repository.TemplateRepository;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 
 @Service
 public class GenericFormatterServiceImpl implements GenericFormatterService
@@ -39,20 +45,21 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   }
 
   @Override
-  public StringBuilder format(StringBuilder builder, PageItem<String> item)
-  {
-    if(item.hasSubPageItems()) {
-      for(PageItem<String> innerItem : item.getSubPageItems()) {
-        @SuppressWarnings("unchecked")
-        FormatterService<PageItem<String>> formatter = (FormatterService<PageItem<String>>) formatters.getFormatterService(innerItem.getClass().getCanonicalName());
-        formatter.format(builder, innerItem);
-      }
-    }
-    
+  public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt)
+  { 
     //FIXME: HACK: /* Change this to using template instance, once we have implemented it */
     Template template = repository.findByClassName(item.getClass().getCanonicalName());
-    builder.append(template.getSource().replace(REPLACEMENT_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
-    
+    int nextInsertAt = template.getSource().indexOf(REPLACEMENT_VARIABLE.toString()) + insertAt;
+    builder.insert(insertAt, template.getSource().replace(REPLACEMENT_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
+
+    if(item.hasSubPageItems()) {
+      for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getSubPageItems())) ) {
+        @SuppressWarnings("unchecked")
+        FormatterService<PageItem<String>> formatter = (FormatterService<PageItem<String>>) formatters.getFormatterService(innerItem.getClass().getCanonicalName());
+        formatter.format(builder, innerItem, nextInsertAt);
+      }
+    }
+
     return builder;
   }
 

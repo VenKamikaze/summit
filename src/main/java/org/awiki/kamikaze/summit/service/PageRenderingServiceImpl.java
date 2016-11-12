@@ -2,14 +2,10 @@ package org.awiki.kamikaze.summit.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
 import org.awiki.kamikaze.summit.dto.entry.FieldDto;
 import org.awiki.kamikaze.summit.dto.entry.PageDto;
@@ -23,15 +19,14 @@ import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
-import org.awiki.kamikaze.summit.service.processor.SourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
-import org.hibernate.cfg.NotYetImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 /**
  * This is a top level service that co-ordinates the other sub-services to build up a full page.
@@ -44,8 +39,6 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   private static final Logger log = LoggerFactory.getLogger(PageRenderingServiceImpl.class);
   
   private static final String REGION_TYPE_REPORT = "Report";
-  
-  private static final String TEMPLATE_REPLACEMENT_VAR = "__#DATA#__";
   
   @Autowired
   private ApplicationPageRepository appPageStore;
@@ -109,12 +102,23 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    */
   private String processPageItems(final PageDto pageDto) {
     // Get the collection of pageItems in each region
-    Map<String, List<PageItem>> regionPageItems = processRegionsForRender(pageDto);
+    //Map<String, List<PageItem<?>>> regionPageItems = processRegionsForRender(pageDto);
+    long start = System.nanoTime();
+    processRegionsForRender(pageDto);
+    long end = System.nanoTime();
+    
+    log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processRegionsForRender took: " + (end - start) / 1000000 + "ms");
     
     //now run each page item through the formatters to apply each template
     final StringBuilder builder = new StringBuilder();
+    start = System.nanoTime();
     FormatterService service = sourceFormatters.getFormatterService(PageDto.class.getCanonicalName());
-    return service.format(builder, pageDto).toString();
+    final String result = service.format(builder, pageDto, 0).toString();
+    end = System.nanoTime();
+
+    log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": service.format took: " + (end - start) / 1000000 + "ms");
+
+    return result;
 
     
     //throw new NotYetImplementedException("Run each pageItem through the formatters here.");
@@ -146,13 +150,33 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     return templateBody;
   }
   */
-  // Map of REGION_POSITION_X to List<String (rendered content)>
-  private Map<String, List<PageItem>> processRegionsForRender(final PageDto pageDto) {
-    Map<String, List<PageItem>> processedRegions = new LinkedHashMap<>();
+  // Map of REGION_POSITION_X to List<String (rendered content)> 
+  
+  private void processRegionsForRender(final PageDto pageDto)  {
+    for(PageRegionDto pageRegionDto : pageDto.getPageRegions() ) {
+      RegionDto regionDto = pageRegionDto.getRegionDto();
+      Collection<PageItem<String>> regionItems = new ArrayList<>();
+      if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) ) {
+        ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
+        SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getSource().iterator().next(), null);
+        regionItems.add(resultTable);
+      }
+      else {
+        log.error("Found a " + regionDto.getCodeRegionType() + " ! FIXME: implement the processor!");
+      }
+
+      regionItems.addAll(processFieldsForRender(regionDto.getRegionFields()));
+      regionDto.setSubPageItems(regionItems);
+    } 
+  }
+  
+  /*
+  private Map<String, List<PageItem<?>>> processRegionsForRender(final PageDto pageDto) {
+    Map<String, List<PageItem<?>>> processedRegions = new LinkedHashMap<>();
     
     
     for(PageRegionDto pageRegionDto : pageDto.getPageRegions() ) {
-      List<PageItem> content = new ArrayList<>();
+      List<PageItem<?>> content = new ArrayList<>();
       if (processedRegions.containsKey(pageRegionDto.getRegionDto().getCodeRegionPosition()))
       {
         content = processedRegions.get(pageRegionDto.getRegionDto().getCodeRegionPosition());
@@ -173,11 +197,11 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       processedRegions.put(pageRegionDto.getRegionDto().getCodeRegionPosition(), content);
     }
     return processedRegions;
-  }
+  }*/
   
   
-  private Collection<PageItem> processFieldsForRender(final Set<RegionFieldDto> regionFieldDtos) {
-    Collection<PageItem> fields = new ArrayList<>();
+  private Collection<PageItem<String>> processFieldsForRender(final Set<RegionFieldDto> regionFieldDtos) {
+    Collection<PageItem<String>> fields = new ArrayList<>();
     
     for(RegionFieldDto regionFieldDto : regionFieldDtos) {
       final FieldDto fieldDto = regionFieldDto.getField();

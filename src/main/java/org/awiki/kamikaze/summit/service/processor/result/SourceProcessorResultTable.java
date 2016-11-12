@@ -143,6 +143,8 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   }
   
   public class HeaderRow extends SourceProcessorResultTable.Row {
+    public HeaderRow() { }
+    
     public HeaderRow(final List<Cell> cells) {
       super(cells);
     }
@@ -217,7 +219,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     @Override
     public boolean hasSubPageItems()
     {
-      return false;
+      return this.cells.size() > 0;
     }
 
     @Override
@@ -290,14 +292,12 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     public void setProcessedSource(String t)
     {
       // TODO Auto-generated method stub
-      
     }
 
     @Override
     public String getProcessedSource()
     {
-      // TODO Auto-generated method stub
-      return null;
+      return this.getValue();
     }
 
     @Override

@@ -10,7 +10,7 @@ import java.util.Set;
 import org.hibernate.validator.constraints.NotBlank;
 
 
-public class RegionDto implements PageItem {
+public class RegionDto implements PageItem<String> {
 
   private Long               id;
   private String                codeRegionPosition; // e.g. header,bodyX,footer
@@ -24,6 +24,9 @@ public class RegionDto implements PageItem {
   
   private Set<PageRegionDto>    pageRegions  = new HashSet<>(0);
   private Set<RegionFieldDto>   regionFields = new LinkedHashSet<>(0);
+  
+  ////// post-processed page items, not mapped.
+  private Collection<PageItem<String>> subPageItems = new LinkedHashSet<>(0);
   
   public Long getId() {
     return id;
@@ -75,29 +78,37 @@ public class RegionDto implements PageItem {
   {
     this.codeSourceType = codeSourceType;
   }
+  
+  public void setSubPageItems(Collection<PageItem<String>> subPageItems) {
+    this.subPageItems = subPageItems;
+  }
+  
   @Override
   public boolean hasSubPageItems()
   {
-    return regionFields.size() > 0;
+    return subPageItems.size() > 0;
   }
+  
   @Override
   public Collection<PageItem<String>> getSubPageItems()
   {
+    return subPageItems;
+    /*
     Collection<PageItem<String>> fields = new ArrayList<>(regionFields.size());
     for(RegionFieldDto regionField : regionFields) {
       fields.add(regionField.getField());
     }
     return fields;
+    */
   }
   
   @Override
-  public void setProcessedSource(Object t)
+  public void setProcessedSource(String t)
   {
-    // TODO Auto-generated method stub
-    
+    // postProcessedValue = t;
   }
   @Override
-  public Object getProcessedSource()
+  public String getProcessedSource()
   {
     // TODO Auto-generated method stub
     return null;
