@@ -4,6 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.awiki.kamikaze</groupId>
   <name>summit</name>
+  <artifactId>summit</artifactId>
   <packaging>war</packaging>
   <version>0.0.2-SNAPSHOT</version>
   <properties>
@@ -382,5 +383,4 @@
 
     </plugins>
   </build>
-  <artifactId>summit</artifactId>
 </project>
