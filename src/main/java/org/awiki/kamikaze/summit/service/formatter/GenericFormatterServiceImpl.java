@@ -13,6 +13,7 @@ import org.awiki.kamikaze.summit.dto.entry.FieldDto;
 import org.awiki.kamikaze.summit.dto.entry.PageDto;
 import org.awiki.kamikaze.summit.dto.entry.PageItem;
 import org.awiki.kamikaze.summit.dto.entry.RegionDto;
+import org.awiki.kamikaze.summit.dto.entry.TemplateDto;
 import org.awiki.kamikaze.summit.repository.TemplateRepository;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,7 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   @Override
   public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt)
   { 
-    //FIXME: HACK: /* Change this to using template instance, once we have implemented it */
-    Template template = repository.findByClassName(item.getClass().getCanonicalName());
+    final TemplateDto template = item.getTemplateDto(); 
     int nextInsertAt = template.getSource().indexOf(REPLACEMENT_VARIABLE.toString()) + insertAt;
     builder.insert(insertAt, template.getSource().replace(REPLACEMENT_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
 

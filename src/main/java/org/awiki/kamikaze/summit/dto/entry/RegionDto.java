@@ -24,6 +24,7 @@ public class RegionDto implements PageItem<String> {
   
   private Set<PageRegionDto>    pageRegions  = new HashSet<>(0);
   private Set<RegionFieldDto>   regionFields = new LinkedHashSet<>(0);
+  private TemplateDto           template;
   
   ////// post-processed page items, not mapped.
   private Collection<PageItem<String>> subPageItems = new LinkedHashSet<>(0);
@@ -113,4 +114,19 @@ public class RegionDto implements PageItem<String> {
     // TODO Auto-generated method stub
     return null;
   }
+  public TemplateDto getTemplate()
+  {
+    return template;
+  }
+  public void setTemplate(TemplateDto template)
+  {
+    this.template = template;
+  }
+
+  @Override
+  public TemplateDto getTemplateDto()
+  {
+    return getTemplate();
+  }
+
 }

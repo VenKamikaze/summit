@@ -82,5 +82,10 @@ public class PageDto implements PageItem<String> {
     return regions;
   }
   
-  
+  @Override
+  public TemplateDto getTemplateDto()
+  {
+    return getTemplate();
+  }
+
 }

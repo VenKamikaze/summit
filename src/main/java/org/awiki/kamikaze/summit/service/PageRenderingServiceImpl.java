@@ -110,7 +110,8 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processRegionsForRender took: " + (end - start) / 1000000 + "ms");
     
-    //now run each page item through the formatters to apply each template
+    //now start at the page formatter, which will coordinate
+    // all sub-page-items through their respective formatters to apply each template
     final StringBuilder builder = new StringBuilder();
     start = System.nanoTime();
     FormatterService service = sourceFormatters.getFormatterService(PageDto.class.getCanonicalName());
@@ -160,6 +161,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) ) {
         ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
         SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getSource().iterator().next(), null);
+        resultTable.setTemplateDto(regionDto.getTemplateDto());
         regionItems.add(resultTable);
       }
       else {

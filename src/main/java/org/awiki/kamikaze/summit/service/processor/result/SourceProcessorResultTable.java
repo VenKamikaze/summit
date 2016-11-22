@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.collections.iterators.ArrayListIterator;
 import org.awiki.kamikaze.summit.dto.entry.PageItem;
+import org.awiki.kamikaze.summit.dto.entry.TemplateDto;
 import org.awiki.kamikaze.summit.service.formatter.Formattable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ import org.slf4j.LoggerFactory;
 public class SourceProcessorResultTable implements PageItem<String>, Formattable<org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Row>
 {  
   private static final Logger logger = LoggerFactory.getLogger(SourceProcessorResultTable.class);
+  
+  private TemplateDto templateDto;
   
   /*
    * This class only knows about the list of rows it contains.
@@ -152,6 +155,8 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   
   
   public class Row implements PageItem<String>, Iterable<Cell>, Formattable<String> {
+    private TemplateDto templateDto;
+    
     private List<Cell> cells = new ArrayList<>();
 
     public Row() { }
@@ -241,11 +246,31 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       // TODO Auto-generated method stub
       return null;
     }
+
+    @Override
+    public TemplateDto getTemplateDto()
+    {
+      return templateDto;
+    }
+
+    public void setTemplateDto(final TemplateDto templateDto)
+    {
+      this.templateDto = templateDto;
+      for(TemplateDto childTemplate : templateDto.getChildren()) {
+        if(Cell.class.getCanonicalName().equals(childTemplate.getClassName())) {
+          for(Cell c : getCells()) {
+            c.setTemplateDto(childTemplate);
+          }
+        }
+        // FIXME: FooterRow TODO
+      }
+    }
     
   }
 
   
   public class Cell implements PageItem<String> {
+    private TemplateDto templateDto;
     private Row parentRow;
     private Column parentColumn;
     private String value;
@@ -305,6 +330,17 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     {
       return new ArrayList<>(0);
     }
+
+    @Override
+    public TemplateDto getTemplateDto()
+    {
+      return templateDto;
+    }
+
+    public void setTemplateDto(TemplateDto templateDto)
+    {
+      this.templateDto = templateDto;
+    }
   }
   
   @SuppressWarnings("serial")
@@ -352,5 +388,32 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public TemplateDto getTemplateDto()
+  {
+    return templateDto;
+  }
+
+  /**
+   * Also sets sub-element templates for headerRow and Row
+   * FIXME: Footer not implemented
+   * @param templateDto
+   */
+  public void setTemplateDto(final TemplateDto templateDto)
+  {
+    this.templateDto = templateDto;
+    for(TemplateDto childTemplate : templateDto.getChildren()) {
+      if(HeaderRow.class.getCanonicalName().equals(childTemplate.getClassName())) {
+        getHeader().setTemplateDto(childTemplate);
+      }
+      else if(Row.class.getCanonicalName().equals(childTemplate.getClassName())) {
+        for(Row r : getBody()) {
+          r.setTemplateDto(childTemplate);
+        }
+      }
+      // FIXME: FooterRow TODO
+    }
   }
 }

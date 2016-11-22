@@ -26,6 +26,7 @@ public class FieldDto implements PageItem<String> {
   private String                defaultValueSource; // actual SQL/HTML/JSP code
   private String                notes;
   private Set<RegionFieldDto>   regionFields = new HashSet<>(0);
+  private TemplateDto           template;
   
   private PostProcessedFieldContentDto postProcessedSource;
   private PostProcessedFieldContentDto postProcessedDefaultValue;
@@ -152,6 +153,20 @@ public class FieldDto implements PageItem<String> {
   public List<PageItem<String>> getSubPageItems()
   {
     return new ArrayList<>(0);
+  }
+  public TemplateDto getTemplate()
+  {
+    return template;
+  }
+  public void setTemplate(TemplateDto template)
+  {
+    this.template = template;
+  }
+
+  @Override
+  public TemplateDto getTemplateDto()
+  {
+    return getTemplate();
   }
   
 }

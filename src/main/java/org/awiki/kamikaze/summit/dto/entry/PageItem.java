@@ -25,6 +25,12 @@ public interface PageItem<T> // Where T is the processed source type
    */
   public Collection<PageItem<T>> getSubPageItems();
   
+  /**
+   * If the instance of this pageItem has an associated template, then return it.
+   * @return TemplateDto
+   */
+  public TemplateDto getTemplateDto();
+  
   public void setProcessedSource(T t); //unsure if needed
 
   /**

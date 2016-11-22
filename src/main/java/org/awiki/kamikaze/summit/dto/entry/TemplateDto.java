@@ -8,6 +8,10 @@ public class TemplateDto {
   private long       id;
   private String     className;
   private String     source;
+  private String     mimeType;
+  
+  private TemplateDto parent;
+  private Set<TemplateDto> children = new HashSet<>(0);
   
   private Set<PageDto> pages = new HashSet<>(0);
   
@@ -44,4 +48,32 @@ public class TemplateDto {
     this.pages = pages;
   }
 
+  public String getMimeType()
+  {
+    return mimeType;
+  }
+
+  public void setMimeType(String mimeType)
+  {
+    this.mimeType = mimeType;
+  }
+
+  public TemplateDto getParent() {
+    return parent;
+  }
+
+  public void setParent(TemplateDto parent) {
+    this.parent = parent;
+  }
+
+  public Set<TemplateDto> getChildren()
+  {
+    return children;
+  }
+
+  public void setChildren(Set<TemplateDto> children)
+  {
+    this.children = children;
+  }
+  
 }
