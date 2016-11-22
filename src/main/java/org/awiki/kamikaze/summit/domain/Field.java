@@ -42,6 +42,8 @@ public class Field implements java.io.Serializable
   //private String              defaultValue;
   private String              notes;
   private Set<RegionField>    regionFields = new HashSet<RegionField>(0);
+  private Template             template;
+  
 
   public Field()
   {
@@ -170,6 +172,17 @@ public class Field implements java.io.Serializable
   public void setRegionFields(Set<RegionField> regionFields)
   {
     this.regionFields = regionFields;
+  }
+
+  
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "template_id", nullable = false)
+  public Template getTemplate() {
+    return template;
+  }
+
+  public void setTemplate(Template template) {
+    this.template = template;
   }
 
 }

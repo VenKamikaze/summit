@@ -44,6 +44,8 @@ public class Region implements java.io.Serializable
   
   private Set<PageRegion>    pageRegions  = new HashSet<PageRegion>(0);
   private Set<RegionField>   regionFields = new HashSet<RegionField>(0);
+  private Template           template;
+  
 
   public Region()
   {
@@ -161,5 +163,17 @@ public class Region implements java.io.Serializable
   {
     this.codeSourceType = codeSourceType;
   }
+  
+  
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "template_id", nullable = false)
+  public Template getTemplate() {
+    return template;
+  }
+
+  public void setTemplate(Template template) {
+    this.template = template;
+  }
+
 
 }
