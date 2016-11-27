@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * Handles requests for the application home page.
  */
 @Controller
-public class RenderPageController {
+public class PageRenderController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(RenderPageController.class);
+	private static final Logger logger = LoggerFactory.getLogger(PageRenderController.class);
 
 	@Autowired
 	PageRenderingService renderService;
