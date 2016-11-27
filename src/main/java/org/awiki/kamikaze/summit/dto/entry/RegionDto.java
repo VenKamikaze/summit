@@ -1,10 +1,8 @@
 package org.awiki.kamikaze.summit.dto.entry;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -12,7 +10,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 public class RegionDto implements PageItem<String> {
 
-  private Long               id;
+  private Long                  id;
   private String                codeRegionPosition; // e.g. header,bodyX,footer
   private String                codeRegionType;     // e.g. HTML,SQL,JSP
   private String                codeSourceType;     // e.g. dml_report

@@ -1,9 +1,9 @@
 package org.awiki.kamikaze.summit.service;
 
+import static org.awiki.kamikaze.summit.domain.Region.REGION_TYPE_REPORT;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
@@ -37,8 +37,6 @@ import org.springframework.stereotype.Service;
 public class PageRenderingServiceImpl implements PageRenderingService {
   
   private static final Logger log = LoggerFactory.getLogger(PageRenderingServiceImpl.class);
-  
-  private static final String REGION_TYPE_REPORT = "Report";
   
   @Autowired
   private ApplicationPageRepository appPageStore;

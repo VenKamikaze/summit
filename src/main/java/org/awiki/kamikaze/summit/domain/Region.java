@@ -27,6 +27,7 @@ import org.awiki.kamikaze.summit.domain.codetable.CodeSourceType;
 public class Region implements java.io.Serializable
 {
 
+  public static final String REGION_TYPE_REPORT = "Report";
   /**
    * 
    */

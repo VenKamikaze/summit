@@ -1,6 +1,7 @@
 package org.awiki.kamikaze.summit.controller;
 
 import org.awiki.kamikaze.summit.service.PageRenderingService;
+import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +26,25 @@ public class PageRestController {
   /**
    * Checks all columns with an OR clause to find results.
    */
+  @RequestMapping(value = "/api/filter/{regionId}", method = RequestMethod.POST)
+  public SourceProcessorResultTable filterRegion(@PathVariable String regionId) {
+    /*
+     * 1) Store cached column names per page
+     * 2) * When we have a front-end for building queries, clear out the column names on query update
+     * 3) Allow searching on these column names
+     * 4) Wrap query statement in an outer query, and search on individual columns, use setMaxResults(x) to limit results
+     * 5) Return result as JSON, up to client to parse and use.
+     */
+    
+    logger.info("Hit page /api/filter/" + regionId);
+    throw new NotYetImplementedException("filterRegion");
+  }
+	
+  /**
+   * Checks all columns with an OR clause to find results.
+   */
   @RequestMapping(value = "/api/filter/{applicationId}/{pageId}", method = RequestMethod.POST)
-  @ResponseBody
-  public String filter(@PathVariable String applicationId, @PathVariable String pageId) {
+  public SourceProcessorResultTable filter(@PathVariable String applicationId, @PathVariable String pageId) {
     /*
      * 1) Store cached column names per page
      * 2) * When we have a front-end for building queries, clear out the column names on query update
@@ -45,8 +62,7 @@ public class PageRestController {
 	  * Checks specified columnName with a LIKE '%' + term + '%' clause to find results.
    */
   @RequestMapping(value = "/api/filter/{applicationId}/{pageId}/{columnName}", method = RequestMethod.POST)
-  @ResponseBody
-  public String filterColumn(@PathVariable String applicationId, @PathVariable String pageId, @PathVariable String columnName) {
+  public SourceProcessorResultTable filterColumn(@PathVariable String applicationId, @PathVariable String pageId, @PathVariable String columnName) {
     /*
      * 1) Store cached column names per page
      * 2) * When we have a front-end for building queries, clear out the column names on query update
