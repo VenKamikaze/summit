@@ -1,13 +1,14 @@
 package org.awiki.kamikaze.summit.controller;
 
+import org.awiki.kamikaze.summit.dto.entry.PageItem;
 import org.awiki.kamikaze.summit.service.PageFilteringService;
-import org.awiki.kamikaze.summit.service.PageRenderingService;
+import org.awiki.kamikaze.summit.service.formatter.FormatterService;
+import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,7 +26,10 @@ public class PageRestController {
 
 	@Autowired
 	private PageFilteringService filterService;
-
+	
+  @Autowired
+  private ProxyFormatterService sourceFormatters;
+	
   /**
    * Checks all columns with an OR clause to find results.
    */
@@ -46,6 +50,7 @@ public class PageRestController {
   /**
    * Checks all columns with an OR clause to find results.
    */
+  //@ResponseBody
   @RequestMapping(value = "/api/filter/{applicationId}/{pageId}", method = { RequestMethod.GET, RequestMethod.POST })
   public SourceProcessorResultTable filter(@PathVariable String applicationId, @PathVariable String pageId,
           @RequestParam(required=false,name="search") final String searchValue) {
@@ -59,7 +64,11 @@ public class PageRestController {
     
     logger.info("Hit page /api/filter/" + applicationId + "/" + pageId);
     
-    return filterService.filterPage(Long.parseLong(applicationId), Long.parseLong(pageId), searchValue);
+    final PageItem<String> filteredResults = filterService.filterPage(Long.parseLong(applicationId), Long.parseLong(pageId), searchValue);
+    return (SourceProcessorResultTable)filteredResults;
+    //FormatterService<PageItem<?>> formatter = sourceFormatters.getFormatterService(filteredResults.getClass().getCanonicalName());
+    
+    //return formatter.format(new StringBuilder(), filteredResults, 0).toString();
     
     //throw new NotYetImplementedException("filter");
   }

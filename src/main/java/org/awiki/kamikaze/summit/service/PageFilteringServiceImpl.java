@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.dto.entry.PageDto;
 import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
+import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
@@ -26,6 +27,9 @@ public class PageFilteringServiceImpl implements PageFilteringService
 
   @Autowired
   private ProxySourceProcessorService sourceProcessors;
+  
+  @Autowired
+  private ProxyFormatterService sourceFormatters;
   
   @Override
   public SourceProcessorResultTable filterPage(long applicationId, long pageId, String searchText)

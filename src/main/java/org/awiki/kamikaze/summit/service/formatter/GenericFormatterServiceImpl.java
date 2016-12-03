@@ -54,8 +54,7 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
 
     if(item.hasSubPageItems()) {
       for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getSubPageItems())) ) {
-        @SuppressWarnings("unchecked")
-        FormatterService<PageItem<String>> formatter = (FormatterService<PageItem<String>>) formatters.getFormatterService(innerItem.getClass().getCanonicalName());
+        FormatterService<PageItem<?>> formatter = formatters.getFormatterService(innerItem.getClass().getCanonicalName());
         formatter.format(builder, innerItem, nextInsertAt);
       }
     }

@@ -12,6 +12,11 @@ import org.awiki.kamikaze.summit.service.formatter.Formattable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.google.common.base.Objects;
+
 /**
  * When our source returns a table of information, this class is what is used to store the results.
  * It consists of {@link Column}s, {@link Row}s and {@link Cell}s.
@@ -27,6 +32,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
 {  
   private static final Logger logger = LoggerFactory.getLogger(SourceProcessorResultTable.class);
   
+  @JsonIgnore
   private TemplateDto templateDto;
   
   /*
@@ -37,8 +43,10 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   
   private Long pages;
   
+  @JsonManagedReference("tablerow")
   private List<Row> rows = new ArrayList<Row>();
-  
+
+  @JsonIgnore
   private List<Column> columns = new ArrayList<Column>();
   
   public Long getPages()
@@ -112,6 +120,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     private String name;
     private int order;
     
+    @JsonIgnore
     private List<Cell> cellsInColumn = new ArrayList<>();
 
 
@@ -168,13 +177,31 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     public HeaderRow(final List<Cell> cells) {
       super(cells);
     }
+    
+    @Override
+    public boolean equals(Object obj)
+    {
+      if(obj instanceof HeaderRow) {
+        return this.hashCode() == ( ((HeaderRow)obj).hashCode());
+      }
+      return false;
+    }
+    
+    @Override
+    public int hashCode()
+    {
+      return Objects.hashCode(cells);
+    }
   }
   
   
   public class Row implements PageItem<String>, Iterable<Cell>, Formattable<String> {
+
+    @JsonIgnore
     private TemplateDto templateDto;
     
-    private List<Cell> cells = new ArrayList<>();
+    @JsonManagedReference("rowcell")
+    protected List<Cell> cells = new ArrayList<>();
 
     public Row() { }
     
@@ -209,6 +236,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     }
 
     @Override
+    @JsonIgnore
     public Collection<String> getHeaderElements()
     {
       logger.debug("getHeaderElements called on row(), but row() cannot have non-body elements"); 
@@ -216,12 +244,14 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     }
 
     @Override
+    @JsonIgnore
     public Collection<String> getBodyElements()
     {
       return convertToStringCollection(this);
     }
 
     @Override
+    @JsonIgnore
     public Collection<String> getFooterElements()
     {
       logger.debug("getFooterElements called on row(), but row() cannot have non-body elements");
@@ -244,6 +274,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       return this.cells.size() > 0;
     }
 
+    @JsonIgnore
     @Override
     public Collection<PageItem<String>> getSubPageItems()
     {
@@ -287,9 +318,15 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
 
   
   public class Cell implements PageItem<String> {
+    @JsonIgnore
     private TemplateDto templateDto;
+    
+    @JsonBackReference("rowcell")
     private Row parentRow;
+    
+    @JsonIgnore
     private Column parentColumn;
+    
     private String value;
     
     public Cell(Row parentRow, Column parentColumn, String value)
@@ -342,6 +379,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       return this.getValue();
     }
 
+    @JsonIgnore
     @Override
     public Collection<PageItem<String>> getSubPageItems()
     {
@@ -360,6 +398,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     }
   }
   
+  @JsonIgnore
   @SuppressWarnings("serial")
   @Override
   public Collection<Row> getHeaderElements()
@@ -367,12 +406,14 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     return new ArrayList<Row>(1) {{ add(getHeader()); }};
   }
 
+  @JsonIgnore
   @Override
   public Collection<Row> getBodyElements()
   {
     return this.getBody();
   }
 
+  @JsonIgnore
   @SuppressWarnings("serial")
   @Override
   public Collection<Row> getFooterElements()
@@ -387,6 +428,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   }
 
   @Override
+  @JsonIgnore
   public Collection<PageItem<String>> getSubPageItems()
   {
     return new ArrayList<PageItem<String>>(this.rows);

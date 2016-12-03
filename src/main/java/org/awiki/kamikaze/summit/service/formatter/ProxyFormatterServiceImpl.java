@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.xml.crypto.NoSuchMechanismException;
 
+import org.awiki.kamikaze.summit.dto.entry.PageItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +18,15 @@ public class ProxyFormatterServiceImpl implements ProxyFormatterService {
   private Logger log = LoggerFactory.getLogger(ProxyFormatterServiceImpl.class);
   
   @Autowired
-  List<FormatterService<?>> formatterServices; // TODO: review, may not make sense to split these
+  List<FormatterService<PageItem<?>>> formatterServices; // TODO: review, may not make sense to split these
   
-  HashMap<String, FormatterService<?>> formatterServiceCache;
+  HashMap<String, FormatterService<PageItem<?>>> formatterServiceCache;
 
   @PostConstruct
   private void initializeCache()
   {
     formatterServiceCache = new HashMap<>(formatterServices.size());
-    for(FormatterService<?> service : formatterServices)
+    for(FormatterService<PageItem<?>> service : formatterServices)
     {
       for(String responsibility : service.getResponsibilities()){
         if (formatterServiceCache.containsKey(responsibility))
@@ -35,7 +36,7 @@ public class ProxyFormatterServiceImpl implements ProxyFormatterService {
     }
   }
   
-  public FormatterService<?> getFormatterService(final String canonicalClassNameToFormat) {
+  public FormatterService<PageItem<?>> getFormatterService(final String canonicalClassNameToFormat) {
     if (formatterServiceCache.get(canonicalClassNameToFormat) == null)
       throw new NoSuchMechanismException("No service found for formatter type=" + canonicalClassNameToFormat);
 
