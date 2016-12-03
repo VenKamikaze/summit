@@ -140,7 +140,7 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRe
         ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
         
         // TODO, split+call out to a formatter here to apply styling & formatting as needed to the results.
-        SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getSource().iterator().next(), null);
+        SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getId(), regionDto.getSource().iterator().next(), null);
         for(int y = 0; y < resultTable.getCount(); y++)
         {
           final SourceProcessorResultTable.Row row = resultTable.getRowByY(y);

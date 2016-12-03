@@ -1,6 +1,7 @@
 package org.awiki.kamikaze.summit.util;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,16 @@ public class DebugUtils {
             logger.info("DebugUtils: m.getName()=" + m.getName());
             if (r != null)
               logger.info("DebugUtils: r.toString()=" + r.toString());
+            if(r instanceof Map<?,?>) {
+              logger.info("DebugUtils: found map when calling "+ m.getName());
+              Map<?,?> map = (Map<?,?>)r;
+              if(map.keySet().size() > 0) {
+                for(Object k : map.keySet()) {
+                  logger.info("DebugUtils: mapkey= "+ k.toString());
+                  logger.info("DebugUtils: mapval= "+ map.get(k).toString());
+                }
+              }
+            }
             // do your thing with r
           }
       }

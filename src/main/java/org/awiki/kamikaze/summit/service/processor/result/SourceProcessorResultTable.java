@@ -39,6 +39,8 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   
   private List<Row> rows = new ArrayList<Row>();
   
+  private List<Column> columns = new ArrayList<Column>();
+  
   public Long getPages()
   {
     return pages;
@@ -58,12 +60,22 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   {
     return rows;
   }
+  
+  public List<Column> getColumns()
+  {
+    return columns;
+  }
 
   public void setRows(List<Row> rows)
   {
     this.rows = rows;
   }
 
+  public void setColumns(List<Column> columns)
+  {
+    this.columns = columns;
+  }
+  
   public Cell getCellByXY(int x, int y)
   {
     return this.rows.get(y).getCell(x);
@@ -142,6 +154,11 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     public void addCell(Cell cell)
     {
       this.cellsInColumn.add(cell);
+    }
+    
+    @Override
+    public String toString() {
+      return getName();
     }
   }
   

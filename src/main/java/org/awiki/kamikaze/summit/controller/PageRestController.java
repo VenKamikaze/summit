@@ -1,5 +1,6 @@
 package org.awiki.kamikaze.summit.controller;
 
+import org.awiki.kamikaze.summit.service.PageFilteringService;
 import org.awiki.kamikaze.summit.service.PageRenderingService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.hibernate.cfg.NotYetImplementedException;
@@ -10,18 +11,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Handles requests for the application home page.
  */
-@Controller
+@RestController
 public class PageRestController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(PageRestController.class);
 
 	@Autowired
-	PageRenderingService renderService;
+	private PageFilteringService filterService;
 
   /**
    * Checks all columns with an OR clause to find results.
@@ -43,8 +46,9 @@ public class PageRestController {
   /**
    * Checks all columns with an OR clause to find results.
    */
-  @RequestMapping(value = "/api/filter/{applicationId}/{pageId}", method = RequestMethod.POST)
-  public SourceProcessorResultTable filter(@PathVariable String applicationId, @PathVariable String pageId) {
+  @RequestMapping(value = "/api/filter/{applicationId}/{pageId}", method = { RequestMethod.GET, RequestMethod.POST })
+  public SourceProcessorResultTable filter(@PathVariable String applicationId, @PathVariable String pageId,
+          @RequestParam(required=false,name="search") final String searchValue) {
     /*
      * 1) Store cached column names per page
      * 2) * When we have a front-end for building queries, clear out the column names on query update
@@ -54,9 +58,11 @@ public class PageRestController {
      */
     
     logger.info("Hit page /api/filter/" + applicationId + "/" + pageId);
-    throw new NotYetImplementedException("filter");
+    
+    return filterService.filterPage(Long.parseLong(applicationId), Long.parseLong(pageId), searchValue);
+    
+    //throw new NotYetImplementedException("filter");
   }
-
 	
 	 /**
 	  * Checks specified columnName with a LIKE '%' + term + '%' clause to find results.

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author msaun
  *
  */
-public class GenericMapper
+public class GenericMapper<S,D>
 {
   @Autowired
   private Mapper mapper;

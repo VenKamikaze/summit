@@ -1,7 +1,10 @@
 package org.awiki.kamikaze.summit.service;
 
-import org.awiki.kamikaze.summit.domain.ApplicationPage;
-import org.awiki.kamikaze.summit.domain.PageRegion;
+import static org.awiki.kamikaze.summit.domain.Region.REGION_TYPE_REPORT;
+
+import java.util.Collection;
+
+import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.dto.entry.PageDto;
 import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
@@ -10,9 +13,9 @@ import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import static org.awiki.kamikaze.summit.domain.Region.REGION_TYPE_REPORT;
-
+@Service
 public class PageFilteringServiceImpl implements PageFilteringService
 {
   @Autowired
@@ -29,26 +32,27 @@ public class PageFilteringServiceImpl implements PageFilteringService
   {
     final PageDto pageDto = pageMapper.map(appPageStore.findByApplicationIdAndPageId(applicationId, pageId).getPage());
     
-    int count = 0;
-    
     for(PageRegionDto pr : pageDto.getPageRegions()) {
       if (REGION_TYPE_REPORT.equals(pr.getRegionDto().getCodeRegionType())) {
-        count++;
-       // ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
-       // SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getSource().iterator().next(), null);
-       // resultTable.setTemplateDto(regionDto.getTemplateDto());
-       // regionItems.add(resultTable);
+        ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(pr.getRegionDto().getCodeSourceType());
+        final String filteredQuery = buildWrapperQuery(pr.getRegionDto().getSource().iterator().next(), reportService.getColumnList(pr.getRegionDto().getId()), searchText);
+        SourceProcessorResultTable resultTable = reportService.querySource(null, filteredQuery, null);
+        resultTable.setTemplateDto(pr.getRegionDto().getTemplateDto());
+        return resultTable;
       }
     }
     
-    if(count > 1) {
-      throw new RuntimeException("Cannot use this method to search over two report regions. Please use method identifying regionId instead.");
-    }
-    
-    // TODO Auto-generated method stub
-    return null;
+    throw new RuntimeException("No report region found on " + applicationId + "/" + pageId + ".");
   }
 
+  private String buildWrapperQuery(final String innerQuery, final Collection<String> columnList, final String searchText) {
+    StringBuilder fullQuery = new StringBuilder();
+    fullQuery.append("SELECT ").append(StringUtils.join(columnList, ", "));
+    fullQuery.append(" FROM ( " + innerQuery + " ) SUBQUERY ");
+    fullQuery.append(" WHERE ").append(StringUtils.join(columnList, " = '" + searchText + "' OR ")).append(" = '" + searchText +"'");
+    return fullQuery.toString();
+  }
+  
   @Override
   public SourceProcessorResultTable filterPageByColumn(long applicationId, long pageId, String columnName,
           String searchText)

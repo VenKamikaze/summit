@@ -158,7 +158,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       Collection<PageItem<String>> regionItems = new ArrayList<>();
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) ) {
         ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
-        SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getSource().iterator().next(), null);
+        SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getId(), regionDto.getSource().iterator().next(), null);
         resultTable.setTemplateDto(regionDto.getTemplateDto());
         regionItems.add(resultTable);
       }

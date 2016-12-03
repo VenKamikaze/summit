@@ -77,6 +77,7 @@ public class SourceProcessorResultTableExtractor implements ResultSetExtractor<S
       } while(rs.next());
       
       results.setRows(rows);
+      results.setColumns(cols);
     }
     return results;
   }
