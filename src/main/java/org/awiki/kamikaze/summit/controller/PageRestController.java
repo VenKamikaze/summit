@@ -34,7 +34,8 @@ public class PageRestController {
    * Checks all columns with an OR clause to find results.
    */
   @RequestMapping(value = "/api/filter/{regionId}", method = RequestMethod.POST)
-  public SourceProcessorResultTable filterRegion(@PathVariable String regionId) {
+  public SourceProcessorResultTable filterRegion(@PathVariable String regionId, 
+          @RequestParam(required=false,name="search") final String searchValue) {
     /*
      * 1) Store cached column names per page
      * 2) * When we have a front-end for building queries, clear out the column names on query update

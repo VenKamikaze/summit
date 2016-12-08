@@ -3,28 +3,28 @@ package org.awiki.kamikaze.summit.service.formatter;
 import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_VARIABLE;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import javax.swing.event.ListSelectionEvent;
-
-import org.awiki.kamikaze.summit.domain.Template;
 import org.awiki.kamikaze.summit.dto.entry.FieldDto;
 import org.awiki.kamikaze.summit.dto.entry.PageDto;
 import org.awiki.kamikaze.summit.dto.entry.PageItem;
 import org.awiki.kamikaze.summit.dto.entry.RegionDto;
 import org.awiki.kamikaze.summit.dto.entry.TemplateDto;
 import org.awiki.kamikaze.summit.repository.TemplateRepository;
+import org.awiki.kamikaze.summit.service.processor.SQLReportSourceProcessorServiceImpl;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 @Service
 public class GenericFormatterServiceImpl implements GenericFormatterService
 {
+  private static final Logger logger = LoggerFactory.getLogger(GenericFormatterService.class);
+  
   @Autowired
   private TemplateRepository repository;
   
@@ -49,6 +49,7 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt)
   { 
     final TemplateDto template = item.getTemplateDto(); 
+    logger.debug("Formatting item : " + item.getClass().getCanonicalName());
     int nextInsertAt = template.getSource().indexOf(REPLACEMENT_VARIABLE.toString()) + insertAt;
     builder.insert(insertAt, template.getSource().replace(REPLACEMENT_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
 

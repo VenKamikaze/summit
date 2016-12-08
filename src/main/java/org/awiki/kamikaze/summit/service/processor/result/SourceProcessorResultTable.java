@@ -99,7 +99,10 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
 
   public Row getHeader()
   {
-    return new HeaderRow(getRowByY(0).getCells());
+    if(getRowByY(0) instanceof SourceProcessorResultTable.HeaderRow) {
+      return getRowByY(0);
+    }
+    return null;
   }
   
   public List<Row> getBody()
@@ -464,13 +467,13 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   {
     this.templateDto = templateDto;
     for(TemplateDto childTemplate : templateDto.getChildren()) {
-      if(HeaderRow.class.getCanonicalName().equals(childTemplate.getClassName())) {
-        getHeader().setTemplateDto(childTemplate);
-      }
-      else if(Row.class.getCanonicalName().equals(childTemplate.getClassName())) {
-        for(Row r : getBody()) {
-          r.setTemplateDto(childTemplate);
+      if(Row.class.getCanonicalName().equals(childTemplate.getClassName())) {
+        for(Row r : getRows()) {  // operates on HeaderRow and Row indiscriminately
+          r.setTemplateDto(childTemplate); // this lets Cell items in HeaderRow share templates with rows if no unique header cell template is specified.
         }
+      }
+      if(HeaderRow.class.getCanonicalName().equals(childTemplate.getClassName())) {
+        getHeader().setTemplateDto(childTemplate); // set header template after
       }
       // FIXME: FooterRow TODO
     }
