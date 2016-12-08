@@ -1,0 +1,138 @@
+<html>
+<head>
+<script type="text/javascript" src="./mustache.js">
+<!-- test -->
+  </script>
+  <script type="text/javascript" src="http://coenraets.org/tutorials/mustache/js/jquery-1.7.1.min.js">
+    <!-- jq -->
+  </script>
+  <script type="text/javascript">
+/*
+    function sample4() {
+	var data = {name: "John Smith", skills: ['JavaScript', 'PHP', 'Java']};
+	var tpl = "{{name}} skills:<ul>{{#skills}}<li>{{.}}</li>{{/skills}}</ul>";
+	var html = Mustache.to_html(tpl, data);
+	$('#sampleArea').html(html);
+}
+*/
+/*
+    function sample5() {
+	var data = {
+		employees: [
+		{	firstName: "Christophe",
+			lastName: "Coenraets"},
+		{	firstName: "John",
+			lastName: "Smith"}
+		]};
+	var template = "Employees:<ul>{{#employees}}<li>{{firstName}} {{lastName}}</li>{{/employees}}</ul>";
+	var html = Mustache.to_html(template, data);
+	$('#sampleArea').html(html);
+}
+*/
+    
+    function micktest() {
+     var template = "<table>{{#header}}<tr class=\"tablerowheader\">{{#cells}}<td class=\"tablecell\">{{value}}</td>{{/cells}}</tr>{{/header}}</table>";
+     var data = {
+"pages": null,
+"rows": [
+{
+"cells": [
+{
+"value": "id",
+"processedSource": "id"
+},
+{
+"value": "page_id",
+"processedSource": "page_id"
+},
+{
+"value": "region_id",
+"processedSource": "region_id"
+},
+{
+"value": "region_num",
+"processedSource": "region_num"
+}
+],
+"processedSource": null
+},
+{
+"cells": [
+{
+"value": "3",
+"processedSource": "3"
+},
+{
+"value": "1",
+"processedSource": "1"
+},
+{
+"value": "1",
+"processedSource": "1"
+},
+{
+"value": "1",
+"processedSource": "1"
+}
+],
+"processedSource": null
+}
+],
+"count": 2,
+"header": {
+"cells": [
+{
+"value": "id",
+"processedSource": "id"
+},
+{
+"value": "page_id",
+"processedSource": "page_id"
+},
+{
+"value": "region_id",
+"processedSource": "region_id"
+},
+{
+"value": "region_num",
+"processedSource": "region_num"
+}
+],
+"processedSource": null
+},
+"processedSource": null,
+"body": [
+{
+"cells": [
+{
+"value": "3",
+"processedSource": "3"
+},
+{
+"value": "1",
+"processedSource": "1"
+},
+{
+"value": "1",
+"processedSource": "1"
+},
+{
+"value": "1",
+"processedSource": "1"
+}
+],
+"processedSource": null
+}
+],
+"footer": null
+};
+      	var html = Mustache.to_html(template, data);
+	$('#sampleArea').html(html);
+    }
+  </script>
+</head>
+<body>
+<p>normal</p>
+  <div id="sampleArea"></div>
+  </body>
+</html>
