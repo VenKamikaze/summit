@@ -46,40 +46,55 @@ public class SourceProcessorResultTableExtractor implements ResultSetExtractor<S
       final List<SourceProcessorResultTable.Column> cols = new ArrayList<SourceProcessorResultTable.Column>(rsm.getColumnCount());
 
       if(rsm != null) {
-        final SourceProcessorResultTable.Row row = results.new HeaderRow();
-        row.setCells(new ArrayList<SourceProcessorResultTable.Cell>(rsm.getColumnCount()) {{
-          logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "rsm.getColumnCount=" + rsm.getColumnCount());
-          logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "cols.size=" + cols.size());
-          logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "rsm.getColumnLabel(1)=" + rsm.getColumnLabel(1));
-
-          for(int i = 0; i < rsm.getColumnCount(); ++i) {
-            if(cols.size() != rsm.getColumnCount())
-            {
-              logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "new Col(\""+rsm.getColumnLabel(i+1)+"\","+i+");");
-              cols.add(results.new Column(rsm.getColumnLabel(i+1), i));
-            }
-            add(results.new Cell(row, cols.get(i), (rsm.getColumnLabel(i+1)) ));
-          }
-        }});
-        rows.add(row);
+        rows.add(getColumnMetadata(results, rsm, cols));
       }
 
       do {
-        SourceProcessorResultTable.Row row = results.new Row();
-        List<SourceProcessorResultTable.Cell> rowOfCells = new ArrayList<SourceProcessorResultTable.Cell>(rsm.getColumnCount());
-        for(int i = 0; i < rsm.getColumnCount(); ++i) {
-          SourceProcessorResultTable.Cell cell = results.new Cell(row, cols.get(i), rs.getString(i+1));
-          cols.get(i).addCell(cell);
-          rowOfCells.add(cell);
-        }
-        row.setCells(rowOfCells);
-        rows.add(row);
+        rows.add(getRowData(rs, results, cols));
       } while(rs.next());
       
       results.setRows(rows);
       results.setColumns(cols);
     }
     return results;
+  }
+
+
+  private SourceProcessorResultTable.Row getRowData(final ResultSet rs, final SourceProcessorResultTable results, 
+          final List<SourceProcessorResultTable.Column> cols) throws SQLException
+  {
+    final SourceProcessorResultTable.Row row = results.new Row();
+    List<SourceProcessorResultTable.Cell> rowOfCells = new ArrayList<SourceProcessorResultTable.Cell>(rs.getMetaData().getColumnCount());
+    for(int i = 0; i < rs.getMetaData().getColumnCount(); ++i) {
+      SourceProcessorResultTable.Cell cell = results.new Cell(row, cols.get(i), rs.getString(i+1));
+      cols.get(i).addCell(cell);
+      rowOfCells.add(cell);
+    }
+    row.setCells(rowOfCells);
+    return row;
+    
+  }
+
+
+  private SourceProcessorResultTable.Row getColumnMetadata(final SourceProcessorResultTable results,
+          final ResultSetMetaData rsm, final List<SourceProcessorResultTable.Column> cols) throws SQLException
+  {
+    final SourceProcessorResultTable.Row row = results.new HeaderRow();
+    row.setCells(new ArrayList<SourceProcessorResultTable.Cell>(rsm.getColumnCount()) {{
+      logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "rsm.getColumnCount=" + rsm.getColumnCount());
+      logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "cols.size=" + cols.size());
+      logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "rsm.getColumnLabel(1)=" + rsm.getColumnLabel(1));
+
+      for(int i = 0; i < rsm.getColumnCount(); ++i) {
+        if(cols.size() != rsm.getColumnCount())
+        {
+          logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "new Col(\""+rsm.getColumnLabel(i+1)+"\","+i+");");
+          cols.add(results.new Column(rsm.getColumnLabel(i+1), i));
+        }
+        add(results.new Cell(row, cols.get(i), (rsm.getColumnLabel(i+1)) ));
+      }
+    }});
+    return row;
   }
 
 }
