@@ -1,3 +1,8 @@
+TODO: Replacement variables for e.g. current region/page/app id, so we can reference them within the templates.
+
+
+-------------------- Old notes from pre-December 2016 -----------------------
+
 * Render:
 
 * Picks up wanted page by ${applicationId}/${pageId}
