@@ -53,11 +53,14 @@ public class PageFilteringServiceImpl implements PageFilteringService
   }
 
   private String buildWrapperQuery(final String innerQuery, final Collection<String> columnList, final String searchText) {
-    StringBuilder fullQuery = new StringBuilder();
-    fullQuery.append("SELECT ").append(StringUtils.join(columnList, ", "));
-    fullQuery.append(" FROM ( " + innerQuery + " ) SUBQUERY ");
-    fullQuery.append(" WHERE ").append(StringUtils.join(columnList, " = '" + searchText + "' OR ")).append(" = '" + searchText +"'");
-    return fullQuery.toString();
+    if(searchText != null) {
+      StringBuilder fullQuery = new StringBuilder();
+      fullQuery.append("SELECT ").append(StringUtils.join(columnList, ", "));
+      fullQuery.append(" FROM ( " + innerQuery + " ) SUBQUERY ");
+      fullQuery.append(" WHERE ").append(StringUtils.join(columnList, " = '" + searchText + "' OR ")).append(" = '" + searchText +"'");
+      return fullQuery.toString();      
+    }
+    return innerQuery; // if no search is specified, just run the standard query.
   }
   
   private SourceProcessorResultTable filterQueryOnRegion(final RegionDto regionDto, final String searchText) {

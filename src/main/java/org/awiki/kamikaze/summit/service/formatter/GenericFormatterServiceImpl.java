@@ -49,17 +49,24 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt)
   { 
     final TemplateDto template = item.getTemplateDto(); 
-    logger.debug("Formatting item : " + item.getClass().getCanonicalName());
-    int nextInsertAt = template.getSource().indexOf(REPLACEMENT_VARIABLE.toString()) + insertAt;
-    builder.insert(insertAt, template.getSource().replace(REPLACEMENT_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
-
-    if(item.hasSubPageItems()) {
-      for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getSubPageItems())) ) {
-        FormatterService<PageItem<?>> formatter = formatters.getFormatterService(innerItem.getClass().getCanonicalName());
-        formatter.format(builder, innerItem, nextInsertAt);
+    // A template can be null, for example with Mustache templating you could handle Row/HeaderRow/Cell objects at a higher level
+    if(null != template) {
+      logger.debug("Formatting item : " + item.getClass().getCanonicalName());
+      int templateSourceReplaceLocation = template.getSource().indexOf(REPLACEMENT_VARIABLE.toString()) == -1 ? 0 : template.getSource().indexOf(REPLACEMENT_VARIABLE.toString());
+      int nextInsertAt = templateSourceReplaceLocation + insertAt;
+      builder.insert(insertAt, template.getSource().replace(REPLACEMENT_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
+  
+      if(item.hasSubPageItems()) {
+        for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getSubPageItems())) ) {
+          FormatterService<PageItem<?>> formatter = formatters.getFormatterService(innerItem.getClass().getCanonicalName());
+          formatter.format(builder, innerItem, nextInsertAt);
+        }
       }
     }
-
+    else {
+      logger.debug("Got null template for item: " + item.getClass().getCanonicalName());
+    }
+    
     return builder;
   }
 

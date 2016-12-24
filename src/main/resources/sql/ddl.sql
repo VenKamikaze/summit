@@ -84,9 +84,10 @@ create table TEMPLATE
 (
   ID bigint primary key,
   PARENT_ID bigint references TEMPLATE(ID),  -- used exclusively for items on a page that are sub-elements and do not have their own tables to represent them, e.g. the ROWS and CELLS within a table.
+  DESCRIPTION character varying(255),
   CLASS_NAME character varying(32000) not null,
   SOURCE character varying(32000),
-  MIME_TYPE character varying(255)  -- e.g. text/html, application/json, text/csv etc  
+  MIME_TYPE character varying(255)  -- e.g. text/html, application/json, text/csv etc
 );
 
 
@@ -98,7 +99,7 @@ create table TEMPLATE
   id,
   page_id references page.id
   template_id references template.id
-  mimetype  -- e.g. text/html, application/json, text/csv etc  
+  mimetype  -- e.g. text/html, application/json, text/csv etc
 )
 
 
@@ -124,9 +125,9 @@ create table TEMPLATE
   id,
   class_name,
   pre_element,
-  post_element 
+  post_element
 )
- 
+
  table itself, <table> </table>
  header row (needs its own class) <th> </th>
  row <tr></tr>
@@ -255,5 +256,3 @@ create sequence page_seq start 1;
 create sequence region_seq start 1;
 create sequence field_seq start 1;
 create sequence spare_seq start 1;
-
-
