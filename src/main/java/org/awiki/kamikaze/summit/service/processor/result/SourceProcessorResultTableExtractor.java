@@ -24,6 +24,12 @@ public class SourceProcessorResultTableExtractor implements ResultSetExtractor<S
 {
   private static final Logger logger = LoggerFactory.getLogger(SQLReportSourceProcessorServiceImpl.class);
   
+  private final String id;
+  
+  public SourceProcessorResultTableExtractor(String id)
+  {
+    this.id = id;
+  }
   
   /** 
    * This extracts data from a standard SQL ResultSet and stores it in a SourceProcessorResultTable.
@@ -33,7 +39,7 @@ public class SourceProcessorResultTableExtractor implements ResultSetExtractor<S
   @Override
   public SourceProcessorResultTable extractData(ResultSet rs) throws SQLException, DataAccessException
   {
-    final SourceProcessorResultTable results = new SourceProcessorResultTable();
+    final SourceProcessorResultTable results = new SourceProcessorResultTable(id);
     List<SourceProcessorResultTable.Row> rows = new ArrayList<SourceProcessorResultTable.Row>();
     /*if(rs.last())
     {

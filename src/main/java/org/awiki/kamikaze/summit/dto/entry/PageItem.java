@@ -11,6 +11,8 @@ public interface PageItem
 
 public interface PageItem<T> // Where T is the processed source type
 {
+  public Object getId();
+  
   /**
    * whether this pageItem contains PageItems itself.
    * This helps control the order that the items are processed in (inner first, then outer).

@@ -41,6 +41,8 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
    * Each Cell knows it's value, parent row and a parent Column
    */
   
+  private String id;
+  
   private Long pages;
   
   @JsonManagedReference("tablerow")
@@ -49,6 +51,11 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   @JsonIgnore
   private List<Column> columns = new ArrayList<Column>();
   
+  public SourceProcessorResultTable(String id)
+  {
+    this.id = id;
+  }
+
   public Long getPages()
   {
     return pages;
@@ -316,6 +323,13 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
         // FIXME: FooterRow TODO
       }
     }
+
+    @Override
+    public Object getId()
+    {
+      logger.warn("getId() called on " + this.getClass().getCanonicalName() + " but we have no ID. Returning hashCode()");
+      return hashCode();
+    }
     
   }
 
@@ -399,6 +413,13 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     {
       this.templateDto = templateDto;
     }
+
+    @Override
+    public Object getId()
+    {
+      logger.warn("getId() called on " + this.getClass().getCanonicalName() + " but we have no specific ID. Return hashCode()");
+      return hashCode();
+    }
   }
   
   @JsonIgnore
@@ -478,5 +499,14 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       }
       // FIXME: FooterRow TODO
     }
+  }
+
+  @Override
+  public Object getId()
+  {
+    if(id != null)
+      return id;
+    logger.warn("getId() called on " + this.getClass().getCanonicalName() + " but we have no specific ID. Return hashCode()");
+    return hashCode();
   }
 }

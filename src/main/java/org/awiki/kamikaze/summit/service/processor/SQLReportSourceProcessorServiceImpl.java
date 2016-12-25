@@ -57,14 +57,14 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   @Override
   public SourceProcessorResultTable querySource(Long regionId, final String source, List<BindVar<Types>> bindVars)
   {
-    final SourceProcessorResultTable table = getResults(source, getParams(bindVars));
+    final SourceProcessorResultTable table = getResults(source, getParams(bindVars), regionId != null ? regionId.toString() : null);
     if(regionId != null) {
       updateColumnList(regionId, getColumnNames(table));
     }
     return table;
   }
   
-  private SourceProcessorResultTable getResults(final String source, List params)
+  private SourceProcessorResultTable getResults(final String source, List params, String regionId)
   {
     PreparedStatementCreatorFactory  factory = new PreparedStatementCreatorFactory(source);
     factory.setResultSetType(ResultSet.TYPE_SCROLL_INSENSITIVE);
@@ -72,7 +72,7 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
     PreparedStatementCreator psc = factory.newPreparedStatementCreator(params);
     logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "about to process source: " + source );
     logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "params=" + StringUtils.collectionToCommaDelimitedString(params) );
-    return jdbc.getJdbcOperations().query(psc, new SourceProcessorResultTableExtractor());
+    return jdbc.getJdbcOperations().query(psc, new SourceProcessorResultTableExtractor(regionId));
   }
   
   private List getParams(List<BindVar<Types>> bindVars)
@@ -116,7 +116,7 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   public Collection<String> getColumnList(long regionId)
   {
     RegionDto regionDto = regionMapper.map(regionRepo.findOne(regionId), RegionDto.class);
-    final SourceProcessorResultTable table = getResults(regionDto.getSource().iterator().next(), null);
+    final SourceProcessorResultTable table = getResults(regionDto.getSource().iterator().next(), null, String.valueOf(regionId));
     return getColumnNames(table);
   }
 

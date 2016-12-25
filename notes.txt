@@ -1,4 +1,6 @@
 TODO: Replacement variables for e.g. current region/page/app id, so we can reference them within the templates.
+Need to be able to then use these variables in place of e.g. the region id for a report region, so we can have multiple report regions working with the mustache templating on one page.
+
 
 
 -------------------- Old notes from pre-December 2016 -----------------------
