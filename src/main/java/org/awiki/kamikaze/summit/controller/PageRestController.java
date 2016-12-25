@@ -33,7 +33,7 @@ public class PageRestController {
   /**
    * Checks all columns with an OR clause to find results.
    */
-  @RequestMapping(value = "/api/filter/{regionId}", method = RequestMethod.POST)
+  @RequestMapping(value = "/api/filter/{regionId}", method = { RequestMethod.GET, RequestMethod.POST })
   public SourceProcessorResultTable filterRegion(@PathVariable String regionId, 
           @RequestParam(required=false,name="search") final String searchValue) {
     /*
@@ -45,7 +45,8 @@ public class PageRestController {
      */
     
     logger.info("Hit page /api/filter/" + regionId);
-    throw new NotYetImplementedException("filterRegion");
+    final PageItem<String> filteredResults = filterService.filterRegion(Long.parseLong(regionId), searchValue);
+    return (SourceProcessorResultTable)filteredResults;
   }
 	
   /**
@@ -67,11 +68,6 @@ public class PageRestController {
     
     final PageItem<String> filteredResults = filterService.filterPage(Long.parseLong(applicationId), Long.parseLong(pageId), searchValue);
     return (SourceProcessorResultTable)filteredResults;
-    //FormatterService<PageItem<?>> formatter = sourceFormatters.getFormatterService(filteredResults.getClass().getCanonicalName());
-    
-    //return formatter.format(new StringBuilder(), filteredResults, 0).toString();
-    
-    //throw new NotYetImplementedException("filter");
   }
 	
 	 /**
