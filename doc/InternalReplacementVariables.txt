@@ -1,0 +1,5 @@
+The following replacment variables are processed by the internal formatters and replaced with identifiers unique to each section:
+
+##__DATA__## : This identifies sub-region replacement locations.
+##__ID__## : This identifies an ID for the current region.
+
