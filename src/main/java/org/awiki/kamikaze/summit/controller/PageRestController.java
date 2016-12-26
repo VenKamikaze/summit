@@ -35,7 +35,9 @@ public class PageRestController {
    */
   @RequestMapping(value = "/api/filter/{regionId}", method = { RequestMethod.GET, RequestMethod.POST })
   public SourceProcessorResultTable filterRegion(@PathVariable String regionId, 
-          @RequestParam(required=false,name="search") final String searchValue) {
+          @RequestParam(required=false,name="search") final String searchValue,
+          @RequestParam(required=false,name="page") final String pageNumber,
+          @RequestParam(required=false,name="rows") final String rowsPerPage) {
     /*
      * 1) Store cached column names per page
      * 2) * When we have a front-end for building queries, clear out the column names on query update
