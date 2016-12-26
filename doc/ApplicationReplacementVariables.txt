@@ -1,0 +1,6 @@
+The following replacment variables are processed by the generic formatter and replaced with identifiers that can be specified via the src/main/resources/applicationContext-replacement-vars.xml file:
+
+##__CONTEXTPATH__## : /summit
+##__APIPATH__## : /summit/api
+
+You can modify the above to suit your environment, for example if you have summit behind a proxy you may need to modify the generated path for CONTEXTPATH or APIPATH. You can also add your own and then use them within your templates.

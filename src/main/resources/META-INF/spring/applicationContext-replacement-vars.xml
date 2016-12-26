@@ -12,6 +12,7 @@
   <bean id="variableManager" class="org.awiki.kamikaze.summit.service.VariableManager">
     <constructor-arg index="0">
       <map>
+        <entry key="##__CONTEXTPATH__##" value="/summit" />
         <entry key="##__APIPATH__##" value="/summit/api" />
       </map>
     </constructor-arg>
