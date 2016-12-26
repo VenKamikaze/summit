@@ -105,9 +105,9 @@ public class PageFilteringServiceImpl implements PageFilteringService
         
       case POSTGRES:
       case MYSQL:
-        currentQuery.append("LIMIT ").append(rowsPerPage);
+        currentQuery.append(" LIMIT ").append(rowsPerPage);
         if(page > 1) {
-          currentQuery.append("OFFSET ").append(page-1 * rowsPerPage);
+          currentQuery.append(" OFFSET ").append(page-1 * rowsPerPage);
         }
         break;
         
