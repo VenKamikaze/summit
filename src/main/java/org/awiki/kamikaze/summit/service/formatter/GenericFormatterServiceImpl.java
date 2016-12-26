@@ -5,15 +5,16 @@ import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMEN
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-
 import org.awiki.kamikaze.summit.dto.entry.FieldDto;
 import org.awiki.kamikaze.summit.dto.entry.PageDto;
 import org.awiki.kamikaze.summit.dto.entry.PageItem;
 import org.awiki.kamikaze.summit.dto.entry.RegionDto;
 import org.awiki.kamikaze.summit.dto.entry.TemplateDto;
 import org.awiki.kamikaze.summit.repository.TemplateRepository;
+import org.awiki.kamikaze.summit.service.VariableManager;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,9 @@ import com.google.common.collect.Lists;
 public class GenericFormatterServiceImpl implements GenericFormatterService
 {
   private static final Logger logger = LoggerFactory.getLogger(GenericFormatterService.class);
+  
+  @Autowired
+  private VariableManager variableManager;
   
   @Autowired
   private TemplateRepository repository;
@@ -54,8 +58,8 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
     // A template can be null, for example with Mustache templating you could handle Row/HeaderRow/Cell objects at a higher level
     if(null != template) {
       logger.debug("Formatting item : " + item.getClass().getCanonicalName());
-      final String templateSource = replaceInternalVariables(template.getSource(), item);
-      
+      String templateSource = replaceInternalVariables(template.getSource(), item);
+      templateSource = replaceApplicationVariables(templateSource, variableManager.getReplacementVars());
       int templateSourceReplaceLocation = templateSource.indexOf(REPLACEMENT_SUBREGION_VARIABLE.toString()) == -1 ? 0 : templateSource.indexOf(REPLACEMENT_SUBREGION_VARIABLE.toString());
       int nextInsertAt = templateSourceReplaceLocation + insertAt;
       builder.insert(insertAt, templateSource.replace(REPLACEMENT_SUBREGION_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
@@ -82,6 +86,14 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
    */
   private String replaceInternalVariables(String templateSource, PageItem<String> item) {
     return StringUtils.replace(templateSource, REPLACEMENT_ID_VARIABLE.toString(), item.getId().toString());
+  }
+  
+  String replaceApplicationVariables(String templateSource, Map<String,String> replacementVariables) {
+    String processedString = templateSource;
+    for(Map.Entry<String,String> me : replacementVariables.entrySet()) {
+      processedString = StringUtils.replace(processedString, me.getKey(), me.getValue());
+    }
+    return processedString;
   }
 
 }
