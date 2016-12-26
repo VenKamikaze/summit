@@ -9,7 +9,7 @@
   <!-- The variable manager will be used for replacing the key values within
     the template definitions. You can safely add or change these values to suit
     your environment. -->
-  <bean id="variableManager" class="org.awiki.kamikaze.summit.service.VariableManager">
+  <bean id="variableManager" class="org.awiki.kamikaze.summit.util.component.VariableManager">
     <constructor-arg index="0">
       <map>
         <entry key="##__CONTEXTPATH__##" value="/summit" />

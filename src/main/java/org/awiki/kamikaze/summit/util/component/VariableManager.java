@@ -1,4 +1,4 @@
-package org.awiki.kamikaze.summit.service;
+package org.awiki.kamikaze.summit.util.component;
 
 import java.util.HashMap;
 import java.util.Map;
