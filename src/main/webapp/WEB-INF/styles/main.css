@@ -63,7 +63,7 @@ a:visited {
 
 .listContent {
   margin-left: 4em;
-  width: 40em;
+  width: 90%;
 }
 
 .searchBar {
@@ -71,16 +71,13 @@ a:visited {
   margin-bottom: 1em;
   margin-left: 4em;
   margin-right: 3em;
-
-  width: 40em;
+  width: 70%;
 }
 
 .search {
 	font-size: 10pt;
 	border-bottom: 1px solid #dcdcdc;
-	width: 28em;
-    height: 2.3em;
-
+  height: 2.3em;
 }
 
 .search-image {
@@ -90,8 +87,9 @@ a:visited {
     margin-right: 1em;
 }
 
-.search #search {
+.search input[type=text] {
 	margin-left: 1em;
+  width: 50%
 }
 
 .searchButton {

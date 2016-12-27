@@ -67,7 +67,7 @@ public class PageFilteringServiceImpl implements PageFilteringService
 
   private String buildWrapperQuery(final String innerQuery, final Collection<String> columnList, final String searchText,
           long page, long rowsPerPage) {
-    if(searchText != null) {
+    if(StringUtils.isNotEmpty(searchText)) {
       StringBuilder fullQuery = new StringBuilder();
       fullQuery.append("SELECT ").append(StringUtils.join(columnList, ", "));
       fullQuery.append(" FROM ( " + innerQuery + " ) SUBQUERY ");
