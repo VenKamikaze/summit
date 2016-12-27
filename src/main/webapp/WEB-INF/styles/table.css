@@ -1,4 +1,4 @@
-#rounded-corner
+.rounded-corner
 {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
@@ -7,31 +7,32 @@
 	text-align: left;
 	border-collapse: collapse;
 }
-#rounded-corner thead th.rounded-start
+.rounded-corner thead th.rounded-start
 {
 	background: #00649e url('images/left.png') left -1px no-repeat;
 }
-#rounded-corner thead th.rounded-end
+.rounded-corner thead th.rounded-end
 {
 	background: #00649e url('images/right.png') right -1px no-repeat;
 }
 
-#rounded-corner tbody tr
+.rounded-corner tbody tr
 {
   cursor: pointer;
 }
 
-#rounded-corner tbody tr.row-0
+.rounded-corner tbody tr.row-0,
+.rounded-corner tbody tr.tablerowdata
 {
   background: #e8edff;
 }
 
-#rounded-corner tbody tr.row-1
+.rounded-corner tbody tr.row-1
 {
   background: #dae5f4;
 }
 
-#rounded-corner th
+.rounded-corner th
 {
 	padding: 8px;
 	font-weight: normal;
@@ -40,39 +41,37 @@
         font-weight: bold;
 	background: #00649e;
 }
-#rounded-corner td
+.rounded-corner td
 {
 	padding: 8px;
-/*	background: #e8edff; 
+/*	background: #e8edff;
 	color: #669; */
 	border-top: 1px solid #fff;
 }
-#rounded-corner tfoot td.rounded-foot-left
+.rounded-corner tfoot td.rounded-foot-left
 {
 	background: #e8edff url('images/botleft.png') left bottom no-repeat;
         text-align: left;
 }
-#rounded-corner tfoot td.rounded-foot-right
+.rounded-corner tfoot td.rounded-foot-right
 {
 	background: #e8edff url('images/botright.png') right bottom no-repeat;
         text-align: right;
 }
-#rounded-corner tbody tr:hover td
+.rounded-corner tbody tr:hover td
 {
 	background: #d0dafd;
 }
 
-#rounded-corner tfoot td.table-buttons-left
+.rounded-corner tfoot td.table-buttons-left
 {
 	background: #fff;
 	color: #000;
 }
 
-#rounded-corner tfoot td.table-buttons-right
+.rounded-corner tfoot td.table-buttons-right
 {
 	background: #fff;
 	color: #000;
 	text-align: right;
 }
-
-
