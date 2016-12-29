@@ -1,12 +1,13 @@
 package org.awiki.kamikaze.summit.service;
 
 import static org.awiki.kamikaze.summit.domain.Region.REGION_TYPE_REPORT;
-import static org.awiki.kamikaze.summit.service.DatabaseTypeEnum.*;
 
+import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.awiki.kamikaze.summit.controller.PageRestController;
 import org.awiki.kamikaze.summit.dto.entry.PageDto;
 import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.entry.RegionDto;
@@ -15,6 +16,7 @@ import org.awiki.kamikaze.summit.repository.RegionRepository;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
+import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
@@ -155,12 +157,21 @@ public class PageFilteringServiceImpl implements PageFilteringService
   private SourceProcessorResultTable filterQueryOnRegion(final RegionDto regionDto, final String searchText, long page, long rowsPerPage) {
     if (REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType())) {
       ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
-      final String filteredQuery = buildWrapperQuery(regionDto.getSource().iterator().next(), reportService.getColumnList(regionDto.getId()), searchText,page, rowsPerPage);
+      final Collection<String> columnList = reportService.getColumnList(regionDto.getId());
+      final String filteredQuery = buildWrapperQuery(regionDto.getSource().iterator().next(), columnList, searchText,page, rowsPerPage);
       SourceProcessorResultTable resultTable = reportService.querySource(null, filteredQuery, null);
       resultTable.setTemplateDto(regionDto.getTemplateDto());
       return resultTable;
     }
     return null;
+  }
+  
+  private List<BindVar> buildParametersForFullQuery(final int numColumns, final String searchText) {
+    return new ArrayList<BindVar>(numColumns) {{ 
+      for(int i = 0; i < numColumns; i++) {
+        add(new BindVar(searchText, java.sql.Types.VARCHAR, String.valueOf(i))); 
+      }
+     }};
   }
   
   @Override

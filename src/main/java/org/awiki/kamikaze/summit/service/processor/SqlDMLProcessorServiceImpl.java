@@ -35,14 +35,14 @@ public class SqlDMLProcessorServiceImpl implements SingularSourceProcessorServic
   }
   
   @Override
-  public SourceProcessorResult executeSource(final String sql, List<BindVar<Types>> bindVars) {
+  public SourceProcessorResult executeSource(final String sql, List<BindVar> bindVars) {
     SqlParameterSource params = mapBindVars(bindVars);
     int changedRows = jdbc.update(sql,params);
     return new SourceProcessorResult((long) changedRows, SourceProcessorResult.STANDARD_SUCCESS_CODE, SourceProcessorResult.STANDARD_SUCCESS_MESSAGE, null);
   }
   
   @Override
-  public SourceProcessorResult querySource(final String sql, List<BindVar<Types>> bindVars) {
+  public SourceProcessorResult querySource(final String sql, List<BindVar> bindVars) {
     SqlParameterSource params = mapBindVars(bindVars);
     
     SourceProcessorResult result = new SourceProcessorResult();
@@ -62,7 +62,7 @@ public class SqlDMLProcessorServiceImpl implements SingularSourceProcessorServic
     //return "evaluate if this makes sense here.";
   }
 
-  protected SqlParameterSource mapBindVars(List<BindVar<Types>> bindVars)
+  protected SqlParameterSource mapBindVars(List<BindVar> bindVars)
   {
     MapSqlParameterSource params = new MapSqlParameterSource();
     for(BindVar var : bindVars)

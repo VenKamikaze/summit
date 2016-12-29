@@ -55,7 +55,7 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   }
 
   @Override
-  public SourceProcessorResultTable querySource(Long regionId, final String source, List<BindVar<Types>> bindVars)
+  public SourceProcessorResultTable querySource(Long regionId, final String source, List<BindVar> bindVars)
   {
     final SourceProcessorResultTable table = getResults(source, getParams(bindVars), regionId != null ? regionId.toString() : null);
     if(regionId != null) {
@@ -75,12 +75,12 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
     return jdbc.getJdbcOperations().query(psc, new SourceProcessorResultTableExtractor(regionId));
   }
   
-  private List getParams(List<BindVar<Types>> bindVars)
+  private List getParams(List<BindVar> bindVars)
   {
     ArrayList paramList = new ArrayList(bindVars != null ? bindVars.size() : 1);
     if (bindVars != null)
     {
-      for (BindVar<Types> var : bindVars)
+      for (BindVar var : bindVars)
       {
         paramList.add( var.getValue());
       }
@@ -89,7 +89,7 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   }
   
   @Deprecated
-  protected SqlParameterSource mapBindVars(List<BindVar<Types>> bindVars)
+  protected SqlParameterSource mapBindVars(List<BindVar> bindVars)
   {
     MapSqlParameterSource params = new MapSqlParameterSource();
     if (bindVars != null)
