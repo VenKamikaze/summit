@@ -1,0 +1,81 @@
+<link type="text/css" rel="stylesheet" media="all" href="##__CONTEXTPATH__##/styles/table.css" />
+<div style="clear: both;"></div>
+<div class="searchBar">
+    <div class="search">
+        <form id="searchForm" action="##__APIPATH__##/filter/##__ID__##.json" method="post">
+            <div class="search-image"></div>
+            <div class="fieldgroup">
+                <div class="field"><label for="search">Search:</label><input name="search" type="text" id="searchInput" />
+                    <div class="searchButton">
+                      <input value="Go" name="action" type="submit" id="searchButton" />
+                      <input value="Clear" name="action" type="submit" id="clearSearchButton" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="listContent">
+    <div class="region" id="mustacheReportRegion-##__ID__##">##__DATA__##</div>
+    <script type="text/javascript">
+        var searchUrl = "##__APIPATH__##/filter/##__ID__##.json";
+
+        function select(id) {
+            parent.window.location.href = "##__CONTEXTPATH__##/view/" + id;
+        };
+
+        function processJsonResponse(data) {
+            buildHtmlTable(data);
+            var idIdx = getIdColumnIndex(data);
+            if (idIdx != null) {
+                linkViewPageToRows(idIdx, data, $("#mustacheReportRegion-##__ID__##"));
+            }
+        };
+
+        function buildHtmlTable(data) {
+            var template =
+                "<table id=\"mustache_table\" class=\"rounded-corner\"><thead>{{#header}}<tr class=\"tablerowheader\">{{#cells}}<th class=\"tablecell\">{{value}}</th>{{/cells}}</tr>{{/header}}</thead><tbody>{{#body}}<tr class=\"tablerowdata\">{{#cells}}<td class=\"tablecell\">{{value}}</td>{{/cells}}</tr>{{/body}}</tbody></table></div>";
+            var html = Mustache.to_html(template, data);
+            $("#mustacheReportRegion-##__ID__##").html(html);
+        };
+
+        function getIdColumnIndex(data) {
+            var columnIndexForId = null;
+            $.each(data.header.cells, function(index, cell) {
+                if ("id" === cell.value) {
+                    columnIndexForId = index;
+                }
+            });
+            return columnIndexForId;
+        };
+
+        function linkViewPageToRows(idIdx, data, elementContainingTable) {
+            var mustacheTableElement = elementContainingTable.find("table");
+            if (mustacheTableElement[0] !== undefined) {
+                var trElements = mustacheTableElement.find("tr"); /* ignore first element as it is the header */
+                $.each(data.body, function(index, row) {
+                    trElements[index + 1].onclick = function() {
+                        select(row.cells[idIdx].value);
+                    };
+                });
+            }
+        };
+
+        function doRequest(formData) {
+            var data = $.ajax({
+                url: searchUrl,
+                data: formData,
+                cache: false,
+                success: function(response) {
+                    processJsonResponse(response);
+                }
+            });
+        };
+        $(document).ready(doRequest(null));
+        $("#searchForm").on("submit", function(event) {
+            event.preventDefault();
+            var formData = $(this).serialize();
+            console.log(formData);
+            doRequest(formData);
+        });
+    </script>

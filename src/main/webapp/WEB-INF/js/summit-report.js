@@ -1,13 +1,24 @@
-var summit = summit || {};
+var Summit = Summit || {};
 
-summit.report = summit.report || {
-  contextPath: null,
-  apiPath: null,
+/**
+ * Contains helper methods for summit reports
+ * Also contains ReportInstance "class" for holding report data.
+ */
+Summit.Report = Summit.Report || {
+  reportInstances: [], /* The report instances on this page */
 
-  initialise : function(contextPath, apiPath) {
-    this.contextPath = contextPath;
-    this.apiPath = apiPath;
+  /* Initialise function for Summit.Report */
+  initialise : function(reportInstances) {
+    this.reportInstances = reportInstances;
+    try {
+      console.log("Initialised Summit.Report");
+    }
+    catch (e) {
+      /* IE8 has issues with console.log, do nothing */
+    }
   },
+
+  /*************** HELPER METHODS FOR Summit.Report BELOW ********************/
 
   /**
    * Find the 0-based column index that has the column name (value) of 'id'
@@ -49,22 +60,36 @@ summit.report = summit.report || {
    */
   select : function(id) {
     // FIXME : this would have to go to a particular view page, usually unique per report data.
-    parent.window.location.href = this.contextPath + "/view/" + id;
+    parent.window.location.href = Summit.Page.contextPath + "/view/" + id;
   },
 
   /**
    * Performs the actual AJAX request to the server,
    * on success, will call processJsonResponse which handles the DOM manipulation with the result
+   * Params : formData - serialised formData to send to the remote server.
+   *        : reportInstance - an initialised Summit.Report.ReportInstance object, without JSON data (or with JSON data that can be replaced).
    */
-  doRequest : function(formData, regionId) {
-    var data = $.ajax({ url: searchUrl,
-                      data: formData,
-                      cache: false,
-                      success: function(response) {
-                          processJsonResponse(response, regionId);
-                        }
-                      });
+  doRequest : function(reportInstance) {
+    if(reportInstance != null && reportInstance.regionId != null) {
+      var data = $.ajax({ url: reportInstance.filterPath,
+                        data: $(reportInstance.formId).serialize(),
+                        cache: false,
+                        success: function(response) {
+                            reportInstance.data = response;
+                            processJsonResponse(response, reportInstance.regionId);
+                          }
+                        });
+    }
   },
+
+  createNewReportInstance : function(regionId, formId, template, viewPath, filterPath, getData) {
+    var instance = Object.create(Summit.Report.ReportInstance);
+    instance.initialise(regionId, formId, null, template, viewPath, filterPath);
+    this.reportInstances.push(instance);
+    if(getData) {
+      doRequest(instance);
+    }
+  }
 
   /**
    * Processes the JSON response of tabular data for the region identified by the regionId.

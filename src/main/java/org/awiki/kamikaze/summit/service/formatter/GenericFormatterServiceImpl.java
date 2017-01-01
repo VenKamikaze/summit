@@ -55,7 +55,7 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt)
   { 
     final TemplateDto template = item.getTemplateDto(); 
-    // A template can be null, for example with Mustache templating you could handle Row/HeaderRow/Cell objects at a higher level
+    // A template can be null, for example with Mustache templating you can handle Row/HeaderRow/Cell objects at a higher level template
     if(null != template) {
       logger.debug("Formatting item : " + item.getClass().getCanonicalName());
       String templateSource = replaceInternalVariables(template.getSource(), item);

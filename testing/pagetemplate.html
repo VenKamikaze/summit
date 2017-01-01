@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="##__CONTEXTPATH__##/js/mustache.js" type="text/javascript"></script>
+    <script src="##__CONTEXTPATH__##/js/jQuery-1.11.1.js" type="text/javascript"></script>
+    <script type="text/javascript" src="##__CONTEXTPATH__##/js/jquery-ui/jquery-ui.js"></script>
+    <script type="text/javascript" src="##__CONTEXTPATH__##/js/summit-page.js"></script>
+    <link type="text/css" rel="stylesheet" media="all" href="##__CONTEXTPATH__##/styles/main.css" />
+    <link type="text/css" rel="stylesheet" media="all" href="##__CONTEXTPATH__##/styles/jquery-ui.css" />
+    <script type="text/javascript">
+    /* initialise summit page variables. */
+    $(
+      function() {
+        Summit.Page.initialise("##__CONTEXTPATH__##", "##__APIPATH__##");
+      }
+    );
+    </script>
+</head>
+
+<body class="thebody">
+    <div id="content">
+        <div class="main-menu" id="sidebar"></div>
+        <div class="main-content" id="main">##__DATA__##</div>
+    </div>
+</body>
+
+</html>
