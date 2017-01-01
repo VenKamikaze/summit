@@ -29,9 +29,17 @@ Summit.Report.ReportInstance = Summit.Report.ReportInstance || {
 
   hasData: function() {
     return ! ($.isEmptyObject(this.data));
-  }
+  },
 
   isInitialised: function() {
     return this.initialised;
+  },
+
+  /**
+   * The select function is triggered via the onclick event on each <tr> of your table data
+   * It should redirect to the appropriate view page for this particular report row.
+   */
+  select : function(id) {
+    parent.window.location.href = this.viewPath + id;
   }
 }
