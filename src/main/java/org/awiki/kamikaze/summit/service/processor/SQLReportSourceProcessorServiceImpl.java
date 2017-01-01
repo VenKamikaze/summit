@@ -1,11 +1,15 @@
 package org.awiki.kamikaze.summit.service.processor;
 
 import java.sql.ResultSet;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.MapUtils;
 import org.awiki.kamikaze.summit.dto.entry.RegionDto;
 import org.awiki.kamikaze.summit.repository.RegionRepository;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
@@ -21,6 +25,8 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
+import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -57,16 +63,21 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   @Override
   public SourceProcessorResultTable querySource(Long regionId, final String source, List<BindVar> bindVars)
   {
-    final SourceProcessorResultTable table = getResults(source, getParams(bindVars), regionId != null ? regionId.toString() : null);
+    final SourceProcessorResultTable table = getResults(source, getParamsForSpring(bindVars), regionId != null ? regionId.toString() : null);
     if(regionId != null) {
       updateColumnList(regionId, getColumnNames(table));
     }
     return table;
   }
   
-  private SourceProcessorResultTable getResults(final String source, List params, String regionId)
+/*  
+ * Could not get this to work with parameters with postgresql driver
+  private SourceProcessorResultTable getResults(final String source, final List<SqlParameter> params, final String regionId)
   {
     PreparedStatementCreatorFactory  factory = new PreparedStatementCreatorFactory(source);
+    for(SqlParameter param : getDeclaredParamsForSpring(params)) {
+      factory.addParameter(param);
+    }
     factory.setResultSetType(ResultSet.TYPE_SCROLL_INSENSITIVE);
     factory.setUpdatableResults(false);
     PreparedStatementCreator psc = factory.newPreparedStatementCreator(params);
@@ -74,34 +85,31 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
     logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "params=" + StringUtils.collectionToCommaDelimitedString(params) );
     return jdbc.getJdbcOperations().query(psc, new SourceProcessorResultTableExtractor(regionId));
   }
-  
-  private List getParams(List<BindVar> bindVars)
-  {
-    ArrayList paramList = new ArrayList(bindVars != null ? bindVars.size() : 1);
-    if (bindVars != null)
-    {
-      for (BindVar var : bindVars)
-      {
-        paramList.add( var.getValue());
-      }
-    }
-    return paramList;
-  }
-  
-  @Deprecated
-  protected SqlParameterSource mapBindVars(List<BindVar> bindVars)
-  {
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    if (bindVars != null)
-    {
-      for (BindVar var : bindVars)
-      {
-        params.addValue(var.getBindParameter(), var.getValue());
-      }
-    }
-    return params;
-  }
+*/
 
+  private SourceProcessorResultTable getResults(final String source, Map<String, SqlParameter> params, final String regionId) {
+    logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "about to process source: " + source );
+   //logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "param names=" + StringUtils.collectionToCommaDelimitedString(params.keySet()) );
+    return jdbc.query(source,  new MapSqlParameterSource(params), new SourceProcessorResultTableExtractor(regionId));
+  }
+  
+  /**
+   * TODO: We should probably just use Spring's SqlParameterValue all the way through considering we are mostly
+   * tied to spring anyway
+   * @param bindVars
+   * @return
+   */
+  private Map<String, SqlParameter> getParamsForSpring(List<BindVar> bindVars)
+  {
+    if(bindVars == null)
+      return MapUtils.EMPTY_MAP;
+    Map<String, SqlParameter> paramMap = new HashMap<>(bindVars.size()); // possibly this size or smaller.
+    for (BindVar var : bindVars) {
+      paramMap.put(var.getBindParameter(), new SqlParameterValue(new SqlParameter(var.getBindParameter(), var.getType()), var.getValue()) );
+    }
+    return paramMap;
+  }
+  
   private Collection<String> getColumnNames(final SourceProcessorResultTable table)
   {
     ArrayList<String> columns = new ArrayList<String>(table.getColumns().size());

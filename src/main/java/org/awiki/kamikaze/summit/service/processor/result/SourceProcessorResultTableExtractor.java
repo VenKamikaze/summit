@@ -46,7 +46,7 @@ public class SourceProcessorResultTableExtractor implements ResultSetExtractor<S
       // can only do this if we set TYPE_SCROLL_INSENSITIVE for every query... TODO perhaps consider this?
       rows = new ArrayList<SourceProcessorResultTable.Row>(rs.getRow() + 1); // add 1 for column names
     }*/
-    if(rs.first())
+    if(rs.next())
     {
       final ResultSetMetaData rsm = rs.getMetaData();
       final List<SourceProcessorResultTable.Column> cols = new ArrayList<SourceProcessorResultTable.Column>(rsm.getColumnCount());

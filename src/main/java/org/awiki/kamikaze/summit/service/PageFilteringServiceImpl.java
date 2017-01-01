@@ -73,7 +73,7 @@ public class PageFilteringServiceImpl implements PageFilteringService
       StringBuilder fullQuery = new StringBuilder();
       fullQuery.append("SELECT ").append(StringUtils.join(columnList, ", "));
       fullQuery.append(" FROM ( " + innerQuery + " ) SUBQUERY ");
-      fullQuery.append(" WHERE ").append(StringUtils.join(columnList, " = '" + searchText + "' OR ")).append(" = '" + searchText +"'");
+      fullQuery.append(" WHERE ").append(StringUtils.join( wrapInCast(columnList, "varchar"), " = :searchText OR ")).append(" = :searchText ");
       if(page > 0)
         addPaginationToQuery(fullQuery, StringUtils.join(columnList, ", "), true, page, rowsPerPage);
       return fullQuery.toString();      
@@ -81,6 +81,14 @@ public class PageFilteringServiceImpl implements PageFilteringService
     if(page > 0)
       addPaginationToQuery(new StringBuilder(innerQuery), StringUtils.join(columnList, ", "), false, page, rowsPerPage);
     return innerQuery; // if no search is specified, just run the standard query.
+  }
+  
+  private Collection<String> wrapInCast(final Collection<String> columnList, final String castType) {
+    Collection<String> castedColumns = new ArrayList<String>(columnList.size());
+    for(String col : columnList) {
+      castedColumns.add("CAST (" + col + " as " + castType + ")");
+    }
+    return castedColumns;
   }
   
   private StringBuilder addPaginationToQuery(StringBuilder currentQuery, final String columnList, boolean hasWhereClause, long page, long rowsPerPage) {
@@ -159,19 +167,23 @@ public class PageFilteringServiceImpl implements PageFilteringService
       ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
       final Collection<String> columnList = reportService.getColumnList(regionDto.getId());
       final String filteredQuery = buildWrapperQuery(regionDto.getSource().iterator().next(), columnList, searchText,page, rowsPerPage);
-      SourceProcessorResultTable resultTable = reportService.querySource(null, filteredQuery, null);
+      SourceProcessorResultTable resultTable = reportService.querySource(null, filteredQuery, buildParametersForFullQuery(columnList.size(), searchText));
       resultTable.setTemplateDto(regionDto.getTemplateDto());
       return resultTable;
     }
     return null;
   }
   
+  @SuppressWarnings("serial")
   private List<BindVar> buildParametersForFullQuery(final int numColumns, final String searchText) {
-    return new ArrayList<BindVar>(numColumns) {{ 
-      for(int i = 0; i < numColumns; i++) {
-        add(new BindVar(searchText, java.sql.Types.VARCHAR, String.valueOf(i))); 
-      }
-     }};
+    if(StringUtils.isNotEmpty(searchText)) {
+      return new ArrayList<BindVar>(numColumns) {{ 
+        for(int i = 0; i < numColumns; i++) {
+          add(new BindVar(searchText, java.sql.Types.VARCHAR, "searchText")); 
+        }
+       }};
+    }
+    return null;
   }
   
   @Override

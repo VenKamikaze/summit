@@ -129,9 +129,11 @@
 
     <!-- DB -->
     <dependency>
-      <groupId>com.google.code.maven-play-plugin.postgresql</groupId>
+      <!--      <groupId>com.google.code.maven-play-plugin.postgresql</groupId> -->
+      <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>9.0-801.jdbc4-patched-play-1.2.3</version>
+      <!--  <version>9.0-801.jdbc4-patched-play-1.2.3</version> -->
+      <version>9.4.1212.jre7</version>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
