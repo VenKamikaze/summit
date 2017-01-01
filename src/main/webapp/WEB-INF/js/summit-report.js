@@ -89,6 +89,7 @@ Summit.Report = Summit.Report || {
     if(getData) {
       doRequest(instance);
     }
+    return instance;
   }
 
   /**
