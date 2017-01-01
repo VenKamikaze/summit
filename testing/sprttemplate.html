@@ -19,63 +19,25 @@
     <div class="region" id="mustacheReportRegion-##__ID__##">##__DATA__##</div>
     <script type="text/javascript">
         var searchUrl = "##__APIPATH__##/filter/##__ID__##.json";
+        var viewUrl   = "##__CONTEXTPATH__##/run/1/3/";
+        /* initialise summit report, create and setup the report instance */
+        $(document).ready(
+          function() {
+            Summit.Report.initialise();
+            /* var template = Summit.Report.doTemplateRequest("##__ID__##"); */
+            /* Until we implement the line above, just use default template string by passing in null template */
+            var rInstance = Summit.Report.createNewReportInstance("##__ID__##", "searchForm", null, viewUrl, searchUrl, true);
 
-        function select(id) {
-            parent.window.location.href = "##__CONTEXTPATH__##/view/" + id;
-        };
-
-        function processJsonResponse(data) {
-            buildHtmlTable(data);
-            var idIdx = getIdColumnIndex(data);
-            if (idIdx != null) {
-                linkViewPageToRows(idIdx, data, $("#mustacheReportRegion-##__ID__##"));
-            }
-        };
-
-        function buildHtmlTable(data) {
-            var template =
-                "<table id=\"mustache_table\" class=\"rounded-corner\"><thead>{{#header}}<tr class=\"tablerowheader\">{{#cells}}<th class=\"tablecell\">{{value}}</th>{{/cells}}</tr>{{/header}}</thead><tbody>{{#body}}<tr class=\"tablerowdata\">{{#cells}}<td class=\"tablecell\">{{value}}</td>{{/cells}}</tr>{{/body}}</tbody></table></div>";
-            var html = Mustache.to_html(template, data);
-            $("#mustacheReportRegion-##__ID__##").html(html);
-        };
-
-        function getIdColumnIndex(data) {
-            var columnIndexForId = null;
-            $.each(data.header.cells, function(index, cell) {
-                if ("id" === cell.value) {
-                    columnIndexForId = index;
-                }
+            $("#searchForm").on("submit", function(event) {
+                event.preventDefault();
+                Summit.Report.doRequest(rInstance);
             });
-            return columnIndexForId;
-        };
+          }
+        );
 
-        function linkViewPageToRows(idIdx, data, elementContainingTable) {
-            var mustacheTableElement = elementContainingTable.find("table");
-            if (mustacheTableElement[0] !== undefined) {
-                var trElements = mustacheTableElement.find("tr"); /* ignore first element as it is the header */
-                $.each(data.body, function(index, row) {
-                    trElements[index + 1].onclick = function() {
-                        select(row.cells[idIdx].value);
-                    };
-                });
-            }
-        };
-
-        function doRequest(formData) {
-            var data = $.ajax({
-                url: searchUrl,
-                data: formData,
-                cache: false,
-                success: function(response) {
-                    processJsonResponse(response);
-                }
-            });
-        };
-        $(document).ready(doRequest(null));
-        $("#searchForm").on("submit", function(event) {
-            event.preventDefault();
-            var formData = $(this).serialize();
-            console.log(formData);
-            doRequest(formData);
-        });
+        $("#clearSearchButton").click(function() {
+          $("#searchForm").trigger('reset');
+          return true;
+        })
     </script>
+</div>

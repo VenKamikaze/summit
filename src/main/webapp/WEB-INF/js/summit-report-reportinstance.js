@@ -11,7 +11,8 @@ Summit.Report.ReportInstance = Summit.Report.ReportInstance || {
   viewPath    : null,
   filterPath  : null,
 
-  Initialised : false,
+  initialised : false,
+  columnIndexForId : null,
 
   /* Initialise function for Summit.Report.ReportInstance */
   initialise : function(regionId, formId, data, template, viewPath, filterPath) {
@@ -25,6 +26,9 @@ Summit.Report.ReportInstance = Summit.Report.ReportInstance || {
     this.filterPath = filterPath; /* The URL for the filter API path this report is associated with (for searching/filtering) */
 
     this.initialised = true;
+    if(this.data != null) {
+      this.columnIndexForId = Summit.Report.getIdColumnIndex(this.data);
+    }
   },
 
   hasData: function() {
@@ -33,6 +37,13 @@ Summit.Report.ReportInstance = Summit.Report.ReportInstance || {
 
   isInitialised: function() {
     return this.initialised;
+  },
+
+  setData: function(data) {
+    this.data = data;
+    if(this.data != null) {
+      this.columnIndexForId = Summit.Report.getIdColumnIndex(this.data);
+    }
   },
 
   /**

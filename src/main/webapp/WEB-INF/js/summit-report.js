@@ -9,7 +9,9 @@ Summit.Report = Summit.Report || {
 
   /* Initialise function for Summit.Report */
   initialise : function(reportInstances) {
-    this.reportInstances = reportInstances;
+    if(reportInstances != null) {
+      this.reportInstances = reportInstances;
+    }
     try {
       console.log("Initialised Summit.Report");
     }
@@ -42,26 +44,26 @@ Summit.Report = Summit.Report || {
    *         data - the JSON table data returned via a server API call for this report region
    *         elementContainingTable - the parent element (usually a div) that sits above the table we are manipulating.
    */
-  linkRowsToViewPage : function(idIdx, data, elementContainingTable) {
+  linkRowsToViewPage : function(reportInstance, elementContainingTable) {
     var mustacheTableElement = elementContainingTable.find("table");
-    if(mustacheTableElement[0] !== undefined) {
+    if(mustacheTableElement[0] !== undefined && reportInstance.viewPath != null) {
       var trElements = mustacheTableElement.find("tr"); /* ignore first element as it is the header */
-      $.each(data.body, function(index, row) {
+      var i = 0;
+      for(i = 0; i < this.reportInstances.length; i++) {
+        if (this.reportInstances[i] === reportInstance) {
+          if(typeof(console.log) !== "undefined") { console.log("Found report instance index: " + i); }
+          break;
+        }
+      }
+      $.each(reportInstance.data.body, function(index, row) {
         trElements[index+1].onclick = function() {
-          select(row.cells[idIdx].value);
+          Summit.Report.reportInstances[i].select(row.cells[reportInstance.columnIndexForId].value);
         };
       });
     }
   },
 
-  /**
-   * The select function is triggered via the onclick event on each <tr> of your table data
-   * It should redirect to the appropriate view page for this particular report row.
-   */
-  select : function(id) {
-    // FIXME : this would have to go to a particular view page, usually unique per report data.
-    parent.window.location.href = Summit.Page.contextPath + "/view/" + id;
-  },
+
 
   /**
    * Performs the actual AJAX request to the server,
@@ -70,13 +72,19 @@ Summit.Report = Summit.Report || {
    *        : reportInstance - an initialised Summit.Report.ReportInstance object, without JSON data (or with JSON data that can be replaced).
    */
   doRequest : function(reportInstance) {
-    if(reportInstance != null && reportInstance.regionId != null) {
+    if(reportInstance != null && reportInstance.isInitialised() ) {
+      var formElement = "";
+      if(reportInstance.formId.charAt(0) != '#') {
+        formElement = "#";
+      }
+      formElement += reportInstance.formId;
+      var that = this;
       var data = $.ajax({ url: reportInstance.filterPath,
-                        data: $(reportInstance.formId).serialize(),
+                        data: $(formElement).serialize(),
                         cache: false,
                         success: function(response) {
-                            reportInstance.data = response;
-                            processJsonResponse(response, reportInstance.regionId);
+                            reportInstance.setData(response);
+                            that.processJsonResponse(reportInstance);
                           }
                         });
     }
@@ -87,34 +95,32 @@ Summit.Report = Summit.Report || {
     instance.initialise(regionId, formId, null, template, viewPath, filterPath);
     this.reportInstances.push(instance);
     if(getData) {
-      doRequest(instance);
+      this.doRequest(instance);
     }
     return instance;
-  }
+  },
 
   /**
    * Processes the JSON response of tabular data for the region identified by the regionId.
-   * Params : data - the JSON table data returned via a server API call for this report region
-   *          regionId - the ID of the region that links to this tabular data (used for DOM manipulation).
+   * Params : reportInstance - the initialised report instance including JSON data.
    */
-  processJsonResponse : function(data, regionId) {
-    buildHtmlTable(data, regionId);
-    var idIdx = getIdColumnIndex(data);
-    if(idIdx != null) {
-      linkRowsToViewPage(idIdx, data, $("#mustacheReportRegion-" + regionId));
+  processJsonResponse : function(reportInstance) {
+    this.buildHtmlTable(reportInstance);
+    if(reportInstance.columnIndexForId != null) {
+      this.linkRowsToViewPage(reportInstance, $("#mustacheReportRegion-" + reportInstance.regionId));
     }
   },
 
   /**
    * Performs the DOM manpulation using a template that we define, combines it with the JSON data
    *   and renders the result on the page.
-   * Params : data - the JSON table data returned via a server API call for this report region
-   *          regionId - the ID of the region that links to this tabular data (used for the DOM manipulation).
+   * Params : reportInstance - the initialised report instance including JSON data.
    */
-  buildHtmlTable : function(data, regionId) {
-    // FIXME : should allow the template to be retrieved via a server side call instead.
-    var template = "<table id=\"mustache_table\" class=\"rounded-corner\"><thead>{{#header}}<tr class=\"tablerowheader\">{{#cells}}<th class=\"tablecell\">{{value}}</th>{{/cells}}</tr>{{/header}}</thead><tbody>{{#body}}<tr class=\"tablerowdata\">{{#cells}}<td class=\"tablecell\">{{value}}</td>{{/cells}}</tr>{{/body}}</tbody></table></div>";
-    var html = Mustache.to_html(template, data);
-    $("#mustacheReportRegion-" + regionId).html(html);
+  buildHtmlTable : function(reportInstance) {
+    // TODO : should make it easy for the template to be retrieved via a server side AJAX call
+    var template = reportInstance.template != null ? reportInstance.template
+                                                   : "<table id=\"mustache_table\" class=\"rounded-corner\"><thead>{{#header}}<tr class=\"tablerowheader\">{{#cells}}<th class=\"tablecell\">{{value}}</th>{{/cells}}</tr>{{/header}}</thead><tbody>{{#body}}<tr class=\"tablerowdata\">{{#cells}}<td class=\"tablecell\">{{value}}</td>{{/cells}}</tr>{{/body}}</tbody></table></div>";
+    var html = Mustache.to_html(template, reportInstance.data);
+    $("#mustacheReportRegion-" + reportInstance.regionId).html(html);
   }
 }
