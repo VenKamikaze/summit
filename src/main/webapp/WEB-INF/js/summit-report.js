@@ -109,6 +109,7 @@ Summit.Report = Summit.Report || {
     if(reportInstance.columnIndexForId != null) {
       this.linkRowsToViewPage(reportInstance, $("#mustacheReportRegion-" + reportInstance.regionId));
     }
+    this.buildPagination(reportInstance, true);
   },
 
   /**
@@ -119,8 +120,57 @@ Summit.Report = Summit.Report || {
   buildHtmlTable : function(reportInstance) {
     // TODO : should make it easy for the template to be retrieved via a server side AJAX call
     var template = reportInstance.template != null ? reportInstance.template
-                                                   : "<table id=\"mustache_table\" class=\"rounded-corner\"><thead>{{#header}}<tr class=\"tablerowheader\">{{#cells}}<th class=\"tablecell\">{{value}}</th>{{/cells}}</tr>{{/header}}</thead><tbody>{{#body}}<tr class=\"tablerowdata\">{{#cells}}<td class=\"tablecell\">{{value}}</td>{{/cells}}</tr>{{/body}}</tbody></table></div>";
+                                                   : "<table id=\"mustache_table\" class=\"rounded-corner\"><thead>{{#header}}<tr class=\"tablerowheader\">{{#cells}}<th class=\"tablecell\">{{value}}</th>{{/cells}}</tr>{{/header}}</thead><tbody>{{#body}}<tr class=\"tablerowdata\">{{#cells}}<td class=\"tablecell\">{{value}}</td>{{/cells}}</tr>{{/body}}</tbody></table>";
     var html = Mustache.to_html(template, reportInstance.data);
     $("#mustacheReportRegion-" + reportInstance.regionId).html(html);
+  },
+
+  /**
+   * Performs the DOM manpulation using a template that we define, combines it with the JSON data
+   *   and renders the pagination section on the page.
+   * Params : reportInstance - the initialised report instance including JSON data.
+   *        : withTotalCount - boolean true/false, if true will show the total count of rows from the current query, but imposes a performance penalty.
+   */
+  buildPagination : function(reportInstance, withTotalCount) {
+    // TODO : should make it easy for the template to be retrieved via a server side AJAX call
+    var rowCount = withTotalCount ? "{{rowFrom}} - {{rowTo}} of {{totalCount}}" : "{{rowFrom}} - {{rowTo}}";
+    var template = "<a id=\"navPrev-" + reportInstance.regionId + "\" href=\"javascript:Summit.Report.navigate(" + reportInstance.regionId + ", 'prev')\"><img src=\"" + Summit.Page.contextPath + "/images/arrow-left-xs.png\" title=\"Prev\" alt=\"Prev\" align=\"absmiddle\"></a>" + rowCount + "<a href=\"javascript:Summit.Report.navigate(" + reportInstance.regionId + ",'next')\"><img src=\"" + Summit.Page.contextPath + "/images/arrow-right-xs.png\" title=\"Next\" alt=\"Next\" align=\"absmiddle\"></a>";
+    var currentPage = $("#searchPage-" + reportInstance.regionId).val();
+    var data = {
+      rowFrom: function() {
+        if( currentPage == "1" )
+          return 1;
+        return ((currentPage -1) * reportInstance.data.count) + 1;
+      },
+
+      rowTo: function() {
+        return (currentPage * reportInstance.data.count);
+      },
+
+      totalCount: reportInstance.data.totalCount
+    }
+    var html = Mustache.to_html(template, data);
+    $("#mustacheReportNav-" + reportInstance.regionId).html(html);
+  },
+
+  /**
+   * Performs page navigation in the report
+   * Params : regionId  - the ID of the region we want to perform the navigation on.
+   *          direction - the direction as a string, either 'prev' or 'next' is supported.
+   */
+  navigate : function(regionId, direction) {
+    var formElement = $("#searchForm-" + regionId);
+    if(formElement != null) {
+      var pageElement = formElement.find("#searchPage-" + regionId);
+      var currentPage = Number(pageElement.val());
+      if(direction == "prev") {
+        currentPage -= 1;
+      }
+      else if(direction == "next") {
+        currentPage += 1;
+      }
+      pageElement.val(currentPage);
+      formElement.submit();
+    }
   }
 }

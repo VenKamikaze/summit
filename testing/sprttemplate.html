@@ -2,10 +2,13 @@
 <div style="clear: both;"></div>
 <div class="searchBar">
     <div class="search">
-        <form id="searchForm" action="##__APIPATH__##/filter/##__ID__##.json" method="post">
+        <form id="searchForm-##__ID__##" action="##__APIPATH__##/filter/##__ID__##.json" method="post">
             <div class="search-image"></div>
             <div class="fieldgroup">
-                <div class="field"><label for="search">Search:</label><input name="search" type="text" id="searchInput" />
+                <div class="field">
+                  <label for="search-##__ID__##">Search:</label><input name="search" type="text" id="searchInput-##__ID__##" />
+                  <input name="page" type="hidden" id="searchPage-##__ID__##" value="1"/>
+                  <label for="searchRows-##__ID__##">Rows:</label><select id="searchRows-##__ID__##" name="rows"><option value="5">5</option><option value="10">10</option><option selected="selected" value="15">15</option><option value="20">20</option><option value="30">30</option><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="500">500</option><option value="1000">1000</option><option value="5000">5000</option><option selected="selected" value="0">All</option></select>
                     <div class="searchButton">
                       <input value="Go" name="action" type="submit" id="searchButton" />
                       <input value="Clear" name="action" type="submit" id="clearSearchButton" />
@@ -16,7 +19,10 @@
     </div>
 </div>
 <div class="listContent">
-    <div class="region" id="mustacheReportRegion-##__ID__##">##__DATA__##</div>
+    <div class="region">
+      <div class="regionContent" id="mustacheReportRegion-##__ID__##">##__DATA__##</div>
+      <span id="mustacheReportNav-##__ID__##" class="pagination"></span>
+    </div>
     <script type="text/javascript">
         var searchUrl = "##__APIPATH__##/filter/##__ID__##.json";
         var viewUrl   = "##__CONTEXTPATH__##/run/1/3/";
@@ -26,9 +32,9 @@
             Summit.Report.initialise();
             /* var template = Summit.Report.doTemplateRequest("##__ID__##"); */
             /* Until we implement the line above, just use default template string by passing in null template */
-            var rInstance = Summit.Report.createNewReportInstance("##__ID__##", "searchForm", null, viewUrl, searchUrl, true);
+            var rInstance = Summit.Report.createNewReportInstance("##__ID__##", "searchForm-##__ID__##", null, viewUrl, searchUrl, true);
 
-            $("#searchForm").on("submit", function(event) {
+            $("#searchForm-##__ID__##").on("submit", function(event) {
                 event.preventDefault();
                 Summit.Report.doRequest(rInstance);
             });
@@ -36,7 +42,7 @@
         );
 
         $("#clearSearchButton").click(function() {
-          $("#searchForm").trigger('reset');
+          $("#searchForm-##__ID__##").trigger('reset');
           return true;
         })
     </script>
