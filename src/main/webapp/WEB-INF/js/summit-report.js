@@ -134,7 +134,7 @@ Summit.Report = Summit.Report || {
   buildPagination : function(reportInstance, withTotalCount) {
     // TODO : should make it easy for the template to be retrieved via a server side AJAX call
     var rowCount = withTotalCount ? "{{rowFrom}} - {{rowTo}} of {{totalCount}}" : "{{rowFrom}} - {{rowTo}}";
-    var template = "<a id=\"navPrev-" + reportInstance.regionId + "\" href=\"javascript:Summit.Report.navigate(" + reportInstance.regionId + ", 'prev')\"><img src=\"" + Summit.Page.contextPath + "/images/arrow-left-xs.png\" title=\"Prev\" alt=\"Prev\" align=\"absmiddle\"></a>" + rowCount + "<a href=\"javascript:Summit.Report.navigate(" + reportInstance.regionId + ",'next')\"><img src=\"" + Summit.Page.contextPath + "/images/arrow-right-xs.png\" title=\"Next\" alt=\"Next\" align=\"absmiddle\"></a>";
+    var template = "<a id=\"navPrev-" + reportInstance.regionId + "\" href=\"javascript:Summit.Report.navigate(" + reportInstance.regionId + ", 'prev')\"><img src=\"" + Summit.Page.contextPath + "/images/arrow-left-xs.png\" title=\"Prev\" alt=\"Prev\" align=\"absmiddle\"></a>" + rowCount + "<a id=\"navNext-" + reportInstance.regionId + "\" href=\"javascript:Summit.Report.navigate(" + reportInstance.regionId + ",'next')\"><img src=\"" + Summit.Page.contextPath + "/images/arrow-right-xs.png\" title=\"Next\" alt=\"Next\" align=\"absmiddle\"></a>";
     var currentPage = $("#searchPage-" + reportInstance.regionId).val();
     var data = {
       rowFrom: function() {
@@ -151,6 +151,14 @@ Summit.Report = Summit.Report || {
     }
     var html = Mustache.to_html(template, data);
     $("#mustacheReportNav-" + reportInstance.regionId).html(html);
+    /* Hide buttons if at first or last pages */
+    if(data.rowTo() == data.totalCount) {
+      $("#mustacheReportNav-" + reportInstance.regionId).find("#navNext-" + reportInstance.regionId).hide();
+    }
+
+    if(data.rowFrom() == 1) {
+      $("#mustacheReportNav-" + reportInstance.regionId).find("#navPrev-" + reportInstance.regionId).hide();
+    }
   },
 
   /**
