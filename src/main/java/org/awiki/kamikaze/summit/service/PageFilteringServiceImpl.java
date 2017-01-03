@@ -61,12 +61,22 @@ public class PageFilteringServiceImpl implements PageFilteringService
     final PageDto pageDto = pageMapper.map(appPageStore.findByApplicationIdAndPageId(applicationId, pageId).getPage());
     
     for(PageRegionDto pr : pageDto.getPageRegions()) {
-      return filterQueryOnRegion(pr.getRegionDto(), searchText,0,0); // FIXME, TODO Pagination
+      return filterQueryOnRegion(pr.getRegionDto(), searchText, 0, 0, false); // FIXME, TODO Pagination
     }
     
     throw new RuntimeException("No report region found on " + applicationId + "/" + pageId + ".");
   }
 
+  private String buildWrapperCountQuery(final String innerQuery, final Collection<String> columnList, final String searchText) {
+    StringBuilder countQuery = new StringBuilder();
+    countQuery.append("SELECT COUNT(1) as TOTALCOUNT");
+    countQuery.append(" FROM ( " + innerQuery + " ) SUBQUERY ");
+    if(StringUtils.isNotEmpty(searchText)) {
+      countQuery.append(" WHERE ").append(StringUtils.join( wrapInCast(columnList, "varchar"), " = :searchText OR ")).append(" = :searchText ");  
+    }
+    return countQuery.toString(); // if no search is specified, just run the standard query.
+  }
+  
   private String buildWrapperQuery(final String innerQuery, final Collection<String> columnList, final String searchText,
           long page, long rowsPerPage) {
     if(StringUtils.isNotEmpty(searchText)) {
@@ -162,12 +172,28 @@ public class PageFilteringServiceImpl implements PageFilteringService
     }
   }
   
-  private SourceProcessorResultTable filterQueryOnRegion(final RegionDto regionDto, final String searchText, long page, long rowsPerPage) {
+  /**
+   * 
+   * @param regionDto
+   * @param searchText
+   * @param page
+   * @param rowsPerPage
+   * @param getTotalCount - only retrieve the total number of records if asked, as this adds another expensive query.
+   * @return
+   */
+  private SourceProcessorResultTable filterQueryOnRegion(final RegionDto regionDto, final String searchText, long page, long rowsPerPage, boolean getTotalCount) {
     if (REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType())) {
       ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
       final Collection<String> columnList = reportService.getColumnList(regionDto.getId());
       final String filteredQuery = buildWrapperQuery(regionDto.getSource().iterator().next(), columnList, searchText,page, rowsPerPage);
       SourceProcessorResultTable resultTable = reportService.querySource(null, filteredQuery, buildParametersForFullQuery(columnList.size(), searchText));
+      
+      if(getTotalCount) {
+        final String countQuery = buildWrapperCountQuery(regionDto.getSource().iterator().next(), columnList, searchText);
+        SourceProcessorResultTable count = reportService.querySource(null, countQuery, buildParametersForFullQuery(columnList.size(), searchText));
+        resultTable.setTotalCount(Long.valueOf(count.getBody().get(0).getCell(0).getValue()));
+      }
+      
       resultTable.setTemplateDto(regionDto.getTemplateDto());
       return resultTable;
     }
@@ -197,24 +223,24 @@ public class PageFilteringServiceImpl implements PageFilteringService
   @Override
   public SourceProcessorResultTable filterRegion(long regionId, String searchText)
   {
-    return filterRegion(regionId, searchText, 0L, 0L);
+    return filterRegion(regionId, searchText, 0L, 0L, false);
   }
 
   @Override
-  public SourceProcessorResultTable filterRegion(long regionId, String searchText, long page, long rowsPerPage)
+  public SourceProcessorResultTable filterRegion(long regionId, String searchText, long page, long rowsPerPage, boolean getTotalCount)
   {
     RegionDto region = mapper.map(regionStore.findOne(regionId), RegionDto.class);
-    return filterQueryOnRegion(region, searchText, page, rowsPerPage);
+    return filterQueryOnRegion(region, searchText, page, rowsPerPage, getTotalCount);
   }
   
   @Override
   public SourceProcessorResultTable filterRegionByColumn(long regionId, String columnName, String searchText)
   {
-    return filterRegionByColumn(regionId, columnName, searchText, 0, 0);
+    return filterRegionByColumn(regionId, columnName, searchText, 0, 0, false); // FIXME, TODO pagination plus impl
   }
 
   @Override
-  public SourceProcessorResultTable filterRegionByColumn(long regionId, String columnName, String searchText, long page, long rowsPerPage)
+  public SourceProcessorResultTable filterRegionByColumn(long regionId, String columnName, String searchText, long page, long rowsPerPage, boolean getTotalCount)
   {
     // TODO Auto-generated method stub
     return null;

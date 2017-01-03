@@ -62,23 +62,6 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
     }
     return table;
   }
-  
-/*  
- * Could not get this to work with parameters with postgresql driver
-  private SourceProcessorResultTable getResults(final String source, final List<SqlParameter> params, final String regionId)
-  {
-    PreparedStatementCreatorFactory  factory = new PreparedStatementCreatorFactory(source);
-    for(SqlParameter param : getDeclaredParamsForSpring(params)) {
-      factory.addParameter(param);
-    }
-    factory.setResultSetType(ResultSet.TYPE_SCROLL_INSENSITIVE);
-    factory.setUpdatableResults(false);
-    PreparedStatementCreator psc = factory.newPreparedStatementCreator(params);
-    logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "about to process source: " + source );
-    logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "params=" + StringUtils.collectionToCommaDelimitedString(params) );
-    return jdbc.getJdbcOperations().query(psc, new SourceProcessorResultTableExtractor(regionId));
-  }
-*/
 
   private SourceProcessorResultTable getResults(final String source, Map<String, SqlParameter> params, final String regionId) {
     logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "about to process source: " + source );
@@ -92,6 +75,7 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
    * @param bindVars
    * @return
    */
+  @SuppressWarnings("unchecked") // for empty map
   private Map<String, SqlParameter> getParamsForSpring(List<BindVar> bindVars)
   {
     if(bindVars == null)

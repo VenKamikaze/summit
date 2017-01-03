@@ -45,6 +45,8 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   
   private Long pages;
   
+  private Long totalCount; // probably different to rows.size() when we having paging enabled.
+  
   @JsonManagedReference("tablerow")
   private List<Row> rows = new ArrayList<Row>();
 
@@ -68,7 +70,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
 
   public int getCount()
   {
-    return this.rows.size();
+    return getBody().size();
   }
 
   public List<Row> getRows()
@@ -508,5 +510,24 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       return id;
     logger.warn("getId() called on " + this.getClass().getCanonicalName() + " but we have no specific ID. Return hashCode()");
     return hashCode();
+  }
+
+  public Long getTotalCount()
+  {
+    return totalCount;
+  }
+
+  public void setTotalCount(Long totalCount)
+  {
+    this.totalCount = totalCount;
+    fillInMissingPageData();
+  }
+  
+  private void fillInMissingPageData() {
+    if(this.getTotalCount() != null && ( this.getCount() != this.getTotalCount()) ) {
+      if(this.getPages() == null) {
+        this.pages = (long) Math.ceil(this.getTotalCount().doubleValue() / (1.0 * this.getCount()) ) ;
+      }
+    }
   }
 }
