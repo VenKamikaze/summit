@@ -35,6 +35,7 @@ public class PageRestController {
    */
   @RequestMapping(value = "/api/filter/{regionId}", method = { RequestMethod.GET, RequestMethod.POST })
   public SourceProcessorResultTable filterRegion(@PathVariable String regionId, 
+          @RequestParam(required=false,name="filterType") final String filterType,
           @RequestParam(required=false,name="search") final String searchValue,
           @RequestParam(required=false,name="page") final String pageNumber,
           @RequestParam(required=false,name="rows") final String rowsPerPage) {
@@ -47,7 +48,7 @@ public class PageRestController {
      */
     
     logger.info("Hit page /api/filter/" + regionId);
-    final PageItem<String> filteredResults = filterService.filterRegion(Long.parseLong(regionId), searchValue, 
+    final PageItem<String> filteredResults = filterService.filterRegion(Long.parseLong(regionId), filterType, searchValue, 
             (pageNumber != null && ( rowsPerPage != null && Long.parseLong(rowsPerPage) != 0L ) ? Long.parseLong(pageNumber) : 0), 
             (rowsPerPage != null ? Long.parseLong(rowsPerPage) : 0),
             (rowsPerPage != null)
@@ -61,7 +62,10 @@ public class PageRestController {
   //@ResponseBody
   @RequestMapping(value = "/api/filter/{applicationId}/{pageId}", method = { RequestMethod.GET, RequestMethod.POST })
   public SourceProcessorResultTable filter(@PathVariable String applicationId, @PathVariable String pageId,
-          @RequestParam(required=false,name="search") final String searchValue) {
+          @RequestParam(required=false,name="filterType") final String filterType,
+          @RequestParam(required=false,name="search") final String searchValue,
+          @RequestParam(required=false,name="page") final String pageNumber,
+          @RequestParam(required=false,name="rows") final String rowsPerPage) {
     /*
      * 1) Store cached column names per page
      * 2) * When we have a front-end for building queries, clear out the column names on query update
@@ -72,7 +76,10 @@ public class PageRestController {
     
     logger.info("Hit page /api/filter/" + applicationId + "/" + pageId);
     
-    final PageItem<String> filteredResults = filterService.filterPage(Long.parseLong(applicationId), Long.parseLong(pageId), searchValue);
+    final PageItem<String> filteredResults = filterService.filterPage(Long.parseLong(applicationId), Long.parseLong(pageId), filterType, searchValue,
+            (pageNumber != null && ( rowsPerPage != null && Long.parseLong(rowsPerPage) != 0L ) ? Long.parseLong(pageNumber) : 0), 
+            (rowsPerPage != null ? Long.parseLong(rowsPerPage) : 0),
+            (rowsPerPage != null));
     return (SourceProcessorResultTable)filteredResults;
   }
 	
@@ -80,7 +87,11 @@ public class PageRestController {
 	  * Checks specified columnName with a LIKE '%' + term + '%' clause to find results.
    */
   @RequestMapping(value = "/api/filter/{applicationId}/{pageId}/{columnName}", method = RequestMethod.POST)
-  public SourceProcessorResultTable filterColumn(@PathVariable String applicationId, @PathVariable String pageId, @PathVariable String columnName) {
+  public SourceProcessorResultTable filterColumn(@PathVariable String applicationId, @PathVariable String pageId, @PathVariable String columnName,
+          @RequestParam(required=false,name="filterType") final String filterType,
+          @RequestParam(required=false,name="search") final String searchValue,
+          @RequestParam(required=false,name="page") final String pageNumber,
+          @RequestParam(required=false,name="rows") final String rowsPerPage) {
     /*
      * 1) Store cached column names per page
      * 2) * When we have a front-end for building queries, clear out the column names on query update
@@ -90,7 +101,11 @@ public class PageRestController {
      */
     
     logger.info("Hit page /api/filter/" + applicationId + "/" + pageId + "/" + columnName);
-    throw new NotYetImplementedException("filterColumn");
+    final PageItem<String> filteredResults = filterService.filterPageByColumn(Long.parseLong(applicationId), Long.parseLong(pageId), filterType, columnName, searchValue,
+            (pageNumber != null && ( rowsPerPage != null && Long.parseLong(rowsPerPage) != 0L ) ? Long.parseLong(pageNumber) : 0), 
+            (rowsPerPage != null ? Long.parseLong(rowsPerPage) : 0),
+            (rowsPerPage != null));
+    return (SourceProcessorResultTable)filteredResults;
   }
   
 }

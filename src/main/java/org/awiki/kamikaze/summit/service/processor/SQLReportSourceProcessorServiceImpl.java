@@ -98,9 +98,9 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   
   @Override
   @Cacheable(value="totalRecordCount")
-  public Long getTotalRecordCount(final String fullQuery) 
+  public Long getTotalRecordCount(final String fullQuery, List<BindVar> bindVars) 
   {
-    final SourceProcessorResultTable count = getResults(fullQuery, null , null);
+    final SourceProcessorResultTable count = getResults(fullQuery,  getParamsForSpring(bindVars), null);
     return Long.parseLong(count.getBody().get(0).getCell(0).getValue());
   }
   

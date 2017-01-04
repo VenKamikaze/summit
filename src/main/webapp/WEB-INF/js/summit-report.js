@@ -29,11 +29,13 @@ Summit.Report = Summit.Report || {
    */
   getIdColumnIndex : function(data) {
     var columnIndexForId = null;
-    $.each(data.header.cells, function(index, cell) {
-      if("id" === cell.value) {
-        columnIndexForId = index;
-      }
-    });
+    if(data != undefined && data.header != undefined && data.header.cells != undefined) {
+      $.each(data.header.cells, function(index, cell) {
+        if("id" === cell.value) {
+          columnIndexForId = index;
+        }
+      });
+    }
     return columnIndexForId;
   },
 
@@ -138,9 +140,14 @@ Summit.Report = Summit.Report || {
     var currentPage = $("#searchPage-" + reportInstance.regionId).val();
     var data = {
       rowFrom: function() {
-        if( currentPage == "1" )
-          return 1;
-        return ((currentPage -1) * reportInstance.data.count) + 1;
+        if( currentPage == "1" ) {
+          if (reportInstance.data.count == 0) {
+            return 0; // we have no records.
+          }
+          return 1; // we have records, and we start from 1 on the first page.
+        }
+
+        return ((currentPage -1) * reportInstance.data.count) + 1; //we have records and we are not on the first page.
       },
 
       rowTo: function() {
@@ -156,7 +163,7 @@ Summit.Report = Summit.Report || {
       $("#mustacheReportNav-" + reportInstance.regionId).find("#navNext-" + reportInstance.regionId).hide();
     }
 
-    if(data.rowFrom() == 1) {
+    if(data.rowFrom() <= 1) {
       $("#mustacheReportNav-" + reportInstance.regionId).find("#navPrev-" + reportInstance.regionId).hide();
     }
   },

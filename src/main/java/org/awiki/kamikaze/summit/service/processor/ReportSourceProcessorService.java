@@ -30,7 +30,8 @@ public interface ReportSourceProcessorService extends SourceProcessorService {
   /**
    * Cachable total record count associated with a particular query.
    * @param fullQuery
+   * @param bindVars - the bind variables if applicable to the query.
    * @return Long
    */
-  public Long getTotalRecordCount(final String fullQuery);
+  public Long getTotalRecordCount(final String fullQuery, List<BindVar> bindVars);
 }

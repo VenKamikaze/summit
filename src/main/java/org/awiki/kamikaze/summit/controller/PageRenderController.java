@@ -23,7 +23,6 @@ public class PageRenderController {
 	
 	 /**
    * This renders the application pages to a String
-   * TODO FIXME obviously this needs to be improved greatly, but will do for testing.
    */
   @RequestMapping(value = "/run/{applicationId}/{pageId}", method = RequestMethod.GET)
   @ResponseBody

@@ -6,9 +6,10 @@
             <div class="search-image"></div>
             <div class="fieldgroup">
                 <div class="field">
+                  <select class="filterType" id="filterType-##__ID__##" name="filterType"><option value="exact" selected="selected">Exact</option><option value="contains">Contains</option><option value="startsWith">Starts With</option><option value="endsWith">Ends With</option></select>
                   <label for="search-##__ID__##">Search:</label><input name="search" type="text" id="searchInput-##__ID__##" />
                   <input name="page" type="hidden" id="searchPage-##__ID__##" value="1"/>
-                  <label for="searchRows-##__ID__##">Rows:</label><select id="searchRows-##__ID__##" name="rows"><option value="5">5</option><option value="10">10</option><option selected="selected" value="15">15</option><option value="20">20</option><option value="30">30</option><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="500">500</option><option value="1000">1000</option><option value="5000">5000</option><option selected="selected" value="0">All</option></select>
+                  <label class="rowsLabel" for="searchRows-##__ID__##">Rows:</label><select id="searchRows-##__ID__##" name="rows"><option value="5">5</option><option value="10">10</option><option selected="selected" value="15">15</option><option value="20">20</option><option value="30">30</option><option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="500">500</option><option value="1000">1000</option><option value="5000">5000</option><option selected="selected" value="0">All</option></select>
                     <div class="searchButton">
                       <input value="Go" name="action" type="submit" id="searchButton" />
                       <input value="Clear" name="action" type="submit" id="clearSearchButton" />
@@ -21,7 +22,7 @@
 <div class="listContent">
     <div class="region">
       <div class="regionContent" id="mustacheReportRegion-##__ID__##">##__DATA__##</div>
-      <span id="mustacheReportNav-##__ID__##" class="pagination"></span>
+      <div id="mustacheReportNav-##__ID__##" class="pagination"></div>
     </div>
     <script type="text/javascript">
         var searchUrl = "##__APIPATH__##/filter/##__ID__##.json";
