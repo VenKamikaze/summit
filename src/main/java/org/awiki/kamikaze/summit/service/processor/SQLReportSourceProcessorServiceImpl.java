@@ -97,6 +97,14 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   }
   
   @Override
+  @Cacheable(value="totalRecordCount")
+  public Long getTotalRecordCount(final String fullQuery) 
+  {
+    final SourceProcessorResultTable count = getResults(fullQuery, null , null);
+    return Long.parseLong(count.getBody().get(0).getCell(0).getValue());
+  }
+  
+  @Override
   @Cacheable(value="reportColumnList")
   public Collection<String> getColumnList(long regionId)
   {

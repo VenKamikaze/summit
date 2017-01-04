@@ -26,4 +26,11 @@ public interface ReportSourceProcessorService extends SourceProcessorService {
    * @param regionId
    */
   public void clearColumnList(long regionId);
+  
+  /**
+   * Cachable total record count associated with a particular query.
+   * @param fullQuery
+   * @return Long
+   */
+  public Long getTotalRecordCount(final String fullQuery);
 }

@@ -12,6 +12,7 @@
           <property name="caches">
             <set>
               <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="reportColumnList"/>
+              <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="totalRecordCount"/> <!-- we need to clear this frequently -->
             </set>
           </property>
         </bean>

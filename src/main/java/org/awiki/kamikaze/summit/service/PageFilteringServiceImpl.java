@@ -191,8 +191,7 @@ public class PageFilteringServiceImpl implements PageFilteringService
       
       if(getTotalCount) {
         final String countQuery = buildWrapperCountQuery(regionDto.getSource().iterator().next(), columnList, searchText);
-        SourceProcessorResultTable count = reportService.querySource(null, countQuery, buildParametersForFullQuery(columnList.size(), searchText));
-        resultTable.setTotalCount(Long.valueOf(count.getBody().get(0).getCell(0).getValue()));
+        resultTable.setTotalCount(reportService.getTotalRecordCount(countQuery));
       }
       
       resultTable.setTemplateDto(regionDto.getTemplateDto());
