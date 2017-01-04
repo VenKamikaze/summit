@@ -1,3 +1,55 @@
+/* Search bar / buttons / image etc */
+.listContent {
+  margin-left: 4em;
+  width: 90%;
+}
+
+.searchBar {
+  margin-top: 3em;
+  margin-bottom: 1em;
+  margin-left: 4em;
+  margin-right: 3em;
+  width: 70%;
+}
+
+.search {
+	font-size: 10pt;
+	border-bottom: 1px solid #dcdcdc;
+  height: 2.3em;
+}
+
+.search-image {
+	float: left;
+    content:url('images/search24.png');
+	/* thanks to http://www.aha-soft.com/ for the magnifying glass icon */
+    margin-right: 1em;
+}
+
+.search input[type=text] {
+	margin-left: 1em;
+  width: 50%
+}
+
+.searchButton {
+	display: inline;
+	float: right;
+}
+
+#clearSearchButton {
+	margin-left:0.2em;
+}
+
+/* Pagination bar */
+
+.pagination {
+	font-size: 10pt;
+	padding-top: 0.5em;
+	/* border-bottom: 1px solid #dcdcdc;
+  height: 1.5em; */
+}
+
+/* Styles for the rendered report region (SPRT) */
+
 .rounded-corner
 {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;

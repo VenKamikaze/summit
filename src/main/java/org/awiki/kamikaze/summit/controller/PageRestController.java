@@ -48,7 +48,7 @@ public class PageRestController {
     
     logger.info("Hit page /api/filter/" + regionId);
     final PageItem<String> filteredResults = filterService.filterRegion(Long.parseLong(regionId), searchValue, 
-            (pageNumber != null ? Long.parseLong(pageNumber) : 0), 
+            (pageNumber != null && ( rowsPerPage != null && Long.parseLong(rowsPerPage) != 0L ) ? Long.parseLong(pageNumber) : 0), 
             (rowsPerPage != null ? Long.parseLong(rowsPerPage) : 0),
             (rowsPerPage != null)
            );

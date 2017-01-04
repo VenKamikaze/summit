@@ -89,8 +89,9 @@ public class PageFilteringServiceImpl implements PageFilteringService
       return fullQuery.toString();      
     }
     if(page > 0)
-      addPaginationToQuery(new StringBuilder(innerQuery), StringUtils.join(columnList, ", "), false, page, rowsPerPage);
-    return innerQuery; // if no search is specified, just run the standard query.
+      return addPaginationToQuery(new StringBuilder(innerQuery), StringUtils.join(columnList, ", "), false, page, rowsPerPage).toString();
+    
+    return innerQuery; // if no search is specified, and we are not using pagination, just run the standard query.
   }
   
   private Collection<String> wrapInCast(final Collection<String> columnList, final String castType) {
@@ -127,7 +128,7 @@ public class PageFilteringServiceImpl implements PageFilteringService
       case MYSQL:
         currentQuery.append(" LIMIT ").append(rowsPerPage);
         if(page > 1) {
-          currentQuery.append(" OFFSET ").append(page-1 * rowsPerPage);
+          currentQuery.append(" OFFSET ").append((page-1) * rowsPerPage);
         }
         break;
         
