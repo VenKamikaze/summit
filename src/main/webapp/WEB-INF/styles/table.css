@@ -19,8 +19,11 @@
 }
 
 .search-image {
+  width: 24px;
+  height: 24px;
 	float: left;
-    content:url('images/search24.png');
+  /*  content:url('images/search24.png'); */
+  background:url('images/search24.png'); /* firefox did not handle "content" well */
 	/* thanks to http://www.aha-soft.com/ for the magnifying glass icon */
     margin-right: 1em;
 }
