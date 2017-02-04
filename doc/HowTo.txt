@@ -1,0 +1,28 @@
+How to get Summit running quickly:
+
+Pre-requisites:
+
+* Java7+
+* Maven 3+
+* Apache Tomcat or similar container software
+* A database (note: so far only tested against Postgres, other databases YMMV)
+
+1) Clone the repository, for now the 'master' branch will usually have the latest changes:
+git clone https://github.com/VenKamikaze/summit.git
+cd summit
+
+2) Review and execute the SQL under src/main/resources/sql in this order. 
+2a) dba_ddl.sql  (creates the user and tablespace - please modify to suit your environment).
+2b) ddl.sql (creates the schema table structure used by summit)
+2c) test_dml.sql (not strictly necessary, contains Demo/Test data to show the current capability of summit)
+
+3) Modify src/main/resources/META-INF/spring/database.properties to contain your connection details as per (2a).
+
+4) Build the project
+mvn clean package
+
+5) Deploy your built summit.war to your Java web application container software:
+sudo cp target/summit.war /var/lib/tomcat7/webapps/  (if your tomcat env is similar to mine and setup to auto-deploy, this would explode the WAR automatically).
+
+6) Access http://localhost:8080/summit/run/1/2 or appropriate location for your container software to run a summit page(if you ran (2c) this should show a report page).
+
