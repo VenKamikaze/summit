@@ -1,4 +1,4 @@
-package org.awiki.kamikaze.summit.util.mapper;
+package org.awiki.kamikaze.summit.util.mapper.edit;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -7,10 +7,8 @@ import org.awiki.kamikaze.summit.domain.Page;
 import org.awiki.kamikaze.summit.domain.PageRegion;
 import org.awiki.kamikaze.summit.dto.render.ApplicationPageDto;
 import org.awiki.kamikaze.summit.dto.render.PageDto;
-import org.awiki.kamikaze.summit.dto.render.PageProcessingDto;
 import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
-import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.dozer.Mapper;
 import org.dozer.MappingException;
@@ -20,20 +18,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PageToPageDtoMapper
+public class PageToEditPageDtoMapper
 {
   @Autowired
   private Mapper mapper;
 
-  private static final Logger logger = LoggerFactory.getLogger(PageToPageDtoMapper.class);
+  private static final Logger logger = LoggerFactory.getLogger(PageToEditPageDtoMapper.class);
   
   public PageDto map(Page page)
   {
-    logger.info("in PageToPageDtoMapper");
+    logger.info("in EditPageToPageDtoMapper");
     PageDto pageDto = mapper.map(page, PageDto.class);
     pageDto.getApplicationPages().addAll(mapSet(page.getApplicationPages(), ApplicationPageDto.class));
-    pageDto.getPageProcessings().addAll(mapSet(page.getPageProcessings(), PageProcessingDto.class));
-    //not required. duplicated by getApplicationPages. pageDto.getPageRegions().addAll(mapSet(page.getPageRegions(), PageRegionDto.class));
 
     DebugUtils.debugObjectGetters(pageDto);
     
@@ -50,7 +46,6 @@ public class PageToPageDtoMapper
             DebugUtils.debugObjectGetters(dto);
             dto.setRegionDto(mapper.map(pr.getRegion(), RegionDto.class));
             DebugUtils.debugObjectGetters(dto.getRegionDto());
-            dto.getRegionDto().getRegionFields().addAll(mapSet(pr.getRegion().getRegionFields(), RegionFieldDto.class));
             break;
           }
         }

@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.awiki.kamikaze.summit.dto.entry.FieldDto;
-import org.awiki.kamikaze.summit.dto.entry.PageDto;
-import org.awiki.kamikaze.summit.dto.entry.PageItem;
-import org.awiki.kamikaze.summit.dto.entry.RegionDto;
-import org.awiki.kamikaze.summit.dto.entry.TemplateDto;
+import org.awiki.kamikaze.summit.dto.render.FieldDto;
+import org.awiki.kamikaze.summit.dto.render.PageDto;
+import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.dto.render.RegionDto;
+import org.awiki.kamikaze.summit.dto.render.TemplateDto;
 import org.awiki.kamikaze.summit.repository.TemplateRepository;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.component.VariableManager;

@@ -1,7 +1,7 @@
 package org.awiki.kamikaze.summit.service;
 
-import org.awiki.kamikaze.summit.dto.entry.FieldDto;
-import org.awiki.kamikaze.summit.dto.entry.FieldDto.PostProcessedFieldContentDto;
+import org.awiki.kamikaze.summit.dto.render.FieldDto;
+import org.awiki.kamikaze.summit.dto.render.FieldDto.PostProcessedFieldContentDto;
 
 public class FieldServiceImpl implements FieldService {
 

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.MapUtils;
-import org.awiki.kamikaze.summit.dto.entry.RegionDto;
+import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.repository.RegionRepository;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;

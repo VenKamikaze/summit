@@ -7,12 +7,12 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
-import org.awiki.kamikaze.summit.dto.entry.FieldDto;
-import org.awiki.kamikaze.summit.dto.entry.PageDto;
-import org.awiki.kamikaze.summit.dto.entry.PageItem;
-import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
-import org.awiki.kamikaze.summit.dto.entry.RegionDto;
-import org.awiki.kamikaze.summit.dto.entry.RegionFieldDto;
+import org.awiki.kamikaze.summit.dto.render.FieldDto;
+import org.awiki.kamikaze.summit.dto.render.PageDto;
+import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
+import org.awiki.kamikaze.summit.dto.render.RegionDto;
+import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.service.formatter.FormatterService;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
@@ -52,21 +52,6 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   
   @Autowired
   private PageToPageDtoMapper pageMapper;
-  
-  @Override
-  /**
-   * Overarching method that begins the page rendering
-   * Maps the page domain to the dto, .... nothing else yet implemented!
-   */
-  public PageDto renderPage(long applicationId, long pageId) {
-    ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
-    //PageDto pageDto = mapper.map(appPage.getPage(), PageDto.class);
-    PageDto pageDto = pageMapper.map(appPage.getPage());
-    
-    DebugUtils.debugObjectGetters(pageDto);
-    
-    return pageDto;
-  }
   
   /**
    * Overarching method that handles the page rendering

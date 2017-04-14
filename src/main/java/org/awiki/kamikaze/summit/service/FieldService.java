@@ -1,6 +1,6 @@
 package org.awiki.kamikaze.summit.service;
 
-import org.awiki.kamikaze.summit.dto.entry.FieldDto;
+import org.awiki.kamikaze.summit.dto.render.FieldDto;
 
 public interface FieldService {
 

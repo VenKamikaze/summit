@@ -1,14 +1,14 @@
-package org.awiki.kamikaze.summit.dto.entry;
+package org.awiki.kamikaze.summit.dto.edit;
 
 import org.hibernate.validator.constraints.NotBlank;
 
 
 
-public class PageRegionDto {
+public class EditPageRegionDto {
 
   private Long    id;
-  private PageDto    pageDto;
-  private RegionDto  regionDto;
+  private EditPageDto    pageDto;
+  private EditRegionDto  regionDto;
   
   @NotBlank(message = "Must not be empty.")
   private Long    regionNum;
@@ -19,16 +19,16 @@ public class PageRegionDto {
   public void setId(Long id) {
     this.id = id;
   }
-  public PageDto getPageDto() {
+  public EditPageDto getPageDto() {
     return pageDto;
   }
-  public void setPageDto(PageDto pageDto) {
+  public void setPageDto(EditPageDto pageDto) {
     this.pageDto = pageDto;
   }
-  public RegionDto getRegionDto() {
+  public EditRegionDto getRegionDto() {
     return regionDto;
   }
-  public void setRegionDto(RegionDto regionDto) {
+  public void setRegionDto(EditRegionDto regionDto) {
     this.regionDto = regionDto;
   }
   public Long getRegionNum() {

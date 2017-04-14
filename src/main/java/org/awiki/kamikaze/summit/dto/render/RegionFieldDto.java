@@ -1,4 +1,4 @@
-package org.awiki.kamikaze.summit.dto.entry;
+package org.awiki.kamikaze.summit.dto.render;
 
 
 public class RegionFieldDto {

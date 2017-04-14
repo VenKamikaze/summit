@@ -6,25 +6,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
-import org.awiki.kamikaze.summit.dto.entry.FieldDto;
-import org.awiki.kamikaze.summit.dto.entry.PageDto;
-import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
-import org.awiki.kamikaze.summit.dto.entry.RegionDto;
-import org.awiki.kamikaze.summit.dto.entry.RegionFieldDto;
+import org.awiki.kamikaze.summit.dto.render.FieldDto;
+import org.awiki.kamikaze.summit.dto.render.PageDto;
+import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
+import org.awiki.kamikaze.summit.dto.render.RegionDto;
+import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
-import org.awiki.kamikaze.summit.service.processor.SourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 /**
@@ -33,7 +31,7 @@ import org.springframework.util.StringUtils;
  *
  */
 //@Service
-public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRenderingService {
+public class OldPageRenderingServiceImplBeforeTemplateRefactor implements OldPageRenderingServiceBeforeTemplateRefactor {
   
   private static final Logger log = LoggerFactory.getLogger(OldPageRenderingServiceImplBeforeTemplateRefactor.class);
   
@@ -184,13 +182,6 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRe
         sb.append(processedContent.getPostProcessedContent());
     }
     return sb.toString();
-  }
-
-  @Override
-  public String renderPageToString(long applicationId, long pageId)
-  {
-    // TODO Auto-generated method stub
-    return null;
   }
 
 }

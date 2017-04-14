@@ -6,7 +6,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.xml.crypto.NoSuchMechanismException;
 
-import org.awiki.kamikaze.summit.dto.entry.PageItem;
+import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

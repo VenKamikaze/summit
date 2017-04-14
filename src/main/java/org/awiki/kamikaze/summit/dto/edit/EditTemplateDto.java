@@ -1,19 +1,19 @@
-package org.awiki.kamikaze.summit.dto.entry;
+package org.awiki.kamikaze.summit.dto.edit;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class TemplateDto {
+public class EditTemplateDto {
 
   private long       id;
   private String     className;
   private String     source;
   private String     mimeType;
   
-  private TemplateDto parent;
-  private Set<TemplateDto> children = new HashSet<>(0);
+  private EditTemplateDto parent;
+  private Set<EditTemplateDto> children = new HashSet<>(0);
   
-  private Set<PageDto> pages = new HashSet<>(0);
+  private Set<EditPageDto> pages = new HashSet<>(0);
   
   public long getId() {
     return id;
@@ -40,11 +40,11 @@ public class TemplateDto {
     this.source = bodySource;
   }
 
-  public Set<PageDto> getPages() {
+  public Set<EditPageDto> getPages() {
     return pages;
   }
 
-  public void setPages(Set<PageDto> pages) {
+  public void setPages(Set<EditPageDto> pages) {
     this.pages = pages;
   }
 
@@ -58,20 +58,20 @@ public class TemplateDto {
     this.mimeType = mimeType;
   }
 
-  public TemplateDto getParent() {
+  public EditTemplateDto getParent() {
     return parent;
   }
 
-  public void setParent(TemplateDto parent) {
+  public void setParent(EditTemplateDto parent) {
     this.parent = parent;
   }
 
-  public Set<TemplateDto> getChildren()
+  public Set<EditTemplateDto> getChildren()
   {
     return children;
   }
 
-  public void setChildren(Set<TemplateDto> children)
+  public void setChildren(Set<EditTemplateDto> children)
   {
     this.children = children;
   }

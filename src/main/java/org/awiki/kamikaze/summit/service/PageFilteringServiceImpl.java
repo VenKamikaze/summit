@@ -8,9 +8,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.awiki.kamikaze.summit.dto.entry.PageDto;
-import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
-import org.awiki.kamikaze.summit.dto.entry.RegionDto;
+import org.awiki.kamikaze.summit.dto.render.PageDto;
+import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
+import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.repository.RegionRepository;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;

@@ -1,6 +1,6 @@
 package org.awiki.kamikaze.summit.controller;
 
-import org.awiki.kamikaze.summit.dto.entry.PageItem;
+import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.service.PageFilteringService;
 import org.awiki.kamikaze.summit.service.formatter.FormatterService;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
