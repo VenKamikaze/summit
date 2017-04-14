@@ -18,7 +18,7 @@ public class GenericMapper<S,D>
   {
     try
     {
-      D d = (D) mapper.map(source, dest);
+      D d = mapper.map(source, dest);
 
       return d;
     }
