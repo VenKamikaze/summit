@@ -171,7 +171,7 @@ create table APPLICATION_PAGE
 create table SOURCE
 (
   ID bigint primary key,
-  SOURCE text,
+  SOURCE text
   --WAS: SOURCE character varying(32000)
 );
 
@@ -202,10 +202,9 @@ create table FIELD
   SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE),
   FIELD_TYPE_CODE character varying(10) references CODE_FIELD_TYPE(CODE),
   DEFAULT_SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE),
-  SOURCE text,
-  DEFAULT_SOURCE text,
   --WAS: SOURCE character varying(32000),
   --WAS: DEFAULT_SOURCE character varying(32000),
+  -- Note: joins through FIELD_SOURCE to store source.
   NOTES character varying(4000)
 );
 
