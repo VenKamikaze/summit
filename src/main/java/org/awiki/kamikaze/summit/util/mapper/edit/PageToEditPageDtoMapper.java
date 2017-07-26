@@ -5,10 +5,10 @@ import java.util.Set;
 
 import org.awiki.kamikaze.summit.domain.Page;
 import org.awiki.kamikaze.summit.domain.PageRegion;
-import org.awiki.kamikaze.summit.dto.render.ApplicationPageDto;
-import org.awiki.kamikaze.summit.dto.render.PageDto;
-import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
-import org.awiki.kamikaze.summit.dto.render.RegionDto;
+import org.awiki.kamikaze.summit.dto.edit.EditApplicationPageDto;
+import org.awiki.kamikaze.summit.dto.edit.EditPageDto;
+import org.awiki.kamikaze.summit.dto.edit.EditPageRegionDto;
+import org.awiki.kamikaze.summit.dto.edit.EditRegionDto;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.dozer.Mapper;
 import org.dozer.MappingException;
@@ -25,18 +25,18 @@ public class PageToEditPageDtoMapper
 
   private static final Logger logger = LoggerFactory.getLogger(PageToEditPageDtoMapper.class);
   
-  public PageDto map(Page page)
+  public EditPageDto map(Page page)
   {
     logger.info("in EditPageToPageDtoMapper");
-    PageDto pageDto = mapper.map(page, PageDto.class);
-    pageDto.getApplicationPages().addAll(mapSet(page.getApplicationPages(), ApplicationPageDto.class));
+    EditPageDto pageDto = mapper.map(page, EditPageDto.class);
+    pageDto.getApplicationPages().addAll(mapSet(page.getApplicationPages(), EditApplicationPageDto.class));
 
     DebugUtils.debugObjectGetters(pageDto);
     
     if(pageDto.getPageRegions().size() > 0)
     {
       // TODO optimisation candidate
-      for(PageRegionDto dto : pageDto.getPageRegions())
+      for(EditPageRegionDto dto : pageDto.getPageRegions())
       {
         for(java.util.Iterator<PageRegion> it = page.getPageRegions().iterator(); it.hasNext();)
         {
@@ -44,7 +44,7 @@ public class PageToEditPageDtoMapper
           if(pr.getId() == dto.getId())
           {
             DebugUtils.debugObjectGetters(dto);
-            dto.setRegionDto(mapper.map(pr.getRegion(), RegionDto.class));
+            dto.setRegionDto(mapper.map(pr.getRegion(), EditRegionDto.class));
             DebugUtils.debugObjectGetters(dto.getRegionDto());
             break;
           }

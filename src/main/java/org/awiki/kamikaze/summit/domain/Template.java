@@ -8,9 +8,12 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "template", schema = "public")
@@ -68,8 +71,8 @@ public class Template  implements java.io.Serializable {
   }
 
 
-  @Lob
-  @Type(type="org.hibernate.type.MaterializedClobType")
+  //@Lob
+  //@Type(type="org.hibernate.type.MaterializedClobType")
   @Column(name = "source", nullable = true)
   public String getSource()
   {
