@@ -58,7 +58,9 @@ public class Source implements java.io.Serializable
     this.id = id;
   }
 
-  @Column(name = "source", nullable = false, length = 32000)
+  @Lob
+  @Column(name = "source", nullable = false)
+  @Type(type="org.hibernate.type.MaterializedClobType")
   public String  getSource()
   {
     return this.source;

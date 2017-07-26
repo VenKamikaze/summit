@@ -68,6 +68,8 @@ public class Template  implements java.io.Serializable {
   }
 
 
+  @Lob
+  @Type(type="org.hibernate.type.MaterializedClobType")
   @Column(name = "source", nullable = true)
   public String getSource()
   {

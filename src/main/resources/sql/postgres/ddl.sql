@@ -85,8 +85,9 @@ create table TEMPLATE
   ID bigint primary key,
   PARENT_ID bigint references TEMPLATE(ID),  -- used exclusively for items on a page that are sub-elements and do not have their own tables to represent them, e.g. the ROWS and CELLS within a table.
   DESCRIPTION character varying(255),
-  CLASS_NAME character varying(32000) not null,
-  SOURCE character varying(32000),
+  CLASS_NAME character varying(4000) not null,
+  --WAS: SOURCE character varying(32000),
+  SOURCE text,
   MIME_TYPE character varying(255)  -- e.g. text/html, application/json, text/csv etc
 );
 
@@ -170,7 +171,8 @@ create table APPLICATION_PAGE
 create table SOURCE
 (
   ID bigint primary key,
-  SOURCE character varying(32000)
+  SOURCE text,
+  --WAS: SOURCE character varying(32000)
 );
 
 
@@ -181,7 +183,6 @@ create table PAGE_PROCESSING
   PAGE_ID bigint not null references PAGE(ID),
   PROCESSING_TYPE_CODE character varying(10) not null references CODE_PROCESSING_TYPE(CODE),
   PROCESSING_NUM bigint not null
-  --SOURCE character varying(32000)
 );
 
 create table PAGE_PROCESSING_SOURCE
@@ -201,8 +202,10 @@ create table FIELD
   SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE),
   FIELD_TYPE_CODE character varying(10) references CODE_FIELD_TYPE(CODE),
   DEFAULT_SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE),
-  SOURCE character varying(32000),
-  DEFAULT_SOURCE character varying(32000),
+  SOURCE text,
+  DEFAULT_SOURCE text,
+  --WAS: SOURCE character varying(32000),
+  --WAS: DEFAULT_SOURCE character varying(32000),
   NOTES character varying(4000)
 );
 
@@ -224,7 +227,6 @@ create table REGION
   CODE_REGION_POSITION character varying(10) references CODE_REGION_POSITION(CODE),
   CODE_REGION_TYPE character varying(10) references CODE_REGION_TYPE(CODE),
   SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE)
-  --SOURCE character varying(32000)
 );
 
 create table REGION_SOURCE

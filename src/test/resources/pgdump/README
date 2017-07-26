@@ -1,0 +1,5 @@
+This is a PG_DUMP -Fc of the 'summit' database that I was using up until 2017-07-26 for testing summit.
+
+This extract works with the git commit of summit as of 'a72c06343fb8cf52018e7d4517520f5ed6f3a29e', however there are a few superfluous fields on tables that are not used due to the changing nature of the data model during development.
+
+
