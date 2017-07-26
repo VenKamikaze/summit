@@ -16,7 +16,7 @@
     <!--    <spring-security.version>3.2.4.RELEASE</spring-security.version> -->
     <spring-security.version>4.1.0.RELEASE</spring-security.version>
     <!-- <hibernate-orm.version>4.3.5.Final</hibernate-orm.version> -->
-    <hibernate-orm.version>5.0.7.Final</hibernate-orm.version>
+    <hibernate-orm.version>5.1.8.Final</hibernate-orm.version>
     <org.aspectj-version>1.6.10</org.aspectj-version>
     <org.slf4j-version>1.7.2</org.slf4j-version>
     <tiles.version>3.0.5</tiles.version>
@@ -129,11 +129,10 @@
 
     <!-- DB -->
     <dependency>
-      <!--      <groupId>com.google.code.maven-play-plugin.postgresql</groupId> -->
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <!--  <version>9.0-801.jdbc4-patched-play-1.2.3</version> -->
-      <version>9.4.1212.jre7</version>
+      <version>42.1.3.jre7</version>
+      <!-- <version>9.4.1212.jre7</version> -->
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>

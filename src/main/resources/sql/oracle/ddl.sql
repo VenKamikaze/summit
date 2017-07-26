@@ -86,7 +86,8 @@ create table TEMPLATE
   DESCRIPTION varchar2(255),
   CLASS_NAME varchar2(4000) not null,
   -- WAS: SOURCE varchar2(32000),
-  SOURCE CLOB,
+  --SOURCE CLOB,
+  SOURCE varchar2(4000), -- TODO: find a way to use CLOB in Oracle and TEXT in postgres - cannot find a portable way in hibernate to make this work.
   MIME_TYPE varchar2(255)  -- e.g. text/html, application/json, text/csv etc
 );
 
@@ -171,7 +172,8 @@ create table SOURCE
 (
   ID number(19) primary key,
   --WAS: SOURCE varchar2(32000)
-  SOURCE CLOB
+  -- SOURCE CLOB
+  SOURCE varchar2(4000)  -- TODO: find a way to use CLOB in Oracle and TEXT in postgres - cannot find a portable way in hibernate to make this work.
 );
 
 
