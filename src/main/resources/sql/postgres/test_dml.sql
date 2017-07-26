@@ -49,7 +49,7 @@ insert into region  (select nextval('region_seq'), id, 'Test Report Region with 
 insert into page_region select nextval('spare_seq'), (select id from page where name like '%Mustache'), id, id from region where name like '%Mustache';
 insert into page_region (select nextval('spare_seq'), (select id from page where name = 'Test Report Page'), id, 1 from region where name ='Test Report Region');
 
-insert into source values (1, 'select id, page_id, region_id, region_num from page_region');
+insert into source values (1, 'select id, parent_id, description, class_name, source, mime_type from template');
 
 insert into region_source (select nextval('spare_seq'), id, 1 from region where name = 'Test Report Region with Mustache');
 insert into region_source (select nextval('spare_seq'), id, 1 from region where name = 'Test Report Region');
