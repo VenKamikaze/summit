@@ -42,7 +42,7 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
       fullQuery.append(" FROM ( " + innerQuery + " ) SUBQUERY ");
       addPredicate(fullQuery, filterType, columnToFilter, columnList);
       if(page > 0)
-        addPaginationToQuery(fullQuery, StringUtils.join(columnList, ", "), true, page, rowsPerPage);
+        fullQuery = addPaginationToQuery(fullQuery, StringUtils.join(columnList, ", "), true, page, rowsPerPage);
       return fullQuery.toString();      
     }
     if(page > 0)
@@ -56,7 +56,7 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
     if(StringUtils.isNotBlank(columnToFilter)) {
       /* A column is specified - query against the column specified (check it is valid first) */
       if(columnList.contains(columnToFilter)) {
-        query.append(" WHERE ").append(wrapInCast(new ArrayList<String>(1) {{ add(columnToFilter); }}, "varchar")).append(handleFilterType(FilterTypeEnum.valueOf(filterType.toUpperCase()), ":searchText"));
+        query.append(" WHERE ").append(wrapInCast(new ArrayList<String>(1) {{ add(columnToFilter); }}, getVarcharCastType())).append(handleFilterType(FilterTypeEnum.valueOf(filterType.toUpperCase()), ":searchText"));
       }
     }
     else {
@@ -126,6 +126,7 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
     
     switch(detectedDbType) {
       case ORACLE:
+        /*
         // append rownum as column to the current query
         int afterFirstSelect = currentQuery.toString().toUpperCase().indexOf("SELECT ") + 7;
         currentQuery.insert(afterFirstSelect, " rownum RNUM, ");
@@ -140,8 +141,19 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
         // Sub-Query the current query again, so we can specify rows to start from.
         //currentQuery.insert(0, "SELECT RNUM, ").append(columnList).append(" FROM ( ");
         currentQuery.insert(0, "SELECT " + columnList + " FROM ( ");
-        currentQuery.append(" ) WHERE RNUM >= ").append(page <= 1 ? 1 : ( (page-1) * rowsPerPage));
-        break;
+        currentQuery.append(" ) WHERE RNUM > ").append(page <= 1 ? 0 : ( (page-1) * rowsPerPage));
+        *
+        */
+        final String rownumAlias = "RNUM";
+        
+        StringBuilder paginationQuery = new StringBuilder(currentQuery.length() + (columnList.length()*2) + 100); // currentQuery length, plus two lots of the columnList for subquerying, plus additional wrapping syntax
+        paginationQuery.insert(0, "SELECT ").append(columnList).append(" FROM ( "); // outermost query
+        paginationQuery.append(" SELECT rownum ").append(rownumAlias).append(", ").append(columnList).append(" FROM ("); // first inner query with rownum in select 
+        paginationQuery.append(currentQuery).append(" ) "); // inner most query (or queries)
+        paginationQuery.append( " WHERE ").append(" rownum <= ").append(page * rowsPerPage); // first inner query -- predicate limiting results less than max via rownum
+        paginationQuery.append( " ) ");
+        paginationQuery.append(" WHERE ").append(rownumAlias).append( " > ").append(page <= 1 ? 0 : ( (page-1) * rowsPerPage));
+        return paginationQuery;
         
       case POSTGRES:
       case MYSQL:
