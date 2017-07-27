@@ -1,4 +1,7 @@
-TODO: Replacement variables for e.g. current region/page/app id, so we can reference them within the templates.
+TODO: 
+* Pagination is hacky when using Oracle - it needs an 'order by' specified on the innermost subquery, however we don't know what columns are unique at this stage. When allowing edit capability, we might need to prompt users to specify the column with the primary key (or a unique constraint at least). Warn users if they choose to continue without specifying that as rows may be returned in random order. (Jul 2017)
+
+Replacement variables for e.g. current region/page/app id, so we can reference them within the templates.
 Need to be able to then use these variables in place of e.g. the region id for a report region, so we can have multiple report regions working with the mustache templating on one page.
 
 
