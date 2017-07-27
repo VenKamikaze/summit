@@ -126,24 +126,6 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
     
     switch(detectedDbType) {
       case ORACLE:
-        /*
-        // append rownum as column to the current query
-        int afterFirstSelect = currentQuery.toString().toUpperCase().indexOf("SELECT ") + 7;
-        currentQuery.insert(afterFirstSelect, " rownum RNUM, ");
-        if(! hasWhereClause) {
-          currentQuery.append(" WHERE ");
-        }
-        else {
-          currentQuery.append(" AND ");
-        }
-        // limit max rows to the last row of the current page.
-        currentQuery.append(" rownum <= ").append(page * rowsPerPage);
-        // Sub-Query the current query again, so we can specify rows to start from.
-        //currentQuery.insert(0, "SELECT RNUM, ").append(columnList).append(" FROM ( ");
-        currentQuery.insert(0, "SELECT " + columnList + " FROM ( ");
-        currentQuery.append(" ) WHERE RNUM > ").append(page <= 1 ? 0 : ( (page-1) * rowsPerPage));
-        *
-        */
         final String rownumAlias = "RNUM";
         
         StringBuilder paginationQuery = new StringBuilder(currentQuery.length() + (columnList.length()*2) + 100); // currentQuery length, plus two lots of the columnList for subquerying, plus additional wrapping syntax
