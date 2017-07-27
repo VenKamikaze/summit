@@ -21,6 +21,9 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
   
   private static final Logger logger = LoggerFactory.getLogger(SqlQueryBuilderServiceImpl.class);
 
+  private static final String ORACLE_VARCHAR_CAST = "varchar2(4000)";
+  private static final String VARCHAR = "varchar";
+  
   public String buildWrapperCountQuery(final String innerQuery, final String filterType, final String columnToFilter, final Collection<String> columnList, final String searchText) {
     StringBuilder countQuery = new StringBuilder();
     countQuery.append("SELECT COUNT(1) as TOTALCOUNT");
@@ -58,7 +61,7 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
     }
     else {
       /* No column specified - query against ALL columns */
-      query.append(" WHERE ").append(StringUtils.join( wrapInCast(columnList, "varchar"), handleFilterType(FilterTypeEnum.valueOf(filterType.toUpperCase()), ":searchText")+ " OR ")).append(handleFilterType(FilterTypeEnum.valueOf(filterType), ":searchText"));
+      query.append(" WHERE ").append(StringUtils.join( wrapInCast(columnList, getVarcharCastType()), handleFilterType(FilterTypeEnum.valueOf(filterType.toUpperCase()), ":searchText")+ " OR ")).append(handleFilterType(FilterTypeEnum.valueOf(filterType), ":searchText"));
     }
     return query.toString();
   }
@@ -92,6 +95,23 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
     return predicate;
   }
   
+  /**
+   * Gets the database specific type for varchar (as e.g. it is varchar2 and needs length for oracle)
+   * @return
+   */
+  private String getVarcharCastType() {
+    if(detectedDbType == null)
+      detectDbType();
+    
+    switch(detectedDbType) {
+      case ORACLE:
+        return ORACLE_VARCHAR_CAST;
+        
+      default:
+        return VARCHAR;
+    }
+  }
+  
   private Collection<String> wrapInCast(final Collection<String> columnList, final String castType) {
     Collection<String> castedColumns = new ArrayList<String>(columnList.size());
     for(String col : columnList) {
@@ -107,8 +127,8 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
     switch(detectedDbType) {
       case ORACLE:
         // append rownum as column to the current query
-        int firstSelect = currentQuery.indexOf("SELECT ");
-        currentQuery.insert(firstSelect, "rownum RNUM, ");
+        int afterFirstSelect = currentQuery.toString().toUpperCase().indexOf("SELECT ") + 7;
+        currentQuery.insert(afterFirstSelect, " rownum RNUM, ");
         if(! hasWhereClause) {
           currentQuery.append(" WHERE ");
         }
@@ -118,8 +138,9 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
         // limit max rows to the last row of the current page.
         currentQuery.append(" rownum <= ").append(page * rowsPerPage);
         // Sub-Query the current query again, so we can specify rows to start from.
-        currentQuery.insert(0, "SELECT RNUM, ").append(columnList).append(" FROM ( ");
-        currentQuery.append(" ) WHERE RNUM >= ").append(page <= 1 ? 1 : (page-1 * rowsPerPage));
+        //currentQuery.insert(0, "SELECT RNUM, ").append(columnList).append(" FROM ( ");
+        currentQuery.insert(0, "SELECT " + columnList + " FROM ( ");
+        currentQuery.append(" ) WHERE RNUM >= ").append(page <= 1 ? 1 : ( (page-1) * rowsPerPage));
         break;
         
       case POSTGRES:
