@@ -203,10 +203,6 @@ create table FIELD
   SOURCE_TYPE_CODE varchar2(10) references CODE_SOURCE_TYPE(CODE),
   FIELD_TYPE_CODE varchar2(10) references CODE_FIELD_TYPE(CODE),
   DEFAULT_SOURCE_TYPE_CODE varchar2(10) references CODE_SOURCE_TYPE(CODE),
-  --WAS: SOURCE varchar2(32000),
-  --WAS: DEFAULT_SOURCE varchar2(32000),
-  SOURCE CLOB,
-  DEFAULT_SOURCE CLOB,
   NOTES varchar2(4000)
 );
 
@@ -254,9 +250,9 @@ create table REGION_FIELD
   FIELD_NUM number(19) not null
 );
 
-create sequence application_seq start 1;
-create sequence page_seq start 1;
-create sequence region_seq start 1;
-create sequence field_seq start 1;
-create sequence spare_seq start 1;
+create sequence application_seq start with 1;
+create sequence page_seq start with 1;
+create sequence region_seq start with 1;
+create sequence field_seq start with 1;
+create sequence spare_seq start with 1;
 
