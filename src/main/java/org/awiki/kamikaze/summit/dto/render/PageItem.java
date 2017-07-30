@@ -1,6 +1,7 @@
 package org.awiki.kamikaze.summit.dto.render;
 
 import java.util.Collection;
+import java.util.Map;
 
 /*
 public interface PageItem 
@@ -12,6 +13,16 @@ public interface PageItem
 public interface PageItem<T> // Where T is the processed source type
 {
   public Object getId();
+  
+  public String getName();
+  
+  /**
+   * Gets any unique replacement variables associated with this pageItem
+   * Key = replacement variable name.
+   * Value = value to replace with.
+   * @return Map<String, String> or empty Map
+   */
+  public Map<String, String> getReplacementVariables();
   
   /**
    * whether this pageItem contains PageItems itself.

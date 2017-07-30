@@ -5,14 +5,14 @@ import java.util.Set;
 
 public class EditPageDto {
   
-  private Long                 id;
+  private Long                        id;
   private Set<EditPageRegionDto>      pageRegions      = new HashSet<>(0);
-  //not yet impl private Set<PageProcessingDto>  pageProcessings  = new HashSet<>(0);
+  //not yet impl private Set<PageProcessingDto>  pageProcessings  = new HashSet<>(0); // add later!
   private Set<EditApplicationPageDto> applicationPages = new HashSet<>(0);
 
   //changed definition
-  private String               name;
-  private EditTemplateDto          template;
+  private String                      name;
+  private EditTemplateDto             template;
   
   public Long getId() {
     return id;

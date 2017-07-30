@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.iterators.ArrayListIterator;
+import org.apache.commons.collections4.MapUtils;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.TemplateDto;
 import org.awiki.kamikaze.summit.service.formatter.Formattable;
@@ -181,6 +183,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     public String toString() {
       return getName();
     }
+    
   }
   
   public class HeaderRow extends SourceProcessorResultTable.Row {
@@ -333,6 +336,19 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       return hashCode();
     }
     
+    @JsonIgnore
+    @Override
+    public Map<String, String> getReplacementVariables()
+    {
+      return MapUtils.EMPTY_SORTED_MAP;
+    }
+
+    @Override
+    public String getName()
+    {
+      logger.warn("getName() called on " + this.getClass().getCanonicalName() + " but we have no name. Returning null");
+      return null;
+    }
   }
 
   
@@ -421,6 +437,20 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     {
       logger.warn("getId() called on " + this.getClass().getCanonicalName() + " but we have no specific ID. Return hashCode()");
       return hashCode();
+    }
+    
+    @JsonIgnore
+    @Override
+    public Map<String, String> getReplacementVariables()
+    {
+      return MapUtils.EMPTY_SORTED_MAP;
+    }
+
+    @Override
+    public String getName()
+    {
+      logger.warn("getName() called on " + this.getClass().getCanonicalName() + " but we have no name. Returning null");
+      return null;
     }
   }
   
@@ -529,5 +559,19 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
         this.pages = (long) Math.ceil(this.getTotalCount().doubleValue() / (1.0 * this.getCount()) ) ;
       }
     }
+  }
+
+  @JsonIgnore
+  @Override
+  public Map<String, String> getReplacementVariables()
+  {
+    return MapUtils.EMPTY_SORTED_MAP;
+  }
+
+  @Override
+  public String getName()
+  {
+    logger.warn("getName() called on " + this.getClass().getCanonicalName() + " but we have no name. Returning null");
+    return null;
   }
 }

@@ -3,20 +3,25 @@ package org.awiki.kamikaze.summit.dto.render;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.validation.constraints.Size;
 
+import org.apache.commons.collections4.MapUtils;
+import org.awiki.kamikaze.summit.service.formatter.FormatEnums;
 import org.hibernate.validator.constraints.NotBlank;
 
 
 public class FieldDto implements PageItem<String> {
   
   private Long               id;
+  private String             name;
   
   @NotBlank(message = "Must not be empty.")
   @Size(max = 10)
-  private String                codeFieldType;  // ???
+  private String                codeFieldType;  // e.g. 'text','number','drop-down',etc
   
   @NotBlank(message = "Must not be empty.")
   @Size(max = 10)
@@ -36,6 +41,13 @@ public class FieldDto implements PageItem<String> {
   }
   public void setId(Long id) {
     this.id = id;
+  }
+  @Override
+  public String getName() {
+    return name;
+  }
+  public void setName(String name) {
+    this.name = name;
   }
   public String getCodeFieldType() {
     return codeFieldType;
@@ -168,5 +180,10 @@ public class FieldDto implements PageItem<String> {
   {
     return getTemplate();
   }
-  
+
+  @Override
+  public Map<String, String> getReplacementVariables()
+  {
+    return MapUtils.EMPTY_SORTED_MAP; 
+  }
 }

@@ -3,8 +3,11 @@ package org.awiki.kamikaze.summit.dto.render;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
+import org.awiki.kamikaze.summit.service.formatter.FormatEnums;
 import org.hibernate.validator.constraints.NotBlank;
 
 
@@ -45,6 +48,7 @@ public class RegionDto implements PageItem<String> {
   public void setCodeRegionType(String codeRegionType) {
     this.codeRegionType = codeRegionType;
   }
+  @Override
   public String getName() {
     return name;
   }
@@ -125,6 +129,12 @@ public class RegionDto implements PageItem<String> {
   public TemplateDto getTemplateDto()
   {
     return getTemplate();
+  }
+  
+  @Override
+  public Map<String, String> getReplacementVariables()
+  {
+    return new TreeMap<String, String>() {{ put(FormatEnums.REPLACEMENT_REGION_ID_VARIABLE.toString(), getId().toString()); }}; 
   }
 
 }

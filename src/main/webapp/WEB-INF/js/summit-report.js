@@ -76,13 +76,15 @@ Summit.Report = Summit.Report || {
   doRequest : function(reportInstance) {
     if(reportInstance != null && reportInstance.isInitialised() ) {
       var formElement = "";
-      if(reportInstance.formId.charAt(0) != '#') {
-        formElement = "#";
+      if(reportInstance.formId != null) {
+        if (reportInstance.formId.charAt(0) != '#') {
+          formElement = "#";
+        }
+        formElement += reportInstance.formId;
       }
-      formElement += reportInstance.formId;
       var that = this;
       var data = $.ajax({ url: reportInstance.filterPath,
-                        data: $(formElement).serialize(),
+                        data: formElement == "" ? null : $(formElement).serialize(),
                         cache: false,
                         success: function(response) {
                             reportInstance.setData(response);

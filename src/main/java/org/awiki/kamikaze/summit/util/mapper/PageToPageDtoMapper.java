@@ -3,8 +3,10 @@ package org.awiki.kamikaze.summit.util.mapper;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.awiki.kamikaze.summit.domain.Field;
 import org.awiki.kamikaze.summit.domain.Page;
 import org.awiki.kamikaze.summit.domain.PageRegion;
+import org.awiki.kamikaze.summit.domain.RegionField;
 import org.awiki.kamikaze.summit.dto.render.ApplicationPageDto;
 import org.awiki.kamikaze.summit.dto.render.PageDto;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingDto;
@@ -24,6 +26,9 @@ public class PageToPageDtoMapper
 {
   @Autowired
   private Mapper mapper;
+  
+  @Autowired
+  private FieldToFieldDtoMapper fieldMapper;
 
   private static final Logger logger = LoggerFactory.getLogger(PageToPageDtoMapper.class);
   
@@ -50,7 +55,18 @@ public class PageToPageDtoMapper
             DebugUtils.debugObjectGetters(dto);
             dto.setRegionDto(mapper.map(pr.getRegion(), RegionDto.class));
             DebugUtils.debugObjectGetters(dto.getRegionDto());
-            dto.getRegionDto().getRegionFields().addAll(mapSet(pr.getRegion().getRegionFields(), RegionFieldDto.class));
+            // WAS: dto.getRegionDto().getRegionFields().addAll(mapSet(pr.getRegion().getRegionFields(), RegionFieldDto.class));
+            // FIXME TODO configure dozer to use the custom FieldToFieldDtoMapper instead of forcing it here.
+            for(RegionField rf : pr.getRegion().getRegionFields())
+            {
+              for(RegionFieldDto rfDto : dto.getRegionDto().getRegionFields())
+              {
+                if(rf.getId() == rfDto.getId())
+                {
+                  rfDto.setField(fieldMapper.map(rf.getField()));
+                }
+              }
+            }
             break;
           }
         }
@@ -66,7 +82,7 @@ public class PageToPageDtoMapper
       Set<D> destSet = new HashSet<D>(source.size());
       for (S src : source)
       {
-        destSet.add( (D) mapper.map(src, dest));
+        destSet.add( mapper.map(src, dest));
       }
       return destSet;
     }

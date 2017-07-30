@@ -1,7 +1,8 @@
 package org.awiki.kamikaze.summit.service.formatter;
 
+import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_NAME_VARIABLE;
 import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_ID_VARIABLE;
-import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_SUBREGION_VARIABLE;
+import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_DATA_AND_SUBREGION_VARIABLE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,22 +53,24 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   }
 
   @Override
-  public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt)
-  { 
+  public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt, Map<String, String> replacementVariableCache)
+  {
+    replacementVariableCache.putAll(item.getReplacementVariables());
+    
     final TemplateDto template = item.getTemplateDto(); 
     // A template can be null, for example with Mustache templating you can handle Row/HeaderRow/Cell objects at a higher level template
     if(null != template) {
       logger.debug("Formatting item : " + item.getClass().getCanonicalName());
-      String templateSource = replaceInternalVariables(template.getSource(), item);
+      String templateSource = replaceInternalVariables(template.getSource(), item, replacementVariableCache);
       templateSource = replaceApplicationVariables(templateSource, variableManager.getReplacementVars());
-      int templateSourceReplaceLocation = templateSource.indexOf(REPLACEMENT_SUBREGION_VARIABLE.toString()) == -1 ? 0 : templateSource.indexOf(REPLACEMENT_SUBREGION_VARIABLE.toString());
+      int templateSourceReplaceLocation = templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString()) == -1 ? 0 : templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString());
       int nextInsertAt = templateSourceReplaceLocation + insertAt;
-      builder.insert(insertAt, templateSource.replace(REPLACEMENT_SUBREGION_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
+      builder.insert(insertAt, templateSource.replace(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
   
       if(item.hasSubPageItems()) {
         for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getSubPageItems())) ) {
           FormatterService<PageItem<?>> formatter = formatters.getFormatterService(innerItem.getClass().getCanonicalName());
-          formatter.format(builder, innerItem, nextInsertAt);
+          formatter.format(builder, innerItem, nextInsertAt, replacementVariableCache);
         }
       }
     }
@@ -82,9 +85,14 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
    * 
    * @param builder
    * @param item
+   * @param replacementVariableCache - a running cache that is built up of unique replacement variables per PageItem processed.
    * @return recalculated length of insertAt variable after replacements have run.
    */
-  private String replaceInternalVariables(String templateSource, PageItem<String> item) {
+  private String replaceInternalVariables(String templateSource, final PageItem<String> item, final Map<String, String> replacementVariableCache) {
+    for(Map.Entry<String, String> kvp : replacementVariableCache.entrySet()) {
+      templateSource = StringUtils.replace(templateSource, kvp.getKey(), kvp.getValue());
+    }
+    templateSource = StringUtils.replace(templateSource, REPLACEMENT_NAME_VARIABLE.toString(), item.getName() );
     return StringUtils.replace(templateSource, REPLACEMENT_ID_VARIABLE.toString(), item.getId().toString());
   }
   

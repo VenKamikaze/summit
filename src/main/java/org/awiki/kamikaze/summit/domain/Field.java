@@ -32,6 +32,7 @@ public class Field implements java.io.Serializable
   private static final long serialVersionUID = -7419252566793513396L;
   
   private long                id;
+  private String              name;
   private CodeFieldSourceType codeFieldSourceTypeBySourceType;
   private CodeFieldType       codeFieldType;
   private CodeFieldSourceType codeFieldSourceTypeByDefaultValueType;
@@ -85,6 +86,17 @@ public class Field implements java.io.Serializable
   public void setId(long id)
   {
     this.id = id;
+  }
+
+  @Column(name = "NAME")
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
   }
 
   @ManyToOne(fetch = FetchType.LAZY)

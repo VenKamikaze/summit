@@ -4,8 +4,10 @@ import static org.awiki.kamikaze.summit.domain.Region.REGION_TYPE_REPORT;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
 import org.awiki.kamikaze.summit.dto.render.FieldDto;
 import org.awiki.kamikaze.summit.dto.render.PageDto;
@@ -21,6 +23,7 @@ import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.DebugUtils;
+import org.awiki.kamikaze.summit.util.mapper.PageItemToBindVarMapper;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
 import org.slf4j.Logger;
@@ -52,6 +55,9 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   
   @Autowired
   private PageToPageDtoMapper pageMapper;
+  
+  @Autowired
+  private BindVarService bindVarService;
   
   /**
    * Overarching method that handles the page rendering
@@ -98,7 +104,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     final StringBuilder builder = new StringBuilder();
     start = System.nanoTime();
     FormatterService service = sourceFormatters.getFormatterService(PageDto.class.getCanonicalName());
-    final String result = service.format(builder, pageDto, 0).toString();
+    final String result = service.format(builder, pageDto, 0, new HashMap<String,String>()).toString();
     end = System.nanoTime();
 
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": service.format took: " + (end - start) / 1000000 + "ms");
@@ -141,18 +147,22 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     for(PageRegionDto pageRegionDto : pageDto.getPageRegions() ) {
       RegionDto regionDto = pageRegionDto.getRegionDto();
       Collection<PageItem<String>> regionItems = new ArrayList<>();
+
+      // All regions can contain fields, and we need the fields to determine our bind variables in later queries.
+      regionItems.addAll(processFieldsForRender(regionDto.getRegionFields()));
+      regionDto.setSubPageItems(regionItems);
+
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) ) {
         ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
-        SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getId(), regionDto.getSource().iterator().next(), null);
+        
+        // All fields turned into bind variables, with variable name coming from the field name.
+        SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getId(), regionDto.getSource().iterator().next(), bindVarService.convertFieldsToBindVars(regionItems));
         resultTable.setTemplateDto(regionDto.getTemplateDto());
         regionItems.add(resultTable);
       }
       else {
         log.error("Found a " + regionDto.getCodeRegionType() + " ! FIXME: implement the processor!");
       }
-
-      regionItems.addAll(processFieldsForRender(regionDto.getRegionFields()));
-      regionDto.setSubPageItems(regionItems);
     } 
   }
   
@@ -195,11 +205,15 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       FieldDto.PostProcessedFieldContentDto processedDefaultContent = fieldDto.new PostProcessedFieldContentDto();
       SingularSourceProcessorService processor = (SingularSourceProcessorService) sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
       processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource(), null).getResultValue()); // TODO FIXME handle bind vars
-      processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() , null ).getResultValue() );  // TODO FIXME handle bind vars
       fieldDto.setPostProcessedSource(processedContent);
-      fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
-      
-      
+
+      // Default value is optional
+      if(StringUtils.isNotBlank(fieldDto.getDefaultValueSource()))
+      {
+        processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() , null ).getResultValue() );  // TODO FIXME handle bind vars
+        fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
+      }
+
       fields.add(fieldDto);
     }
     return fields;

@@ -1,4 +1,4 @@
-package org.awiki.kamikaze.summit.controller;
+package org.awiki.kamikaze.summit.controller.edit;
 
 import org.awiki.kamikaze.summit.dto.edit.EditPageDto;
 import org.awiki.kamikaze.summit.service.edit.PageEditService;
@@ -23,11 +23,22 @@ public class PageEditController {
 	@Autowired
 	PageEditService pageEditService;
 	
+	/*
+	 * page
+     page_region
+     region
+     region_source
+     source
+	 */
+	
+	// TODO perhaps, for now, we should output a DTO and render a JSP page for the backend edit?
+	// later we can look at making this generic, when we have edit forms rendered on the front-end to end-users.
+	
 	 /**
    * This loads and renders the edit page for modifying basic pages
    */
   @RequestMapping(value = "/edit/{applicationId}/{pageId}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-  public String view(@PathVariable String applicationId, @PathVariable String pageId, Model model) {
+  public String viewPage(@PathVariable String applicationId, @PathVariable String pageId, Model model) {
     logger.info("Hit page /edit/" + applicationId + "/" + pageId);
     final EditPageDto dto = pageEditService.loadPage(Long.parseLong(applicationId), Long.parseLong(pageId));
     model.addAttribute("dto", dto);

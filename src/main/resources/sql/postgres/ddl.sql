@@ -9,6 +9,8 @@ create table CODE_SOURCE_TYPE
 );
 
 
+/*
+-- appears unused as of July 2017
 create table CODE_FIELD_SOURCE_TYPE
 (
   CODE character varying(10) primary key,
@@ -16,6 +18,7 @@ create table CODE_FIELD_SOURCE_TYPE
   SORT_ORDER bigint not null,
   SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE)
 );
+*/
 
 create table CODE_REGION_TYPE
 (
@@ -52,7 +55,8 @@ create table CODE_PROCESSING_TYPE
 --  SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE)
 --);
 
--- use?
+-- Contains codes representing the type of field added to a page
+-- e.g. TEXT, INTEGER, DROP-DOWN, etc.
 create table CODE_FIELD_TYPE
 (
   CODE character varying(10) primary key,

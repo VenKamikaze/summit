@@ -8,6 +8,8 @@ create table CODE_SOURCE_TYPE
 );
 
 
+/*
+ * Appears unused as of July 2017
 create table CODE_FIELD_SOURCE_TYPE
 (
   CODE varchar2(10) primary key,
@@ -15,6 +17,7 @@ create table CODE_FIELD_SOURCE_TYPE
   SORT_ORDER number(19) not null,
   SOURCE_TYPE_CODE varchar2(10) references CODE_SOURCE_TYPE(CODE)
 );
+*/
 
 create table CODE_REGION_TYPE
 (

@@ -9,6 +9,8 @@ import org.awiki.kamikaze.summit.dto.edit.EditApplicationPageDto;
 import org.awiki.kamikaze.summit.dto.edit.EditPageDto;
 import org.awiki.kamikaze.summit.dto.edit.EditPageRegionDto;
 import org.awiki.kamikaze.summit.dto.edit.EditRegionDto;
+import org.awiki.kamikaze.summit.dto.render.PageProcessingDto;
+import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.dozer.Mapper;
 import org.dozer.MappingException;
@@ -30,7 +32,9 @@ public class PageToEditPageDtoMapper
     logger.info("in EditPageToPageDtoMapper");
     EditPageDto pageDto = mapper.map(page, EditPageDto.class);
     pageDto.getApplicationPages().addAll(mapSet(page.getApplicationPages(), EditApplicationPageDto.class));
-
+    // not yet impl pageDto.getPageProcessings().addAll(mapSet(page.getPageProcessings(), PageProcessingDto.class));
+    // TODO add pageprocessing later!
+    
     DebugUtils.debugObjectGetters(pageDto);
     
     if(pageDto.getPageRegions().size() > 0)
@@ -46,6 +50,8 @@ public class PageToEditPageDtoMapper
             DebugUtils.debugObjectGetters(dto);
             dto.setRegionDto(mapper.map(pr.getRegion(), EditRegionDto.class));
             DebugUtils.debugObjectGetters(dto.getRegionDto());
+            // not yet impl dto.getRegionDto().getRegionFields().addAll(mapSet(pr.getRegion().getRegionFields(), RegionFieldDto.class));
+            // TODO add regionfields later!
             break;
           }
         }
