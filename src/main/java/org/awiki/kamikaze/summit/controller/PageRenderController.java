@@ -1,6 +1,7 @@
 package org.awiki.kamikaze.summit.controller;
 
 import org.awiki.kamikaze.summit.service.PageRenderingService;
+import org.awiki.kamikaze.summit.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -26,9 +28,10 @@ public class PageRenderController {
    */
   @RequestMapping(value = "/run/{applicationId}/{pageId}", method = RequestMethod.GET)
   @ResponseBody
-  public String view(@PathVariable String applicationId, @PathVariable String pageId) {
+  public String view(@PathVariable String applicationId, @PathVariable String pageId,
+          @RequestParam(required=false,name="pageParams") final String pageParams) {
     logger.info("Hit page /run/" + applicationId + "/" + pageId);
-    return renderService.renderPageToString(Long.parseLong(applicationId), Long.parseLong(pageId));
+    return renderService.renderPageToString(Long.parseLong(applicationId), Long.parseLong(pageId), StringUtils.toParameterMap(pageParams));
   }
   
 }

@@ -5,6 +5,7 @@ import static org.awiki.kamikaze.summit.domain.Region.REGION_TYPE_REPORT;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -70,7 +71,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    * (formatters) 6. Each formatter gets the appropriate template, and builds up a text representation of the page
    *                 appending content at the start of each format call.
    */
-  public String renderPageToString(long applicationId, long pageId) {
+  public String renderPageToString(long applicationId, long pageId, final Map<String, String> parameterMap) {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     if(appPage != null)
     {
@@ -78,7 +79,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       
       DebugUtils.debugObjectGetters(pageDto);
       
-      return processPageItems(pageDto);
+      return processPageItems(pageDto, parameterMap);
     }
     return "Application " + applicationId + " does not exist.";
   }
@@ -90,11 +91,11 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    * @param pageDto
    * @return
    */
-  private String processPageItems(final PageDto pageDto) {
+  private String processPageItems(final PageDto pageDto, final Map<String, String> parameterMap) {
     // Get the collection of pageItems in each region
     //Map<String, List<PageItem<?>>> regionPageItems = processRegionsForRender(pageDto);
     long start = System.nanoTime();
-    processRegionsForRender(pageDto);
+    processRegionsForRender(pageDto, parameterMap);
     long end = System.nanoTime();
     
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processRegionsForRender took: " + (end - start) / 1000000 + "ms");
@@ -143,13 +144,13 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   */
   // Map of REGION_POSITION_X to List<String (rendered content)> 
   
-  private void processRegionsForRender(final PageDto pageDto)  {
+  private void processRegionsForRender(final PageDto pageDto, final Map<String, String> parameterMap)  {
     for(PageRegionDto pageRegionDto : pageDto.getPageRegions() ) {
       RegionDto regionDto = pageRegionDto.getRegionDto();
       Collection<PageItem<String>> regionItems = new ArrayList<>();
 
       // All regions can contain fields, and we need the fields to determine our bind variables in later queries.
-      regionItems.addAll(processFieldsForRender(regionDto.getRegionFields()));
+      regionItems.addAll(processFieldsForRender(regionDto.getRegionFields(), parameterMap));
       regionDto.setSubPageItems(regionItems);
 
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) ) {
@@ -196,22 +197,30 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   }*/
   
   
-  private Collection<PageItem<String>> processFieldsForRender(final Set<RegionFieldDto> regionFieldDtos) {
+  private Collection<PageItem<String>> processFieldsForRender(final Set<RegionFieldDto> regionFieldDtos, final Map<String, String> parameterMap) {
     Collection<PageItem<String>> fields = new ArrayList<>();
     
     for(RegionFieldDto regionFieldDto : regionFieldDtos) {
       final FieldDto fieldDto = regionFieldDto.getField();
       FieldDto.PostProcessedFieldContentDto processedContent = fieldDto.new PostProcessedFieldContentDto();
       FieldDto.PostProcessedFieldContentDto processedDefaultContent = fieldDto.new PostProcessedFieldContentDto();
-      SingularSourceProcessorService processor = (SingularSourceProcessorService) sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
-      processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource(), null).getResultValue()); // TODO FIXME handle bind vars
-      fieldDto.setPostProcessedSource(processedContent);
+      
+      // Set the value from the page parameter if it exists, and ignore processing.
+      if(parameterMap.containsKey(fieldDto.getName())) {
+        processedContent.setPostProcessedContent(parameterMap.get(fieldDto.getName()));
+        fieldDto.setPostProcessedSource(processedContent);
+      }
+      else { // or process the source content to get the value.
+        SingularSourceProcessorService processor = (SingularSourceProcessorService) sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
+        processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource(), null).getResultValue()); // TODO FIXME handle bind vars
+        fieldDto.setPostProcessedSource(processedContent);
 
-      // Default value is optional
-      if(StringUtils.isNotBlank(fieldDto.getDefaultValueSource()))
-      {
-        processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() , null ).getResultValue() );  // TODO FIXME handle bind vars
-        fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
+        // Default value is optional
+        if(StringUtils.isNotBlank(fieldDto.getDefaultValueSource()))
+        {
+          processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() , null ).getResultValue() );  // TODO FIXME handle bind vars
+          fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
+        }
       }
 
       fields.add(fieldDto);
