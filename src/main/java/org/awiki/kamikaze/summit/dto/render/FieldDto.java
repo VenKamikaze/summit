@@ -67,6 +67,14 @@ public class FieldDto implements PageItem<String> {
   public void setSource(String source) {
     this.source = source;
   }
+  // FIXME HACK for mapping Set<String> to singular string with dozer.
+  public void setSource(Set<String> sources) {
+    if(sources != null && ! sources.isEmpty()) {
+      for(String src : sources) {
+        this.source += src;
+      }
+    }
+  }
   public String getCodeFieldDefaultValueSourceType() {
     return codeFieldDefaultValueSourceType;
   }

@@ -39,4 +39,21 @@
 
   </configuration>
 
+  <mapping> 
+    <class-a>org.awiki.kamikaze.summit.domain.Field</class-a>
+    <class-b>org.awiki.kamikaze.summit.dto.render.FieldDto</class-b>   
+    <field>
+      <a>codeFieldSourceTypeBySourceType.code</a>
+      <b>codeFieldSourceType</b>
+    </field>
+    <field>
+      <a>codeFieldSourceTypeByDefaultValueType.code</a>
+      <b>codeFieldDefaultValueSourceType</b>
+    </field>
+    <field>
+      <a>source</a>
+      <b set-method="setSource(java.util.Set)">source</b>
+    </field>
+  </mapping>  
+
 </mappings>

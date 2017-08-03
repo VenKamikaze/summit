@@ -27,9 +27,6 @@ public class PageToPageDtoMapper
   @Autowired
   private Mapper mapper;
   
-  @Autowired
-  private FieldToFieldDtoMapper fieldMapper;
-
   private static final Logger logger = LoggerFactory.getLogger(PageToPageDtoMapper.class);
   
   public PageDto map(Page page)
@@ -55,18 +52,6 @@ public class PageToPageDtoMapper
             DebugUtils.debugObjectGetters(dto);
             dto.setRegionDto(mapper.map(pr.getRegion(), RegionDto.class));
             DebugUtils.debugObjectGetters(dto.getRegionDto());
-            // WAS: dto.getRegionDto().getRegionFields().addAll(mapSet(pr.getRegion().getRegionFields(), RegionFieldDto.class));
-            // FIXME TODO configure dozer to use the custom FieldToFieldDtoMapper instead of forcing it here.
-            for(RegionField rf : pr.getRegion().getRegionFields())
-            {
-              for(RegionFieldDto rfDto : dto.getRegionDto().getRegionFields())
-              {
-                if(rf.getId() == rfDto.getId())
-                {
-                  rfDto.setField(fieldMapper.map(rf.getField()));
-                }
-              }
-            }
             break;
           }
         }
