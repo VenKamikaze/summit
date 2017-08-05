@@ -5,6 +5,7 @@ import org.awiki.kamikaze.summit.service.PageFilteringService;
 import org.awiki.kamikaze.summit.service.formatter.FormatterService;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
+import org.awiki.kamikaze.summit.util.StringUtils;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,8 @@ public class PageRestController {
           @RequestParam(required=false,name="filterType") final String filterType,
           @RequestParam(required=false,name="search") final String searchValue,
           @RequestParam(required=false,name="page") final String pageNumber,
-          @RequestParam(required=false,name="rows") final String rowsPerPage) {
+          @RequestParam(required=false,name="rows") final String rowsPerPage,
+          @RequestParam(required=false,name="pageParams") final String pageParams) {
     /*
      * 1) Store cached column names per page
      * 2) * When we have a front-end for building queries, clear out the column names on query update
@@ -51,7 +53,8 @@ public class PageRestController {
     final PageItem<String> filteredResults = filterService.filterRegion(Long.parseLong(regionId), filterType, searchValue, 
             (pageNumber != null && ( rowsPerPage != null && Long.parseLong(rowsPerPage) != 0L ) ? Long.parseLong(pageNumber) : 0), 
             (rowsPerPage != null ? Long.parseLong(rowsPerPage) : 0),
-            (rowsPerPage != null)
+            (rowsPerPage != null),
+            StringUtils.toParameterMap(pageParams)
            );
     return (SourceProcessorResultTable)filteredResults;
   }
@@ -65,7 +68,8 @@ public class PageRestController {
           @RequestParam(required=false,name="filterType") final String filterType,
           @RequestParam(required=false,name="search") final String searchValue,
           @RequestParam(required=false,name="page") final String pageNumber,
-          @RequestParam(required=false,name="rows") final String rowsPerPage) {
+          @RequestParam(required=false,name="rows") final String rowsPerPage,
+          @RequestParam(required=false,name="pageParams") final String pageParams) {
     /*
      * 1) Store cached column names per page
      * 2) * When we have a front-end for building queries, clear out the column names on query update
@@ -79,7 +83,8 @@ public class PageRestController {
     final PageItem<String> filteredResults = filterService.filterPage(Long.parseLong(applicationId), Long.parseLong(pageId), filterType, searchValue,
             (pageNumber != null && ( rowsPerPage != null && Long.parseLong(rowsPerPage) != 0L ) ? Long.parseLong(pageNumber) : 0), 
             (rowsPerPage != null ? Long.parseLong(rowsPerPage) : 0),
-            (rowsPerPage != null));
+            (rowsPerPage != null),
+            StringUtils.toParameterMap(pageParams));
     return (SourceProcessorResultTable)filteredResults;
   }
 	
@@ -91,7 +96,8 @@ public class PageRestController {
           @RequestParam(required=false,name="filterType") final String filterType,
           @RequestParam(required=false,name="search") final String searchValue,
           @RequestParam(required=false,name="page") final String pageNumber,
-          @RequestParam(required=false,name="rows") final String rowsPerPage) {
+          @RequestParam(required=false,name="rows") final String rowsPerPage,
+          @RequestParam(required=false,name="pageParams") final String pageParams) {
     /*
      * 1) Store cached column names per page
      * 2) * When we have a front-end for building queries, clear out the column names on query update
@@ -104,7 +110,8 @@ public class PageRestController {
     final PageItem<String> filteredResults = filterService.filterPageByColumn(Long.parseLong(applicationId), Long.parseLong(pageId), filterType, columnName, searchValue,
             (pageNumber != null && ( rowsPerPage != null && Long.parseLong(rowsPerPage) != 0L ) ? Long.parseLong(pageNumber) : 0), 
             (rowsPerPage != null ? Long.parseLong(rowsPerPage) : 0),
-            (rowsPerPage != null));
+            (rowsPerPage != null),
+            StringUtils.toParameterMap(pageParams));
     return (SourceProcessorResultTable)filteredResults;
   }
   

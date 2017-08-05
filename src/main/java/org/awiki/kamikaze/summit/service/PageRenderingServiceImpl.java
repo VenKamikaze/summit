@@ -60,6 +60,9 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   @Autowired
   private BindVarService bindVarService;
   
+  @Autowired
+  private FieldService fieldService;
+  
   /**
    * Overarching method that handles the page rendering
    * This one renders the entire page and all it's contents to a String
@@ -150,7 +153,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       Collection<PageItem<String>> regionItems = new ArrayList<>();
 
       // All regions can contain fields, and we need the fields to determine our bind variables in later queries.
-      regionItems.addAll(processFieldsForRender(regionDto.getRegionFields(), parameterMap));
+      regionItems.addAll(fieldService.processFieldsForRender(regionDto.getRegionFields(), parameterMap));
       regionDto.setSubPageItems(regionItems);
 
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) ) {
@@ -197,35 +200,4 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   }*/
   
   
-  private Collection<PageItem<String>> processFieldsForRender(final Set<RegionFieldDto> regionFieldDtos, final Map<String, String> parameterMap) {
-    Collection<PageItem<String>> fields = new ArrayList<>();
-    
-    for(RegionFieldDto regionFieldDto : regionFieldDtos) {
-      final FieldDto fieldDto = regionFieldDto.getField();
-      FieldDto.PostProcessedFieldContentDto processedContent = fieldDto.new PostProcessedFieldContentDto();
-      FieldDto.PostProcessedFieldContentDto processedDefaultContent = fieldDto.new PostProcessedFieldContentDto();
-      
-      // Set the value from the page parameter if it exists, and ignore processing.
-      if(parameterMap.containsKey(fieldDto.getName())) {
-        processedContent.setPostProcessedContent(parameterMap.get(fieldDto.getName()));
-        fieldDto.setPostProcessedSource(processedContent);
-      }
-      else { // or process the source content to get the value.
-        SingularSourceProcessorService processor = (SingularSourceProcessorService) sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
-        processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource(), null).getResultValue()); // TODO FIXME handle bind vars
-        fieldDto.setPostProcessedSource(processedContent);
-
-        // Default value is optional
-        if(StringUtils.isNotBlank(fieldDto.getDefaultValueSource()))
-        {
-          processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() , null ).getResultValue() );  // TODO FIXME handle bind vars
-          fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
-        }
-      }
-
-      fields.add(fieldDto);
-    }
-    return fields;
-  }
-
 }

@@ -1,15 +1,22 @@
 package org.awiki.kamikaze.summit.service;
 
-import org.awiki.kamikaze.summit.dto.render.FieldDto;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
+import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 
 public interface FieldService {
-
-  public FieldDto save(FieldDto dto);
   
-  public FieldDto load(Integer id);
+  /**
+   * Process collection of regionFields, plus any parameters passed in through the HttpServletRequest into a
+   *   collection of fieldDtos, inserting any values and processing source as required.
+   * @param regionFieldDtos
+   * @param parameterMap
+   * @return Collection of FieldDtos
+   */
+  public Set<PageItem<String>> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, String> parameterMap);
   
-  public FieldDto load(FieldDto fieldDto);
-  
-  public FieldDto.PostProcessedFieldContentDto processFieldSource(FieldDto fieldDto);
-  
+  public Map<String, PageItem<String>> fieldsToMap(Collection<PageItem<String>> fields);
 }

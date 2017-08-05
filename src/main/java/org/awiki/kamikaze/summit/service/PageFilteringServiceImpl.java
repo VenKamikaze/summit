@@ -2,13 +2,15 @@ package org.awiki.kamikaze.summit.service;
 
 import static org.awiki.kamikaze.summit.domain.Region.REGION_TYPE_REPORT;
 
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.dto.render.PageDto;
+import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
@@ -20,12 +22,10 @@ import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
-import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,6 +42,9 @@ public class PageFilteringServiceImpl implements PageFilteringService
   
   @Autowired
   private PageToPageDtoMapper pageMapper;
+  
+  @Autowired
+  private FieldService fieldService;
 
   @Autowired
   private ProxySourceProcessorService sourceProcessors;
@@ -56,12 +59,12 @@ public class PageFilteringServiceImpl implements PageFilteringService
   private static final Logger logger = LoggerFactory.getLogger(PageFilteringServiceImpl.class);
   
   @Override
-  public SourceProcessorResultTable filterPage(long applicationId, long pageId, final String filterType, final String searchText, long page, long rowsPerPage, boolean getTotalCount)
+  public SourceProcessorResultTable filterPage(long applicationId, long pageId, final String filterType, final String searchText, long page, long rowsPerPage, boolean getTotalCount, final Map<String, String> parameterMap)
   {
     final PageDto pageDto = pageMapper.map(appPageStore.findByApplicationIdAndPageId(applicationId, pageId).getPage());
     
     for(PageRegionDto pr : pageDto.getPageRegions()) {
-      return filterQueryOnRegion(pr.getRegionDto(), filterType, null, searchText, page, rowsPerPage, getTotalCount);
+      return filterQueryOnRegion(pr.getRegionDto(), filterType, null, searchText, page, rowsPerPage, getTotalCount, parameterMap);
     }
     
     throw new RuntimeException("No report region found on " + applicationId + "/" + pageId + ".");
@@ -69,29 +72,29 @@ public class PageFilteringServiceImpl implements PageFilteringService
 
   @Override
   public SourceProcessorResultTable filterPageByColumn(long applicationId, long pageId, final String filterType, final String columnName,
-          final String searchText, long page, long rowsPerPage, boolean getTotalCount)
+          final String searchText, long page, long rowsPerPage, boolean getTotalCount, final Map<String, String> parameterMap)
   {
     final PageDto pageDto = pageMapper.map(appPageStore.findByApplicationIdAndPageId(applicationId, pageId).getPage());
     
     for(PageRegionDto pr : pageDto.getPageRegions()) {
-      return filterQueryOnRegion(pr.getRegionDto(), filterType, columnName, searchText, page, rowsPerPage, getTotalCount);
+      return filterQueryOnRegion(pr.getRegionDto(), filterType, columnName, searchText, page, rowsPerPage, getTotalCount, parameterMap);
     }
     
     throw new RuntimeException("No report region found on " + applicationId + "/" + pageId + ".");
   }
 
   @Override
-  public SourceProcessorResultTable filterRegion(long regionId, final String filterType, final String searchText, long page, long rowsPerPage, boolean getTotalCount)
+  public SourceProcessorResultTable filterRegion(long regionId, final String filterType, final String searchText, long page, long rowsPerPage, boolean getTotalCount, final Map<String, String> parameterMap)
   {
     RegionDto region = mapper.map(regionStore.findOne(regionId), RegionDto.class);
-    return filterQueryOnRegion(region, filterType, null, searchText, page, rowsPerPage, getTotalCount);
+    return filterQueryOnRegion(region, filterType, null, searchText, page, rowsPerPage, getTotalCount, parameterMap);
   }
   
   @Override
-  public SourceProcessorResultTable filterRegionByColumn(long regionId, final String filterType, final String columnName, final String searchText, long page, long rowsPerPage, boolean getTotalCount)
+  public SourceProcessorResultTable filterRegionByColumn(long regionId, final String filterType, final String columnName, final String searchText, long page, long rowsPerPage, boolean getTotalCount, final Map<String, String> parameterMap)
   {
     RegionDto region = mapper.map(regionStore.findOne(regionId), RegionDto.class);
-    return filterQueryOnRegion(region, filterType, columnName, searchText, page, rowsPerPage, getTotalCount);
+    return filterQueryOnRegion(region, filterType, columnName, searchText, page, rowsPerPage, getTotalCount, parameterMap);
   }
   
   /**
@@ -103,16 +106,26 @@ public class PageFilteringServiceImpl implements PageFilteringService
    * @param getTotalCount - only retrieve the total number of records if asked, as this can add another expensive query.
    * @return {@link SourceProcessorResultTable}
    */
-  private SourceProcessorResultTable filterQueryOnRegion(final RegionDto regionDto, final String filterType, final String columnName, final String searchText, long page, long rowsPerPage, boolean getTotalCount) {
+  private SourceProcessorResultTable filterQueryOnRegion(final RegionDto regionDto, final String filterType, final String columnName, final String searchText, long page, long rowsPerPage, boolean getTotalCount, final Map<String, String> parameterMap) {
     if (REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType())) {
+
+      final Set<PageItem<String>> fields = fieldService.processFieldsForRender(regionDto.getRegionFields(), parameterMap);
+      // TODO FIXME region has a set of source but we always treat it as one. Decide what we are going to do going forward.
+      List<BindVar> fieldBindings = sqlQueryBuilder.setBindVarsFromFields(regionDto.getSource().iterator().next(), fieldService.fieldsToMap(fields));
+      
+      regionDto.setSubPageItems(fields);
+      
       ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
       final Collection<String> columnList = reportService.getColumnList(regionDto.getId());
+      // TODO FIXME region has a set of source but we always treat it as one. Decide what we are going to do going forward.
       final String filteredQuery = sqlQueryBuilder.buildWrapperQuery(regionDto.getSource().iterator().next(), filterType.toUpperCase(), columnName, columnList, searchText,page, rowsPerPage);
-      SourceProcessorResultTable resultTable = reportService.querySource(null, filteredQuery, buildParametersForFullQuery(columnList.size(), searchText));
+      fieldBindings.addAll(buildParametersForWrapperQuery(columnList.size(), searchText));
+      
+      SourceProcessorResultTable resultTable = reportService.querySource(null, filteredQuery, fieldBindings);
       
       if(getTotalCount) {
         final String countQuery = sqlQueryBuilder.buildWrapperCountQuery(regionDto.getSource().iterator().next(), filterType.toUpperCase(), columnName, columnList, searchText);
-        resultTable.setTotalCount(reportService.getTotalRecordCount(countQuery, buildParametersForFullQuery(columnList.size(), searchText)));
+        resultTable.setTotalCount(reportService.getTotalRecordCount(countQuery, fieldBindings));
       }
       
       resultTable.setTemplateDto(regionDto.getTemplateDto());
@@ -120,10 +133,10 @@ public class PageFilteringServiceImpl implements PageFilteringService
     }
     return null;
   }
-    
+  
   
   @SuppressWarnings("serial")
-  private List<BindVar> buildParametersForFullQuery(final int numColumns, final String searchText) {
+  private List<BindVar> buildParametersForWrapperQuery(final int numColumns, final String searchText) {
     if(StringUtils.isNotEmpty(searchText)) {
       return new ArrayList<BindVar>(numColumns) {{ 
         for(int i = 0; i < numColumns; i++) {
@@ -131,7 +144,7 @@ public class PageFilteringServiceImpl implements PageFilteringService
         }
        }};
     }
-    return null;
+    return new ArrayList<BindVar>(0);
   }
   
 }

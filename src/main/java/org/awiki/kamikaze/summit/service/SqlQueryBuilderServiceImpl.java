@@ -2,8 +2,15 @@ package org.awiki.kamikaze.summit.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +23,9 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
 {
   @Autowired
   private DriverManagerDataSource dataSource;
+  
+  @Autowired
+  private BindVarService bindVarService;
   
   private DatabaseTypeEnum detectedDbType = null;
   
@@ -186,4 +196,20 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
     }
   }
 
+  static Pattern bindParameters = Pattern.compile(".*\\:(\\w+)$.*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  
+  @Override
+  public List<BindVar> setBindVarsFromFields(String regionQuery, final Map<String, PageItem<String>> fields) {
+    final Matcher m = bindParameters.matcher(regionQuery);
+    
+    Map<String, PageItem<String>> fieldsForBinding = new HashMap<String, PageItem<String>>();
+    
+    while(m.find()) {
+      if (fields.containsKey(m.group())) {
+        fieldsForBinding.put(m.group(), fields.get(m.group()));
+      }
+    }
+    
+    return bindVarService.convertFieldsToBindVars(fieldsForBinding.values());
+  }
 }
