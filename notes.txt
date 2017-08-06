@@ -3,6 +3,7 @@ Limitations:
 * Page parameters must populate a field on a page to be used.
 * Fields can only be used as bind variables when they exist in the same region as the query using them.
 ** Fields can be re-used in multiple regions in a page (mitigates the parent issue)
+* Bind variable scraping is done via a simple regex, that just searches SQL for a word after a ":". This will then probably cause issues for SQL that contains a ':' for something that is not a bind variable (e.g. within a search string predicate etc).
 
 TODO:
 * Report region HTML templates for mustache are hard coded in javascript, need to add REST call to pull this down from server.
