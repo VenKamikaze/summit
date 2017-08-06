@@ -1,6 +1,12 @@
+
+Limitations:
+* Page parameters must populate a field on a page to be used.
+* Fields can only be used as bind variables when they exist in the same region as the query using them.
+** Fields can be re-used in multiple regions in a page (mitigates the parent issue)
+
 TODO:
-* Impl missing methods for searching at page level. (note: Jul 2017, might be done? TODO check)
-* Impl functionality for column searching (note: Jul 2017, might be done? TODO check)
+* Report region HTML templates for mustache are hard coded in javascript, need to add REST call to pull this down from server.
+
 
 
 (done, although may need to add more vars:)
