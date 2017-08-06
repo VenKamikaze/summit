@@ -98,7 +98,7 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   
   @Override
   @Cacheable(value="totalRecordCount")
-  public Long getTotalRecordCount(final String fullQuery, List<BindVar> bindVars) 
+  public Long getTotalRecordCount(final String fullQuery, final List<BindVar> bindVars) 
   {
     final SourceProcessorResultTable count = getResults(fullQuery,  getParamsForSpring(bindVars), null);
     return Long.parseLong(count.getBody().get(0).getCell(0).getValue());
@@ -106,10 +106,10 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   
   @Override
   @Cacheable(value="reportColumnList")
-  public Collection<String> getColumnList(long regionId)
+  public Collection<String> getColumnList(long regionId, final List<BindVar> bindVars)
   {
     RegionDto regionDto = regionMapper.map(regionRepo.findOne(regionId), RegionDto.class);
-    final SourceProcessorResultTable table = getResults(regionDto.getSource().iterator().next(), null, String.valueOf(regionId));
+    final SourceProcessorResultTable table = getResults(regionDto.getSource().iterator().next(), getParamsForSpring(bindVars), String.valueOf(regionId));
     return getColumnNames(table);
   }
 

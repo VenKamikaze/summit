@@ -85,7 +85,7 @@ Summit.Report = Summit.Report || {
       var that = this;
       var formData = $(formElement).serialize();
       var pageParams = Summit.Page.getUrlParameter('pageParams');
-      formData = (formData == null ? "pageParams=" + pageParams : "&pageParams=" + pageParams);
+      formData = (formData == null ? "pageParams=" + pageParams : formData + "&pageParams=" + pageParams);
       var data = $.ajax({ url: reportInstance.filterPath,
                         data: formData,
                         cache: false,

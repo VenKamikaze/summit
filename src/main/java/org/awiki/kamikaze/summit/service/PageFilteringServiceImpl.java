@@ -64,7 +64,7 @@ public class PageFilteringServiceImpl implements PageFilteringService
     final PageDto pageDto = pageMapper.map(appPageStore.findByApplicationIdAndPageId(applicationId, pageId).getPage());
     
     for(PageRegionDto pr : pageDto.getPageRegions()) {
-      return filterQueryOnRegion(pr.getRegionDto(), filterType, null, searchText, page, rowsPerPage, getTotalCount, parameterMap);
+      return filterQueryOnRegion(pr.getRegionDto(), filterType != null ? filterType.toUpperCase() : null, null, searchText, page, rowsPerPage, getTotalCount, parameterMap);
     }
     
     throw new RuntimeException("No report region found on " + applicationId + "/" + pageId + ".");
@@ -77,7 +77,7 @@ public class PageFilteringServiceImpl implements PageFilteringService
     final PageDto pageDto = pageMapper.map(appPageStore.findByApplicationIdAndPageId(applicationId, pageId).getPage());
     
     for(PageRegionDto pr : pageDto.getPageRegions()) {
-      return filterQueryOnRegion(pr.getRegionDto(), filterType, columnName, searchText, page, rowsPerPage, getTotalCount, parameterMap);
+      return filterQueryOnRegion(pr.getRegionDto(), filterType != null ? filterType.toUpperCase() : null, columnName, searchText, page, rowsPerPage, getTotalCount, parameterMap);
     }
     
     throw new RuntimeException("No report region found on " + applicationId + "/" + pageId + ".");
@@ -87,14 +87,14 @@ public class PageFilteringServiceImpl implements PageFilteringService
   public SourceProcessorResultTable filterRegion(long regionId, final String filterType, final String searchText, long page, long rowsPerPage, boolean getTotalCount, final Map<String, String> parameterMap)
   {
     RegionDto region = mapper.map(regionStore.findOne(regionId), RegionDto.class);
-    return filterQueryOnRegion(region, filterType, null, searchText, page, rowsPerPage, getTotalCount, parameterMap);
+    return filterQueryOnRegion(region, filterType != null ? filterType.toUpperCase() : null, null, searchText, page, rowsPerPage, getTotalCount, parameterMap);
   }
   
   @Override
   public SourceProcessorResultTable filterRegionByColumn(long regionId, final String filterType, final String columnName, final String searchText, long page, long rowsPerPage, boolean getTotalCount, final Map<String, String> parameterMap)
   {
     RegionDto region = mapper.map(regionStore.findOne(regionId), RegionDto.class);
-    return filterQueryOnRegion(region, filterType, columnName, searchText, page, rowsPerPage, getTotalCount, parameterMap);
+    return filterQueryOnRegion(region, filterType != null ? filterType.toUpperCase() : null, columnName, searchText, page, rowsPerPage, getTotalCount, parameterMap);
   }
   
   /**
@@ -116,15 +116,15 @@ public class PageFilteringServiceImpl implements PageFilteringService
       regionDto.setSubPageItems(fields);
       
       ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
-      final Collection<String> columnList = reportService.getColumnList(regionDto.getId());
+      final Collection<String> columnList = reportService.getColumnList(regionDto.getId(), fieldBindings);
       // TODO FIXME region has a set of source but we always treat it as one. Decide what we are going to do going forward.
-      final String filteredQuery = sqlQueryBuilder.buildWrapperQuery(regionDto.getSource().iterator().next(), filterType.toUpperCase(), columnName, columnList, searchText,page, rowsPerPage);
+      final String filteredQuery = sqlQueryBuilder.buildWrapperQuery(regionDto.getSource().iterator().next(), filterType, columnName, columnList, searchText,page, rowsPerPage);
       fieldBindings.addAll(buildParametersForWrapperQuery(columnList.size(), searchText));
       
       SourceProcessorResultTable resultTable = reportService.querySource(null, filteredQuery, fieldBindings);
       
       if(getTotalCount) {
-        final String countQuery = sqlQueryBuilder.buildWrapperCountQuery(regionDto.getSource().iterator().next(), filterType.toUpperCase(), columnName, columnList, searchText);
+        final String countQuery = sqlQueryBuilder.buildWrapperCountQuery(regionDto.getSource().iterator().next(), filterType, columnName, columnList, searchText);
         resultTable.setTotalCount(reportService.getTotalRecordCount(countQuery, fieldBindings));
       }
       

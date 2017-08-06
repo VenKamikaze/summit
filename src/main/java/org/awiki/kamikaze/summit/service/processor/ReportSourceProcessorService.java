@@ -18,7 +18,7 @@ public interface ReportSourceProcessorService extends SourceProcessorService {
    * @param regionId
    * @return
    */
-  public Collection<String> getColumnList(long regionId);
+  public Collection<String> getColumnList(long regionId, final List<BindVar> bindVars);
   
 
   /**
