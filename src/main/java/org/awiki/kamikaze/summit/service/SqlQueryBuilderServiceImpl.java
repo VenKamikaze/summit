@@ -196,8 +196,9 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
     }
   }
 
-  //static Pattern bindParameters = Pattern.compile(".*(\\:(\\w+))+.*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  static Pattern bindParameters = Pattern.compile("(\\:(\\w+))+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  //  https://stackoverflow.com/questions/2309970/named-parameters-in-jdbc for regex
+  //static Pattern bindParameters = Pattern.compile("(\\:(\\w+))+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  static Pattern bindParameters = Pattern.compile("(?!\\B'[^']*):(\\w+)(?![^']*'\\B)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   
   @Override
   public List<BindVar> setBindVarsFromFields(String regionQuery, final Map<String, PageItem<String>> fields) {
@@ -205,11 +206,9 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
     
     Map<String, PageItem<String>> fieldsForBinding = new HashMap<String, PageItem<String>>();
     
-    //if (true) throw new RuntimeException("fixme");
-    // FIXME, regex only matches one bindvar 
     while(m.find()) {
-      if (fields.containsKey(m.group(2))) {
-        fieldsForBinding.put(m.group(2), fields.get(m.group(2)));
+      if (fields.containsKey(m.group(1))) {
+        fieldsForBinding.put(m.group(1), fields.get(m.group(1)));
       }
     }
     
