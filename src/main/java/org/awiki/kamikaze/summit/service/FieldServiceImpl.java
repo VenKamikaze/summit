@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.dto.render.FieldDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
@@ -20,7 +21,7 @@ public class FieldServiceImpl implements FieldService {
   @Autowired
   private ProxySourceProcessorService sourceProcessors;
   
-  public HashSet<PageItem<String>> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, String> parameterMap) {
+  public HashSet<PageItem<String>> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final Map<String, String> parameterMap) {
     HashSet<PageItem<String>> fields = new HashSet<>();
     
     for(RegionFieldDto regionFieldDto : regionFieldDtos) {
@@ -28,12 +29,20 @@ public class FieldServiceImpl implements FieldService {
       FieldDto.PostProcessedFieldContentDto processedContent = fieldDto.new PostProcessedFieldContentDto();
       FieldDto.PostProcessedFieldContentDto processedDefaultContent = fieldDto.new PostProcessedFieldContentDto();
       
+      if (fieldsToPopulate.containsKey(fieldDto.getName()) ) {
+        // process this first, then override with other options to populate a field below.
+        // order should be: pageProcessing before regions populates a field, but
+        //  parameters can override,
+        //  OR field source can override (as this is the order processing occurs in).
+        throw new RuntimeException("IMPLEMENT ME!");
+      }
+        
       // Set the value from the page parameter if it exists, and ignore processing.
       if(parameterMap.containsKey(fieldDto.getName())) {
         processedContent.setPostProcessedContent(parameterMap.get(fieldDto.getName()));
         fieldDto.setPostProcessedSource(processedContent);
       }
-      else { // or process the source content to get the value.
+      else { // process the source content to get the value
         SingularSourceProcessorService processor = (SingularSourceProcessorService) sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
         processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource(), null).getResultValue()); // TODO FIXME handle bind vars
         fieldDto.setPostProcessedSource(processedContent);

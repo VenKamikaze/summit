@@ -6,25 +6,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
-import org.awiki.kamikaze.summit.dto.render.FieldDto;
 import org.awiki.kamikaze.summit.dto.render.PageDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
-import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.service.formatter.FormatterService;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
-import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.DebugUtils;
-import org.awiki.kamikaze.summit.util.mapper.PageItemToBindVarMapper;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
 import org.slf4j.Logger;
@@ -98,8 +93,13 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     // Get the collection of pageItems in each region
     //Map<String, List<PageItem<?>>> regionPageItems = processRegionsForRender(pageDto);
     long start = System.nanoTime();
-    processRegionsForRender(pageDto, parameterMap);
+    Map<String, PageProcessingSourceSelectDto> fieldsToPopulate = processPageRenderSource(pageDto);
     long end = System.nanoTime();
+    log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processPageRenderSource took: " + (end - start) / 1000000 + "ms");
+    
+    start = System.nanoTime();
+    processRegionsForRender(pageDto, fieldsToPopulate, parameterMap);
+    end = System.nanoTime();
     
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processRegionsForRender took: " + (end - start) / 1000000 + "ms");
     
@@ -147,13 +147,18 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   */
   // Map of REGION_POSITION_X to List<String (rendered content)> 
   
-  private void processRegionsForRender(final PageDto pageDto, final Map<String, String> parameterMap)  {
+  private Map<String, PageProcessingSourceSelectDto> processPageRenderSource(PageDto pageDto) {
+    throw new RuntimeException("IMPLEMENT ME");
+  }
+  
+  
+  private void processRegionsForRender(final PageDto pageDto, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final Map<String, String> parameterMap)  {
     for(PageRegionDto pageRegionDto : pageDto.getPageRegions() ) {
       RegionDto regionDto = pageRegionDto.getRegionDto();
       Collection<PageItem<String>> regionItems = new ArrayList<>();
 
       // All regions can contain fields, and we need the fields to determine our bind variables in later queries.
-      regionItems.addAll(fieldService.processFieldsForRender(regionDto.getRegionFields(), parameterMap));
+      regionItems.addAll(fieldService.processFieldsForRender(regionDto.getRegionFields(), fieldsToPopulate, parameterMap));
       regionDto.setSubPageItems(regionItems);
 
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) ) {

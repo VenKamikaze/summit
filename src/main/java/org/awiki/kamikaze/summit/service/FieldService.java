@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 
 public interface FieldService {
@@ -16,7 +17,7 @@ public interface FieldService {
    * @param parameterMap
    * @return Collection of FieldDtos
    */
-  public Set<PageItem<String>> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, String> parameterMap);
+  public Set<PageItem<String>> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final Map<String, String> parameterMap);
   
   public Map<String, PageItem<String>> fieldsToMap(Collection<PageItem<String>> fields);
 }
