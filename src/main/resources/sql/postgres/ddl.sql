@@ -37,13 +37,11 @@ create table CODE_REGION_POSITION
 
 -- Used by page processing regions.
 --Specifies both the TYPE of processing, e.g. clear session state, redirect to page, run DML
--- and also the type of source code expected for this particular processing (can be null).
 create table CODE_PROCESSING_TYPE
 (
   CODE character varying(10) primary key,
   DESCRIPTION character varying(200) not null,
   SORT_ORDER bigint not null,
-  SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE)
 );
 
 -- use compared to CODE_PROCESSING_TYPE?
@@ -194,6 +192,7 @@ create table PAGE_PROCESSING_SOURCE
   ID bigint primary key,
   PAGE_PROCESSING_ID bigint not null references PAGE_PROCESSING(ID),
   SOURCE_ID bigint not null references SOURCE(ID)
+  SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE)
 );
 
 -- e.g. each field in a region

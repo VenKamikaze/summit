@@ -33,16 +33,6 @@ insert into page (select nextval('page_seq'), id, 'Test Report Page with Mustach
 insert into application_page (select nextval('spare_seq'), id, (select id from page where name = 'Test Report Page'), 1 from application where name = 'Test Application');
 insert into application_page select nextval('spare_seq'), 1, id, id from page where name like '%Mustache';
 
--- TODO review this, seems odd being the same code as source_type
-insert into code_source_type values ('dml_report', 'text/plain; sql; dml; report', 1, 'dml_report');
-
--- TODO review this, seems odd being the same code as source_type
---insert into code_processing_type values ('dml_report', 'text/plain; sql; dml; report', 1, 'dml_report');
-
-insert into code_region_type values ('Report', 'Report Region', 1, 'dml_report');
-
-insert into code_region_position values ('body1', 'Top most region on template body', 3);
-
 insert into region  (select nextval('region_seq'), id, 'Test Report Region', 'body1', 'Report', 'dml_report' from template where class_name = 'org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable' and description not like '%Mustache%');
 insert into region  (select nextval('region_seq'), id, 'Test Report Region with Mustache', 'body1', 'Report', 'dml_report' from template where class_name = 'org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable' and description like '%Mustache%');
 

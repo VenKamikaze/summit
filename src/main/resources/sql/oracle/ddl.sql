@@ -42,7 +42,6 @@ create table CODE_PROCESSING_TYPE
   CODE varchar2(10) primary key,
   DESCRIPTION varchar2(200) not null,
   SORT_ORDER number(19) not null,
-  SOURCE_TYPE_CODE varchar2(10) references CODE_SOURCE_TYPE(CODE)
 );
 
 -- use compared to CODE_PROCESSING_TYPE?
@@ -194,6 +193,7 @@ create table PAGE_PROCESSING_SOURCE
   ID number(19) primary key,
   PAGE_PROCESSING_ID number(19) not null references PAGE_PROCESSING(ID),
   SOURCE_ID number(19) not null references SOURCE(ID)
+  SOURCE_TYPE_CODE varchar2(10) references CODE_SOURCE_TYPE(CODE)
 );
 
 -- e.g. each field in a region

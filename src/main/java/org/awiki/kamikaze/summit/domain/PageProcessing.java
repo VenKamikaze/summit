@@ -8,9 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.awiki.kamikaze.summit.domain.codetable.CodeProcessingType;
@@ -30,13 +29,11 @@ public class PageProcessing implements java.io.Serializable
    */
   private static final long serialVersionUID = -4307936142895462501L;
   
-  private long                   id;
-  //private CodeProcessingSrcType codeProcessingSrcType; // e.g. SQL, pg/sql
-  private Page                  page;
-  private CodeProcessingType    codeProcessingType;    // e.g. clear session state, DML, redirect to another page
-  private long                   processingNum;         // in which order this processing occurs.
-  
-  private Set<Source>        source;
+  private long                       id;
+  private Page                       page;
+  private CodeProcessingType         codeProcessingType;    // e.g. clear session state, DML, redirect to another page
+  private long                       processingNum;         // in which order this processing occurs.
+  private Set<PageProcessingSource>  pageProcessingSource;
 
   public PageProcessing()
   {
@@ -53,18 +50,17 @@ public class PageProcessing implements java.io.Serializable
 
   public PageProcessing(long id,
       Page page, CodeProcessingType codeProcessingType, long processingNum,
-      Set<Source> source)
+      Set<PageProcessingSource> pageProcessingSource)
   {
     this.id = id;
-//    this.codeProcessingSrcType = codeProcessingSrcType;
     this.page = page;
     this.codeProcessingType = codeProcessingType;
     this.processingNum = processingNum;
-    this.source = source;
+    this.pageProcessingSource = pageProcessingSource;
   }
 
   @Id
-  @Column(name = "id", unique = true, nullable = false)
+  @Column(name = "ID", unique = true, nullable = false)
   public long getId()
   {
     return this.id;
@@ -74,22 +70,9 @@ public class PageProcessing implements java.io.Serializable
   {
     this.id = id;
   }
-/*
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "source_type", nullable = false)
-  public CodeProcessingSrcType getCodeProcessingSrcType()
-  {
-    return this.codeProcessingSrcType;
-  }
 
-  public void setCodeProcessingSrcType(
-      CodeProcessingSrcType codeProcessingSrcType)
-  {
-    this.codeProcessingSrcType = codeProcessingSrcType;
-  }
-*/
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "page_id", nullable = false)
+  @JoinColumn(name = "PAGE_ID", nullable = false)
   public Page getPage()
   {
     return this.page;
@@ -100,8 +83,8 @@ public class PageProcessing implements java.io.Serializable
     this.page = page;
   }
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "processing_type_code", nullable = false)
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "PROCESSING_TYPE_CODE", nullable = false)
   public CodeProcessingType getCodeProcessingType()
   {
     return this.codeProcessingType;
@@ -112,7 +95,7 @@ public class PageProcessing implements java.io.Serializable
     this.codeProcessingType = codeProcessingType;
   }
 
-  @Column(name = "processing_num", nullable = false)
+  @Column(name = "PROCESSING_NUM", nullable = false)
   public long getProcessingNum()
   {
     return this.processingNum;
@@ -123,18 +106,15 @@ public class PageProcessing implements java.io.Serializable
     this.processingNum = processingNum;
   }
 
-  @ManyToMany
-  @JoinTable(name="PAGE_PROCESSING_SOURCE",
-          joinColumns = { @JoinColumn(name="PAGE_PROCESSING_ID", referencedColumnName="ID") },
-          inverseJoinColumns = { @JoinColumn(name="SOURCE_ID", referencedColumnName="ID") })
-  public Set<Source> getSource()
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "pageProcessing")
+  public Set<PageProcessingSource> getPageProcessingSource()
   {
-    return this.source;
+    return this.pageProcessingSource;
   }
 
-  public void setSource(Set<Source> source)
+  public void setPageProcessingSource(Set<PageProcessingSource> pageProcessingSource)
   {
-    this.source = source;
+    this.pageProcessingSource = pageProcessingSource;
   }
 
 }

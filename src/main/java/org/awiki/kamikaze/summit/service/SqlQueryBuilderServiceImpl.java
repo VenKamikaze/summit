@@ -197,7 +197,6 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
   }
 
   //  https://stackoverflow.com/questions/2309970/named-parameters-in-jdbc for regex
-  //static Pattern bindParameters = Pattern.compile("(\\:(\\w+))+", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   static Pattern bindParameters = Pattern.compile("(?!\\B'[^']*):(\\w+)(?![^']*'\\B)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   
   @Override
