@@ -1,12 +1,17 @@
 package org.awiki.kamikaze.summit.domain;
 // Generated Oct 31, 2013 9:11:16 PM by Hibernate Tools 3.4.0.CR1
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.awiki.kamikaze.summit.domain.codetable.CodeSourceType;
@@ -27,10 +32,11 @@ public class PageProcessingSource implements java.io.Serializable
    */
   private static final long serialVersionUID = -4307936142895462441L;
   
-  private long                   id;
-  private PageProcessing         pageProcessing;
-  private Source                 source;
-  private CodeSourceType         codeSourceType;
+  private long                             id;
+  private PageProcessing                   pageProcessing;
+  private List<PageProcessingSourceSelect> pageProcessingSourceSelect = new ArrayList<>(); // fields to retrieve
+  private Source                           source;
+  private CodeSourceType                   codeSourceType;
 
   public PageProcessingSource()
   {
@@ -58,6 +64,18 @@ public class PageProcessingSource implements java.io.Serializable
   public void setPageProcessing(PageProcessing pageProcessing)
   {
     this.pageProcessing = pageProcessing;
+  }
+
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "pageProcessingSource")
+  @OrderBy(value="fieldIndex asc")
+  public List<PageProcessingSourceSelect> getPageProcessingSourceSelect()
+  {
+    return this.pageProcessingSourceSelect;
+  }
+
+  public void setPageProcessingSourceSelect(List<PageProcessingSourceSelect> pageProcessingSourceSelect)
+  {
+    this.pageProcessingSourceSelect = pageProcessingSourceSelect;
   }
 
   @ManyToOne(fetch = FetchType.EAGER)

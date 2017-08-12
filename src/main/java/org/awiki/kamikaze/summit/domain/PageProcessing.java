@@ -1,7 +1,8 @@
 package org.awiki.kamikaze.summit.domain;
 // Generated Oct 31, 2013 9:11:16 PM by Hibernate Tools 3.4.0.CR1
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,7 +34,7 @@ public class PageProcessing implements java.io.Serializable
   private Page                       page;
   private CodeProcessingType         codeProcessingType;    // e.g. clear session state, DML, redirect to another page
   private long                       processingNum;         // in which order this processing occurs.
-  private Set<PageProcessingSource>  pageProcessingSource;
+  private List<PageProcessingSource> pageProcessingSource = new ArrayList<>();
 
   public PageProcessing()
   {
@@ -50,7 +51,7 @@ public class PageProcessing implements java.io.Serializable
 
   public PageProcessing(long id,
       Page page, CodeProcessingType codeProcessingType, long processingNum,
-      Set<PageProcessingSource> pageProcessingSource)
+      List<PageProcessingSource> pageProcessingSource)
   {
     this.id = id;
     this.page = page;
@@ -107,12 +108,12 @@ public class PageProcessing implements java.io.Serializable
   }
 
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "pageProcessing")
-  public Set<PageProcessingSource> getPageProcessingSource()
+  public List<PageProcessingSource> getPageProcessingSource()
   {
     return this.pageProcessingSource;
   }
 
-  public void setPageProcessingSource(Set<PageProcessingSource> pageProcessingSource)
+  public void setPageProcessingSource(List<PageProcessingSource> pageProcessingSource)
   {
     this.pageProcessingSource = pageProcessingSource;
   }

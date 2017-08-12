@@ -12,19 +12,14 @@ public class PageProcessingDto {
   
   private Long               id;
   
-  //@NotBlank(message = "Must not be empty.")
-  //private String                codeProcessingSrcType;
-  
   private PageDto               page;
   
   @NotBlank(message = "Must not be empty.")
   private String                codeProcessingType;
   
   @NotBlank(message = "Must not be empty.")
-  private Long               processingNum;
-  
-  private String                source;
-  
+  private Long                  processingNum;
+
   public Long getId() {
     return id;
   }
@@ -49,11 +44,4 @@ public class PageProcessingDto {
   public void setProcessingNum(Long processingNum) {
     this.processingNum = processingNum;
   }
-  public String getSource() {
-    return source;
-  }
-  public void setSource(String source) {
-    this.source = source;
-  }
-  
 }

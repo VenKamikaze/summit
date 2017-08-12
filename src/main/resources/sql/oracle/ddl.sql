@@ -196,6 +196,18 @@ create table PAGE_PROCESSING_SOURCE
   SOURCE_TYPE_CODE varchar2(10) references CODE_SOURCE_TYPE(CODE)
 );
 
+-- Used when we have a page_processing_source type of 'dml_select'
+--   This contains the field names we wish to select values into
+-- Note: it is order based on index, e.g. index 0 is the first field selected by the corresponding pageProcessingSource.source
+--   FIELD_NAME must corresponding with a field name on the associated page.
+create table PAGE_PROCESSING_SOURCE_SELECT
+(
+  ID number(19) primary key,
+  PAGE_PROCESSING_SOURCE_ID number(19) not null references PAGE_PROCESSING_SOURCE(ID),
+  FIELD_INDEX number(19) not null,
+  FIELD_NAME varchar2(200) not null
+);
+
 -- e.g. each field in a region
 -- Seems like this should not need SOURCE as a field since it joins off with FIELD_SOURCE?
 create table FIELD

@@ -1,7 +1,9 @@
 package org.awiki.kamikaze.summit.domain;
 // Generated Oct 31, 2013 9:11:16 PM by Hibernate Tools 3.4.0.CR1
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -11,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 /**
@@ -20,15 +23,11 @@ import javax.persistence.Table;
 @Table(name = "PAGE")
 public class Page implements java.io.Serializable
 {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = -2500329708942281643L;
   
   private long                  id;
   private Set<PageRegion>      pageRegions      = new HashSet<PageRegion>(0);
-  private Set<PageProcessing>  pageProcessings  = new HashSet<PageProcessing>(0);
+  private List<PageProcessing>  pageProcessings  = new ArrayList<PageProcessing>(0);
   private Set<ApplicationPage> applicationPages = new HashSet<ApplicationPage>(0);
 
   //changed definition
@@ -45,7 +44,7 @@ public class Page implements java.io.Serializable
   }
 
   public Page(long id, final String name, Set<PageRegion> pageRegions,
-      Set<PageProcessing> pageProcessings, Set<ApplicationPage> applicationPages)
+          List<PageProcessing> pageProcessings, Set<ApplicationPage> applicationPages)
   {
     this.id = id;
     this.name = name;
@@ -78,12 +77,13 @@ public class Page implements java.io.Serializable
   }
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "page")
-  public Set<PageProcessing> getPageProcessings()
+  @OrderBy(value="processingNum")
+  public List<PageProcessing> getPageProcessings()
   {
     return this.pageProcessings;
   }
 
-  public void setPageProcessings(Set<PageProcessing> pageProcessings)
+  public void setPageProcessings(List<PageProcessing> pageProcessings)
   {
     this.pageProcessings = pageProcessings;
   }

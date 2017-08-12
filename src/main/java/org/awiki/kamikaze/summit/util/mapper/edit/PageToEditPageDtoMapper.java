@@ -1,6 +1,8 @@
 package org.awiki.kamikaze.summit.util.mapper.edit;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.awiki.kamikaze.summit.domain.Page;
@@ -67,7 +69,7 @@ public class PageToEditPageDtoMapper
       Set<D> destSet = new HashSet<D>(source.size());
       for (S src : source)
       {
-        destSet.add( (D) mapper.map(src, dest));
+        destSet.add( mapper.map(src, dest));
       }
       return destSet;
     }
@@ -76,4 +78,19 @@ public class PageToEditPageDtoMapper
     }
   }
   
+  public <S, D> List<D> mapList(List<S> source, Class<D> dest)
+  {
+    try
+    {
+      List<D> destSet = new ArrayList<D>(source.size());
+      for (S src : source)
+      {
+        destSet.add( mapper.map(src, dest));
+      }
+      return destSet;
+    }
+    catch(MappingException e){
+      throw new RuntimeException("Unable to map from " + source.toArray()[0].getClass().getCanonicalName() + " to: " + dest.getCanonicalName(), e);
+    }
+  }
 }
