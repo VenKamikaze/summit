@@ -57,9 +57,13 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   
   public SourceProcessorResultTable(String id)
   {
-    this.id = id;
+    setId(id);
   }
 
+  public void setId(String id) {
+    this.id = id;
+  }
+  
   public Long getPages()
   {
     return pages;

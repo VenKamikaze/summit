@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.awiki.kamikaze.summit.domain.SourceMetadata;
 import org.awiki.kamikaze.summit.service.BindVarService;
+import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
-import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +25,7 @@ public class SQLQuerySourceMetadataGatherer implements QuerySourceMetadataGather
   private BindVarService bindVarService;
 
   @Autowired
-  @Qualifier("SQLQueryProcessor")
-  private ReportSourceProcessorService sqlQueryService;
+  private ProxySourceProcessorService sourceProcessors;
   
   /*
   private Collection<String> getColumnNames(final SourceProcessorResultTable table)
@@ -49,6 +48,7 @@ public class SQLQuerySourceMetadataGatherer implements QuerySourceMetadataGather
 */
 
   @Override
+  @CachePut(value="sourceMetadata", key="sourceId")
   public SourceMetadata getSourceMetadata(long sourceId, List<BindVar> bindVars)
   {
     // TODO Auto-generated method stub
@@ -56,6 +56,7 @@ public class SQLQuerySourceMetadataGatherer implements QuerySourceMetadataGather
   }
 
   @Override
+  @CacheEvict(value="sourceMetadata", allEntries=true)
   public void clearSourceMetadata(long sourceId)
   {
     // TODO Auto-generated method stub

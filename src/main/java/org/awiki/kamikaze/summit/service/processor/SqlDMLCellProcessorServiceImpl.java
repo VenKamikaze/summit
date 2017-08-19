@@ -13,13 +13,16 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 
 /**
- * This service is used for execute single SQL DML actions.
+ * This service is used for executing single SQL DML actions where a result containing one cell is to be returned,
+ *   or where a single action is executed (e.g. a single insert or update).
  * For DDL actions, a different service should be used.
+ * For select actions returning a row, a different service should be used
+ * For select actions returning a table, use {@link SQLQueryReportRegionSourceProcessorServiceImpl}
  * 
  * @author msaun
  */
 @Service
-public class SqlDMLProcessorServiceImpl implements SingularSourceProcessorService {
+public class SqlDMLCellProcessorServiceImpl implements SingularSourceProcessorService {
   
   @Autowired
   private NamedParameterJdbcTemplate jdbc;
@@ -28,7 +31,7 @@ public class SqlDMLProcessorServiceImpl implements SingularSourceProcessorServic
   public List<String> getResponsibilities()
   {
     return new ArrayList<String>(Arrays.asList(SingularSourceProcessorService.BUILT_IN_SQL_DML_MODIFY_TYPE,
-      SingularSourceProcessorService.BUILT_IN_SQL_DML_SELECT_TYPE));
+      SingularSourceProcessorService.BUILT_IN_SQL_DML_SELECT_CELL_TYPE));
   }
   
   @Override

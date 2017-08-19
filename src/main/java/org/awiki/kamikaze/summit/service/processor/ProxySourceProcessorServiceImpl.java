@@ -24,18 +24,18 @@ public class ProxySourceProcessorServiceImpl implements ProxySourceProcessorServ
   List<BatchSourceProcessorService> batchSourceServices; // TODO: review, may not make sense to split these
   
   @Autowired
-  List<ReportSourceProcessorService> reportSourceServices; // TODO: review, may not make sense to split these
+  List<TabularQuerySourceProcessorService> tabularSourceServices; // TODO: review, may not make sense to split these
   
   HashMap<String, SourceProcessorService> allSourceServiceCache;
   HashMap<String, SingularSourceProcessorService> singularSourceServiceCache;
-  HashMap<String, ReportSourceProcessorService> reportSourceServiceCache;
+  HashMap<String, TabularQuerySourceProcessorService> tabularSourceServiceCache;
 
   @PostConstruct
   private void initializeCache()
   {
     singularSourceServiceCache = new HashMap<>(singularSourceServices.size());
-    reportSourceServiceCache   = new HashMap<>(reportSourceServices.size());
-    allSourceServiceCache = new HashMap<>(singularSourceServices.size() + batchSourceServices.size() + reportSourceServices.size());
+    tabularSourceServiceCache   = new HashMap<>(tabularSourceServices.size());
+    allSourceServiceCache = new HashMap<>(singularSourceServices.size() + batchSourceServices.size() + tabularSourceServices.size());
     for(SingularSourceProcessorService service : singularSourceServices)
     {
       for(String responsibility : service.getResponsibilities()){
@@ -55,13 +55,20 @@ public class ProxySourceProcessorServiceImpl implements ProxySourceProcessorServ
         allSourceServiceCache.put(responsibility, service);
       }
     }
+    /*
+    for(SourceProcessorService s : reportSourceServices) {
+      for(String responsibility : s.getResponsibilities()) {
+        log.info("m2s Found " + responsibility + " to service cache. Served by: " + s.getClass().getCanonicalName());
+      }
+    }
+      */
     
-    for(ReportSourceProcessorService service : reportSourceServices)
+    for(TabularQuerySourceProcessorService service : tabularSourceServices)
     {
       for(String responsibility : service.getResponsibilities()){
         if (allSourceServiceCache.containsKey(responsibility))
           log.warn("Found " + responsibility + " in service cache already. It is served by: " + allSourceServiceCache.get(responsibility).getClass().getCanonicalName() + ". Overriding with: " + service.getClass().getCanonicalName());
-        reportSourceServiceCache.put(responsibility, service);
+        tabularSourceServiceCache.put(responsibility, service);
         allSourceServiceCache.put(responsibility, service);
       }
     }
@@ -76,11 +83,20 @@ public class ProxySourceProcessorServiceImpl implements ProxySourceProcessorServ
   }
   
   @Override
-  public ReportSourceProcessorService getReportSourceProcessorService(final String sourceType) {
-    if (reportSourceServiceCache.get(sourceType) == null)
+  public TabularQuerySourceProcessorService getTabularSourceProcessorService(final String sourceType) {
+    if (tabularSourceServiceCache.get(sourceType) == null)
       throw new NoSuchMechanismException("No service found for sourceType=" + sourceType);
 
-    return reportSourceServiceCache.get(sourceType);
+    return tabularSourceServiceCache.get(sourceType);
   }
   
+  @Override
+  public ReportSourceProcessorService getReportSourceProcessorService(final String sourceType) {
+    if (tabularSourceServiceCache.get(sourceType) == null)
+      throw new NoSuchMechanismException("No service found for sourceType=" + sourceType);
+    else if (! (tabularSourceServiceCache.get(sourceType) instanceof ReportSourceProcessorService))
+      throw new NoSuchMechanismException("No ReportSourceProcessor for sourceType=" + sourceType);
+
+    return (ReportSourceProcessorService) tabularSourceServiceCache.get(sourceType);
+  }
 }

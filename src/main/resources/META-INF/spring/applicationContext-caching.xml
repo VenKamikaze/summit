@@ -13,6 +13,7 @@
             <set>
               <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="reportColumnList"/>
               <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="totalRecordCount"/> <!-- we need to clear this frequently -->
+              <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" p:name="sourceMetadata"/> <!-- clear this each time source is updated. -->
             </set>
           </property>
         </bean>
