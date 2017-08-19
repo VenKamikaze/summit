@@ -1,5 +1,8 @@
 package org.awiki.kamikaze.summit.dto.render;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.validator.constraints.NotBlank;
 
 
@@ -19,6 +22,8 @@ public class PageProcessingDto {
   
   @NotBlank(message = "Must not be empty.")
   private Long                  processingNum;
+  
+  private List<PageProcessingSourceDto> pageProcessingSourceDtos = new ArrayList<>();
 
   public Long getId() {
     return id;
@@ -43,5 +48,11 @@ public class PageProcessingDto {
   }
   public void setProcessingNum(Long processingNum) {
     this.processingNum = processingNum;
+  }
+  public List<PageProcessingSourceDto> getPageProcessingSource() {
+    return pageProcessingSourceDtos;
+  }
+  public void setPageProcessingSource(List<PageProcessingSourceDto> pageProcessingSourceDtos) {
+    this.pageProcessingSourceDtos = pageProcessingSourceDtos;
   }
 }

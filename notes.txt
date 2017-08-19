@@ -7,6 +7,7 @@ Limitations:
 
 TODO:
 * Report region HTML templates for mustache are hard coded in javascript, need to add REST call to pull this down from server.
+* Field processing occurs on page render, but has not been implemented when using REST services for page filtering. Do we need this on page filtering as well? Or are we happy to only pass in existing form data to the REST services?
 
 
 

@@ -3,7 +3,7 @@ package org.awiki.kamikaze.summit.dto.render;
 
 
 /**
-* This DTO contains a collection of fields we wish to select values into, from the select query specified in the pageProcessingSource
+* This DTO contains field metadata (name, index) that we wish to select values into, from the select query specified in the pageProcessingSource
 */
 public class PageProcessingSourceSelectDto {
   

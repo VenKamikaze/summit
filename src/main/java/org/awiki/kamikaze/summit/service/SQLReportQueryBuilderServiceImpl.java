@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Service;
 
-@Service("sqlQueryBuilder")
-public class SqlQueryBuilderServiceImpl implements QueryBuilderService
+@Service("reportSQLQueryBuilder")
+public class SQLReportQueryBuilderServiceImpl implements QueryBuilderService
 {
   @Autowired
   private DriverManagerDataSource dataSource;
@@ -29,9 +29,9 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
   
   private DatabaseTypeEnum detectedDbType = null;
   
-  private static final Logger logger = LoggerFactory.getLogger(SqlQueryBuilderServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(SQLReportQueryBuilderServiceImpl.class);
 
-  private static final String ORACLE_VARCHAR_CAST = "varchar2(4000)";
+  private static final String ORACLE_VARCHAR = "varchar2(4000)";
   private static final String VARCHAR = "varchar";
   
   public String buildWrapperCountQuery(final String innerQuery, final String filterType, final String columnToFilter, final Collection<String> columnList, final String searchText) {
@@ -115,7 +115,7 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
     
     switch(detectedDbType) {
       case ORACLE:
-        return ORACLE_VARCHAR_CAST;
+        return ORACLE_VARCHAR;
         
       default:
         return VARCHAR;
@@ -196,21 +196,5 @@ public class SqlQueryBuilderServiceImpl implements QueryBuilderService
     }
   }
 
-  //  https://stackoverflow.com/questions/2309970/named-parameters-in-jdbc for regex
-  static Pattern bindParameters = Pattern.compile("(?!\\B'[^']*):(\\w+)(?![^']*'\\B)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  
-  @Override
-  public List<BindVar> setBindVarsFromFields(String regionQuery, final Map<String, PageItem<String>> fields) {
-    final Matcher m = bindParameters.matcher(regionQuery);
-    
-    Map<String, PageItem<String>> fieldsForBinding = new HashMap<String, PageItem<String>>();
-    
-    while(m.find()) {
-      if (fields.containsKey(m.group(1))) {
-        fieldsForBinding.put(m.group(1), fields.get(m.group(1)));
-      }
-    }
-    
-    return bindVarService.convertFieldsToBindVars(fieldsForBinding.values());
-  }
+
 }

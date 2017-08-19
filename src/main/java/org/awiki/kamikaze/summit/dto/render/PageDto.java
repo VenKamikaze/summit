@@ -7,6 +7,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.persistence.Transient;
+
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.CollectionUtils;
+import org.awiki.kamikaze.summit.domain.codetable.CodeProcessingType;
+import org.awiki.kamikaze.summit.service.PageProcessingService;
 import org.awiki.kamikaze.summit.service.formatter.FormatEnums;
 
 public class PageDto implements PageItem<String> {
@@ -53,6 +59,16 @@ public class PageDto implements PageItem<String> {
   public void setPageProcessings(Set<PageProcessingDto> pageProcessings) {
     this.pageProcessings = pageProcessings;
   }
+
+  /**
+   * Gets all page processing items associated with this page that should execute before regions are rendered.
+   * @return
+   */
+  @Transient
+  public Collection<PageProcessingDto> getPageRenderPreRegionPageProcessings() {
+    return CollectionUtils.select(this.getPageProcessings(), PageProcessingService.PAGE_RENDER_PRE_REGION_PREDICATE);
+  }
+  
   public Set<ApplicationPageDto> getApplicationPages() {
     return applicationPages;
   }

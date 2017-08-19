@@ -17,6 +17,13 @@ public class StaticTextProcessorServiceImpl implements SingularSourceProcessorSe
     return new ArrayList<String>(Arrays.asList(SingularSourceProcessorService.BUILT_IN_STATIC_TEXT_TYPE));
   }
 
+
+  @Override
+  public SourceProcessorResult processSource(String source, String sourceType, List<BindVar> bindVars)
+  {
+    return querySource(source, bindVars);
+  }
+  
   /**
    * There's nothing to execute for static text. Returns null.
    */
@@ -38,4 +45,5 @@ public class StaticTextProcessorServiceImpl implements SingularSourceProcessorSe
     result.setOutputMessage(SourceProcessorResult.STANDARD_SUCCESS_MESSAGE);
     return result;
   }
+
 }

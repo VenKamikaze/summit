@@ -135,7 +135,7 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements OldPag
       RegionDto regionDto = pageRegionDto.getRegionDto();
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) )
       {
-        ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
+        ReportSourceProcessorService reportService = sourceProcessors.getReportSourceProcessorService(regionDto.getCodeSourceType());
         
         // TODO, split+call out to a formatter here to apply styling & formatting as needed to the results.
         SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getId(), regionDto.getSource().iterator().next(), null);
@@ -168,7 +168,7 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements OldPag
       final FieldDto fieldDto = regionFieldDto.getField();
       FieldDto.PostProcessedFieldContentDto processedContent = fieldDto.new PostProcessedFieldContentDto();
       FieldDto.PostProcessedFieldContentDto processedDefaultContent = fieldDto.new PostProcessedFieldContentDto();
-      SingularSourceProcessorService processor = (SingularSourceProcessorService) sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
+      SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(fieldDto.getCodeFieldSourceType());
       processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource(), null).getResultValue()); // TODO FIXME handle bind vars
       processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() , null ).getResultValue() );  // TODO FIXME handle bind vars
       fieldDto.setPostProcessedSource(processedContent);

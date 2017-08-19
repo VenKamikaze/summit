@@ -178,6 +178,27 @@ create table SOURCE
   SOURCE varchar2(4000)  -- TODO: find a way to use CLOB in Oracle and TEXT in postgres - cannot find a portable way in hibernate to make this work.
 );
 
+-- These metadata tables allow us to know the types that we can cast Bind Variables as
+--  when dealing with user entered queries. Note that it is illegal for a bind variable
+--  to be a text type and containing alphabetical characters, when binding to a column
+--  that is expecting a Number type.
+create table SOURCE_METADATA
+(
+  ID number(19) primary key,
+  SOURCE_ID number(19) not null references SOURCE(ID),
+  DATE_CREATED date,
+  LAST_UPDATED date,
+  UPDATED_BY varchar2(200)
+);
+
+create table SOURCE_METADATA_COLS
+(
+  ID number(19) primary key,
+  SOURCE_METADATA_ID number(19) not null references SOURCE_METADATA(ID),
+  COLUMN_ORDER number(19) not null,
+  COLUMN_NAME varchar2(200) not null, -- aliases and real columns
+  COLUMN_TYPE number(19) not null
+);
 
 -- e.g. the request processing objects on a page.
 create table PAGE_PROCESSING

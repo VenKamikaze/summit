@@ -10,6 +10,9 @@ insert into CODE_SOURCE_TYPE
 -- page processing, but could be implemented for fields too?
 insert into CODE_SOURCE_TYPE
  values ('dml_select', 'text/plain; sql; dml; select', 3, 'dml_select');
+-- page processing, used for update/insert/delete actions.
+insert into CODE_SOURCE_TYPE
+ values ('dml_modify', 'text/plain; sql; dml; modify', 4, 'dml_modify');
 
 -- used by reports only
 insert into CODE_REGION_TYPE 

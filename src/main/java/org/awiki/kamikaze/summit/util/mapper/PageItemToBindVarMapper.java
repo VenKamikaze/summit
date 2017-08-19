@@ -17,7 +17,7 @@ public class PageItemToBindVarMapper implements Transformer<PageItem<?>, BindVar
   private static final Logger logger = LoggerFactory.getLogger(PageItemToBindVarMapper.class);
   private static final String NUMBER_TYPE = "NUMBER";
   
-  // TODO FIXME all bind variables are treated as varchar
+  // TODO FIXME missing a large amount of bind var Types
   public BindVar map(PageItem<?> pageItem)
   {
     if(pageItem.getProcessedSource() != null)
@@ -36,8 +36,6 @@ public class PageItemToBindVarMapper implements Transformer<PageItem<?>, BindVar
       }
     }
     return new BindVar(null, java.sql.Types.NULL, pageItem.getName());
-
-//    return new BindVar(StringUtils.EMPTY, java.sql.Types.VARCHAR, pageItem.getName());
   }
   
   @Override

@@ -2,13 +2,12 @@ package org.awiki.kamikaze.summit.service.processor;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.MapUtils;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.repository.RegionRepository;
+import org.awiki.kamikaze.summit.service.BindVarService;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Column;
@@ -21,7 +20,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -32,10 +30,13 @@ import org.springframework.stereotype.Service;
  * @author msaun
  *
  */
-@Service
-public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcessorService
+@Service("SQLQueryProcessor")
+public class SQLQuerySourceProcessorServiceImpl implements ReportSourceProcessorService
 {
-  private static final Logger logger = LoggerFactory.getLogger(SQLReportSourceProcessorServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(SQLQuerySourceProcessorServiceImpl.class);
+  
+  @Autowired
+  private BindVarService bindVarService;
   
   @Autowired
   private RegionRepository regionRepo;
@@ -56,7 +57,7 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   @Override
   public SourceProcessorResultTable querySource(Long regionId, final String source, List<BindVar> bindVars)
   {
-    final SourceProcessorResultTable table = getResults(source, getParamsForSpring(bindVars), regionId != null ? regionId.toString() : null);
+    final SourceProcessorResultTable table = getResults(source, bindVarService.convertBindVarsToSqlParameterMap(bindVars), regionId != null ? regionId.toString() : null);
     if(regionId != null) {
       updateColumnList(regionId, getColumnNames(table));
     }
@@ -64,27 +65,9 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   }
 
   private SourceProcessorResultTable getResults(final String source, Map<String, SqlParameter> params, final String regionId) {
-    logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "about to process source: " + source );
+    logger.info(SQLQuerySourceProcessorServiceImpl.class.getCanonicalName() + ": " + "about to process source: " + source );
    //logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "param names=" + StringUtils.collectionToCommaDelimitedString(params.keySet()) );
     return jdbc.query(source,  new MapSqlParameterSource(params), new SourceProcessorResultTableExtractor(regionId));
-  }
-  
-  /**
-   * TODO: We should probably just use Spring's SqlParameterValue all the way through considering we are mostly
-   * tied to spring anyway
-   * @param bindVars
-   * @return
-   */
-  @SuppressWarnings("unchecked") // for empty map
-  private Map<String, SqlParameter> getParamsForSpring(List<BindVar> bindVars)
-  {
-    if(bindVars == null)
-      return MapUtils.EMPTY_MAP;
-    Map<String, SqlParameter> paramMap = new HashMap<>(bindVars.size()); // possibly this size or smaller.
-    for (BindVar var : bindVars) {
-      paramMap.put(var.getBindParameter(), new SqlParameterValue(new SqlParameter(var.getBindParameter(), var.getType()), var.getValue()) );
-    }
-    return paramMap;
   }
   
   private Collection<String> getColumnNames(final SourceProcessorResultTable table)
@@ -100,7 +83,7 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   @Cacheable(value="totalRecordCount")
   public Long getTotalRecordCount(final String fullQuery, final List<BindVar> bindVars) 
   {
-    final SourceProcessorResultTable count = getResults(fullQuery,  getParamsForSpring(bindVars), null);
+    final SourceProcessorResultTable count = getResults(fullQuery,  bindVarService.convertBindVarsToSqlParameterMap(bindVars), null);
     return Long.parseLong(count.getBody().get(0).getCell(0).getValue());
   }
   
@@ -109,14 +92,14 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   public Collection<String> getColumnList(long regionId, final List<BindVar> bindVars)
   {
     RegionDto regionDto = regionMapper.map(regionRepo.findOne(regionId), RegionDto.class);
-    final SourceProcessorResultTable table = getResults(regionDto.getSource().iterator().next(), getParamsForSpring(bindVars), String.valueOf(regionId));
+    final SourceProcessorResultTable table = getResults(regionDto.getSource().iterator().next(), bindVarService.convertBindVarsToSqlParameterMap(bindVars), String.valueOf(regionId));
     return getColumnNames(table);
   }
 
   @CachePut(value="reportColumnList", key="regionId")
   private Collection<String> updateColumnList(long regionId, Collection<String> columns) 
   {
-    logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "forcing population of cache \"reportColumnList\" for regionId=" + regionId);
+    logger.info(SQLQuerySourceProcessorServiceImpl.class.getCanonicalName() + ": " + "forcing population of cache \"reportColumnList\" for regionId=" + regionId);
     return columns;
   }
   
@@ -124,7 +107,7 @@ public class SQLReportSourceProcessorServiceImpl implements ReportSourceProcesso
   @CacheEvict(value="reportColumnList", allEntries=true)
   public void clearColumnList(long regionId)
   {
-    logger.info(SQLReportSourceProcessorServiceImpl.class.getCanonicalName() + ": " + "clearing cache for reportColumnList");
+    logger.info(SQLQuerySourceProcessorServiceImpl.class.getCanonicalName() + ": " + "clearing cache for reportColumnList");
   }
 
 }

@@ -43,7 +43,7 @@ public class FieldServiceImpl implements FieldService {
         fieldDto.setPostProcessedSource(processedContent);
       }
       else { // process the source content to get the value
-        SingularSourceProcessorService processor = (SingularSourceProcessorService) sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
+        SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(fieldDto.getCodeFieldSourceType());
         processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource(), null).getResultValue()); // TODO FIXME handle bind vars
         fieldDto.setPostProcessedSource(processedContent);
 

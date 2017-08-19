@@ -178,6 +178,28 @@ create table SOURCE
 );
 
 
+-- These metadata tables allow us to know the types that we can cast Bind Variables as
+--  when dealing with user entered queries. Note that it is illegal for a bind variable
+--  to be a text type and containing alphabetical characters, when binding to a column
+--  that is expecting a Number type.
+create table SOURCE_METADATA
+(
+  ID bigint primary key,
+  SOURCE_ID bigint not null references SOURCE(ID),
+  DATE_CREATED date,
+  LAST_UPDATED date,
+  UPDATED_BY character varying(200)
+);
+
+create table SOURCE_METADATA_COLS
+(
+  ID bigint primary key,
+  SOURCE_METADATA_ID bigint not null references SOURCE_METADATA(ID),
+  COLUMN_ORDER bigint not null,
+  COLUMN_NAME character varying(200) not null, -- aliases and real columns
+  COLUMN_TYPE bigint not null
+);
+
 -- e.g. the request processing objects on a page.
 create table PAGE_PROCESSING
 (

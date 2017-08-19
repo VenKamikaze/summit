@@ -1,6 +1,5 @@
 package org.awiki.kamikaze.summit.service.processor;
 
-import java.sql.Types;
 import java.util.Collection;
 import java.util.List;
 

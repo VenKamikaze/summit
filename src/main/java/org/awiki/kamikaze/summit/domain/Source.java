@@ -4,12 +4,14 @@ package org.awiki.kamikaze.summit.domain;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -19,10 +21,6 @@ import javax.persistence.Table;
 @Table(name = "SOURCE")
 public class Source implements java.io.Serializable
 {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = -7419252566793513396L;
   
   private long                      id;
@@ -30,6 +28,7 @@ public class Source implements java.io.Serializable
   private Set<Region>               regions = new HashSet<Region>(0);
   private Set<Field>                fields = new HashSet<Field>(0);
   private Set<PageProcessingSource> pageProcessingSource = new HashSet<PageProcessingSource>(0);
+  private SourceMetadata            sourceMetadata = null;
   
   public Source()
   {
@@ -106,6 +105,17 @@ public class Source implements java.io.Serializable
   public void setPageProcessingSource(Set<PageProcessingSource> pageProcessingSource)
   {
     this.pageProcessingSource = pageProcessingSource;
+  }
+
+  @OneToOne(mappedBy = "source", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  public SourceMetadata getSourceMetadata()
+  {
+    return sourceMetadata;
+  }
+
+  public void setSourceMetadata(SourceMetadata sourceMetadata)
+  {
+    this.sourceMetadata = sourceMetadata;
   }
   
 }

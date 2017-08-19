@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.awiki.kamikaze.summit.service.processor.SQLReportSourceProcessorServiceImpl;
+import org.awiki.kamikaze.summit.service.processor.SQLQuerySourceProcessorServiceImpl;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Column;
 
@@ -22,7 +22,7 @@ import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultT
  */
 public class SourceProcessorResultTableExtractor implements ResultSetExtractor<SourceProcessorResultTable>
 {
-  private static final Logger logger = LoggerFactory.getLogger(SQLReportSourceProcessorServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(SQLQuerySourceProcessorServiceImpl.class);
   
   private final String id;
   

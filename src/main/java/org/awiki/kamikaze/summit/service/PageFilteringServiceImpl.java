@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.dto.render.PageDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
@@ -53,8 +54,11 @@ public class PageFilteringServiceImpl implements PageFilteringService
   private ProxyFormatterService sourceFormatters;
   
   @Autowired
-  @Qualifier(value="sqlQueryBuilder")
-  private QueryBuilderService sqlQueryBuilder;
+  @Qualifier(value="reportSQLQueryBuilder")
+  private QueryBuilderService reportSQLQueryBuilder;
+  
+  @Autowired
+  private BindVarService bindVarService;
   
   private static final Logger logger = LoggerFactory.getLogger(PageFilteringServiceImpl.class);
   
@@ -109,22 +113,23 @@ public class PageFilteringServiceImpl implements PageFilteringService
   private SourceProcessorResultTable filterQueryOnRegion(final RegionDto regionDto, final String filterType, final String columnName, final String searchText, long page, long rowsPerPage, boolean getTotalCount, final Map<String, String> parameterMap) {
     if (REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType())) {
 
-      final Set<PageItem<String>> fields = fieldService.processFieldsForRender(regionDto.getRegionFields(), parameterMap);
+      // TODO passing empty map here -- decide if we want to process associated fields first, or expect that we pass them in as form data?
+      final Set<PageItem<String>> fields = fieldService.processFieldsForRender(regionDto.getRegionFields(), MapUtils.EMPTY_MAP, parameterMap);
       // TODO FIXME region has a set of source but we always treat it as one. Decide what we are going to do going forward.
-      List<BindVar> fieldBindings = sqlQueryBuilder.setBindVarsFromFields(regionDto.getSource().iterator().next(), fieldService.fieldsToMap(fields));
+      List<BindVar> fieldBindings = bindVarService.createBindVarsFromFields(regionDto.getSource().iterator().next(), fieldService.fieldsToMap(fields));
       
       regionDto.setSubPageItems(fields);
       
-      ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
+      ReportSourceProcessorService reportService = sourceProcessors.getReportSourceProcessorService(regionDto.getCodeSourceType());
       final Collection<String> columnList = reportService.getColumnList(regionDto.getId(), fieldBindings);
       // TODO FIXME region has a set of source but we always treat it as one. Decide what we are going to do going forward.
-      final String filteredQuery = sqlQueryBuilder.buildWrapperQuery(regionDto.getSource().iterator().next(), filterType, columnName, columnList, searchText,page, rowsPerPage);
+      final String filteredQuery = reportSQLQueryBuilder.buildWrapperQuery(regionDto.getSource().iterator().next(), filterType, columnName, columnList, searchText,page, rowsPerPage);
       fieldBindings.addAll(buildParametersForWrapperQuery(columnList.size(), searchText));
       
       SourceProcessorResultTable resultTable = reportService.querySource(null, filteredQuery, fieldBindings);
       
       if(getTotalCount) {
-        final String countQuery = sqlQueryBuilder.buildWrapperCountQuery(regionDto.getSource().iterator().next(), filterType, columnName, columnList, searchText);
+        final String countQuery = reportSQLQueryBuilder.buildWrapperCountQuery(regionDto.getSource().iterator().next(), filterType, columnName, columnList, searchText);
         resultTable.setTotalCount(reportService.getTotalRecordCount(countQuery, fieldBindings));
       }
       

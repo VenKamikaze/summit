@@ -7,9 +7,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.Predicate;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
+import org.awiki.kamikaze.summit.domain.PageProcessing;
+import org.awiki.kamikaze.summit.domain.codetable.CodeProcessingType;
 import org.awiki.kamikaze.summit.dto.render.PageDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.dto.render.PageProcessingDto;
+import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceDto;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
@@ -18,6 +26,7 @@ import org.awiki.kamikaze.summit.service.formatter.FormatterService;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
+import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
@@ -93,7 +102,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     // Get the collection of pageItems in each region
     //Map<String, List<PageItem<?>>> regionPageItems = processRegionsForRender(pageDto);
     long start = System.nanoTime();
-    Map<String, PageProcessingSourceSelectDto> fieldsToPopulate = processPageRenderSource(pageDto);
+    Map<String, PageProcessingSourceSelectDto> fieldsToPopulate = processPageRenderSource(pageDto.getPageRenderPreRegionPageProcessings(), parameterMap);
     long end = System.nanoTime();
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processPageRenderSource took: " + (end - start) / 1000000 + "ms");
     
@@ -147,8 +156,23 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   */
   // Map of REGION_POSITION_X to List<String (rendered content)> 
   
-  private Map<String, PageProcessingSourceSelectDto> processPageRenderSource(PageDto pageDto) {
-    throw new RuntimeException("IMPLEMENT ME");
+  /**
+   * Pages can have associated source on page render (a GET request or page render) and on page process (a POST request)
+   * This method processes those sources and if any processes populate fields, it will return those field names with their
+   * post-processed source.  
+   * @param pageDto
+   * @return Map<String, PageProcessingSourceSelectDto>
+   */
+  private Map<String, PageProcessingSourceSelectDto> processPageRenderSource(final Collection<PageProcessingDto> pageProcesses, final Map<String, String> parameterMap) {
+    for(PageProcessingDto process : pageProcesses) {
+      for(PageProcessingSourceDto sourceDto : process.getPageProcessingSource()) {
+        final SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(sourceDto.getCodeSourceType());
+        //processor.processSource(sourceDto.getSource(), sourceDto.getCodeSourceType(), )
+        throw new RuntimeException("IMPLEMENT ME");
+      }
+    }
+    return MapUtils.EMPTY_MAP;
+    //throw new RuntimeException("IMPLEMENT ME");
   }
   
   
@@ -162,7 +186,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       regionDto.setSubPageItems(regionItems);
 
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) ) {
-        ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
+        ReportSourceProcessorService reportService = sourceProcessors.getReportSourceProcessorService(regionDto.getCodeSourceType());
         
         // All fields turned into bind variables, with variable name coming from the field name.
         SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getId(), regionDto.getSource().iterator().next(), bindVarService.convertFieldsToBindVars(regionItems));

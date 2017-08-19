@@ -19,52 +19,68 @@ public class ProxySourceProcessorServiceImpl implements ProxySourceProcessorServ
   @Autowired
   List<SingularSourceProcessorService> singularSourceServices; // TODO: review, may not make sense to split these
 
+  // TODO review: is this required at all?
   @Autowired
   List<BatchSourceProcessorService> batchSourceServices; // TODO: review, may not make sense to split these
   
   @Autowired
   List<ReportSourceProcessorService> reportSourceServices; // TODO: review, may not make sense to split these
   
-  HashMap<String, SourceProcessorService> sourceServiceCache;
+  HashMap<String, SourceProcessorService> allSourceServiceCache;
+  HashMap<String, SingularSourceProcessorService> singularSourceServiceCache;
+  HashMap<String, ReportSourceProcessorService> reportSourceServiceCache;
 
   @PostConstruct
   private void initializeCache()
   {
-    sourceServiceCache = new HashMap<>(singularSourceServices.size() + batchSourceServices.size() + reportSourceServices.size());
+    singularSourceServiceCache = new HashMap<>(singularSourceServices.size());
+    reportSourceServiceCache   = new HashMap<>(reportSourceServices.size());
+    allSourceServiceCache = new HashMap<>(singularSourceServices.size() + batchSourceServices.size() + reportSourceServices.size());
     for(SingularSourceProcessorService service : singularSourceServices)
     {
       for(String responsibility : service.getResponsibilities()){
-        if (sourceServiceCache.containsKey(responsibility))
-          log.warn("Found " + responsibility + " in service cache already. It is served by: " + sourceServiceCache.get(responsibility).getClass().getCanonicalName() + ". Overriding with: " + service.getClass().getCanonicalName());
-        sourceServiceCache.put(responsibility, service);
+        if (allSourceServiceCache.containsKey(responsibility))
+          log.warn("Found " + responsibility + " in service cache already. It is served by: " + allSourceServiceCache.get(responsibility).getClass().getCanonicalName() + ". Overriding with: " + service.getClass().getCanonicalName());
+        singularSourceServiceCache.put(responsibility, service);
+        allSourceServiceCache.put(responsibility, service);
       }
     }
     
     for(BatchSourceProcessorService service : batchSourceServices)
     {
       for(String responsibility : service.getResponsibilities()){
-        if (sourceServiceCache.containsKey(responsibility))
-          log.warn("Found " + responsibility + " in service cache already. It is served by: " + sourceServiceCache.get(responsibility).getClass().getCanonicalName() + ". Overriding with: " + service.getClass().getCanonicalName());
-        sourceServiceCache.put(responsibility, service);
+        if (allSourceServiceCache.containsKey(responsibility))
+          log.warn("Found " + responsibility + " in service cache already. It is served by: " + allSourceServiceCache.get(responsibility).getClass().getCanonicalName() + ". Overriding with: " + service.getClass().getCanonicalName());
+        // reportS.put(responsibility, service);
+        allSourceServiceCache.put(responsibility, service);
       }
     }
     
     for(ReportSourceProcessorService service : reportSourceServices)
     {
       for(String responsibility : service.getResponsibilities()){
-        if (sourceServiceCache.containsKey(responsibility))
-          log.warn("Found " + responsibility + " in service cache already. It is served by: " + sourceServiceCache.get(responsibility).getClass().getCanonicalName() + ". Overriding with: " + service.getClass().getCanonicalName());
-        sourceServiceCache.put(responsibility, service);
+        if (allSourceServiceCache.containsKey(responsibility))
+          log.warn("Found " + responsibility + " in service cache already. It is served by: " + allSourceServiceCache.get(responsibility).getClass().getCanonicalName() + ". Overriding with: " + service.getClass().getCanonicalName());
+        reportSourceServiceCache.put(responsibility, service);
+        allSourceServiceCache.put(responsibility, service);
       }
     }
   }
   
-  // TODO: review, because we've split the singular and batch, we can only return the base type.
-  // this makes execution of code difficult at lower levels
-  public SourceProcessorService getSourceProcessorService(String sourceType) {
-    if (sourceServiceCache.get(sourceType) == null)
+  @Override
+  public SingularSourceProcessorService getSingularSourceProcessorService(final String sourceType) {
+    if (singularSourceServiceCache.get(sourceType) == null)
       throw new NoSuchMechanismException("No service found for sourceType=" + sourceType);
 
-    return sourceServiceCache.get(sourceType);
+    return singularSourceServiceCache.get(sourceType);
   }
+  
+  @Override
+  public ReportSourceProcessorService getReportSourceProcessorService(final String sourceType) {
+    if (reportSourceServiceCache.get(sourceType) == null)
+      throw new NoSuchMechanismException("No service found for sourceType=" + sourceType);
+
+    return reportSourceServiceCache.get(sourceType);
+  }
+  
 }

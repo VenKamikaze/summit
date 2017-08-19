@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
 
+// TODO review: is this required at all?
 public interface BatchSourceProcessorService extends SourceProcessorService {
   public static final String BUILT_IN_SQL_DML_BATCH_TYPE = "text/plain; sql; dml; batch";
   public static final String BUILT_IN_SQL_DDL_BATCH_TYPE = "text/plain; sql; ddl; batch";

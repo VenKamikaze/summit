@@ -27,18 +27,30 @@ public class SqlDMLProcessorServiceImpl implements SingularSourceProcessorServic
   @Override
   public List<String> getResponsibilities()
   {
-    return new ArrayList<String>(Arrays.asList(SingularSourceProcessorService.BUILT_IN_SQL_DML_TYPE));
+    return new ArrayList<String>(Arrays.asList(SingularSourceProcessorService.BUILT_IN_SQL_DML_MODIFY_TYPE,
+      SingularSourceProcessorService.BUILT_IN_SQL_DML_SELECT_TYPE));
   }
   
   @Override
-  public SourceProcessorResult executeSource(final String sql, List<BindVar> bindVars) {
+  public SourceProcessorResult processSource(final String source, final String sourceType, final List<BindVar> bindVars)
+  {
+    if(SingularSourceProcessorService.BUILT_IN_SQL_DML_MODIFY_TYPE.equals(sourceType)) {
+      return executeSource(source, bindVars);
+    }
+    else {
+      return querySource(source, bindVars);
+    }
+  }
+  
+  @Override
+  public SourceProcessorResult executeSource(final String sql, final List<BindVar> bindVars) {
     SqlParameterSource params = mapBindVars(bindVars);
     int changedRows = jdbc.update(sql,params);
     return new SourceProcessorResult((long) changedRows, SourceProcessorResult.STANDARD_SUCCESS_CODE, SourceProcessorResult.STANDARD_SUCCESS_MESSAGE, null);
   }
   
   @Override
-  public SourceProcessorResult querySource(final String sql, List<BindVar> bindVars) {
+  public SourceProcessorResult querySource(final String sql, final List<BindVar> bindVars) {
     SqlParameterSource params = mapBindVars(bindVars);
     
     SourceProcessorResult result = new SourceProcessorResult();
@@ -67,4 +79,5 @@ public class SqlDMLProcessorServiceImpl implements SingularSourceProcessorServic
     }
     return params;
   }
+
 }
