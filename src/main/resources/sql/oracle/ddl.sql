@@ -217,7 +217,7 @@ create table PAGE_PROCESSING_SOURCE
   SOURCE_TYPE_CODE varchar2(10) references CODE_SOURCE_TYPE(CODE)
 );
 
--- Used when we have a page_processing_source type of 'dml_select'
+-- Used when we have a page_processing_source type of 'dml_selrow'
 --   This contains the field names we wish to select values into
 -- Note: it is order based on index, e.g. index 0 is the first field selected by the corresponding pageProcessingSource.source
 --   FIELD_NAME must corresponding with a field name on the associated page.

@@ -7,12 +7,16 @@ insert into CODE_SOURCE_TYPE
 insert into CODE_SOURCE_TYPE
  values ('static', 'text/plain', 2, 'static');
 
--- page processing, but could be implemented for fields too?
+-- page processing, for selecting a single cell, not a row. 
 insert into CODE_SOURCE_TYPE
- values ('dml_select', 'text/plain; sql; dml; select', 3, 'dml_select');
+ values ('dml_selcel', 'text/plain; sql; dml; select; cell', 3, 'dml_selcel');
 -- page processing, used for update/insert/delete actions.
 insert into CODE_SOURCE_TYPE
  values ('dml_modify', 'text/plain; sql; dml; modify', 4, 'dml_modify');
+-- page processing, for selecting a single row. 
+insert into CODE_SOURCE_TYPE
+ values ('dml_selrow', 'text/plain; sql; dml; select; row', 5, 'dml_selrow');
+
 
 -- used by reports only
 insert into CODE_REGION_TYPE 

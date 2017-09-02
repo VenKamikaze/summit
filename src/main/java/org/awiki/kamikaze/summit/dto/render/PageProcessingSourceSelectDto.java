@@ -1,5 +1,7 @@
 package org.awiki.kamikaze.summit.dto.render;
 
+import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
+
 
 
 /**
@@ -11,6 +13,7 @@ public class PageProcessingSourceSelectDto {
   private PageProcessingSourceDto   pageProcessingSource;
   private long                      fieldIndex;
   private String                    fieldName;
+  private SourceProcessorResult     fieldValue;
   
   public Long getId() {
     return id;
@@ -35,5 +38,11 @@ public class PageProcessingSourceSelectDto {
   }
   public void setFieldName(String fieldName) {
     this.fieldName = fieldName;
+  }
+  public SourceProcessorResult getFieldValue()  {
+    return fieldValue;
+  }
+  public void setFieldValue(SourceProcessorResult fieldValue)  {
+    this.fieldValue = fieldValue;
   }
 }

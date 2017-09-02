@@ -95,7 +95,7 @@ public class SourceProcessorResultTableExtractor implements ResultSetExtractor<S
         if(cols.size() != rsm.getColumnCount())
         {
           logger.debug(SourceProcessorResultTableExtractor.class.getCanonicalName() + ": " + "new Col(\""+rsm.getColumnLabel(i+1)+"\","+i+");");
-          cols.add(results.new Column(rsm.getColumnLabel(i+1), i));
+          cols.add(results.new Column(rsm.getColumnLabel(i+1), i, rsm.getColumnType(i+1)));
         }
         add(results.new Cell(row, cols.get(i), (rsm.getColumnLabel(i+1)) ));
       }

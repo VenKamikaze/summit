@@ -56,4 +56,22 @@
     </field>
   </mapping>  
 
+  <!-- convenience when storing metadata on queries -->
+  <mapping>
+    <class-a>org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Column</class-a>
+    <class-b>org.awiki.kamikaze.summit.domain.SourceMetadataCols</class-b>   
+    <field>
+      <a>name</a>
+      <b>columnName</b>
+    </field>
+    <field>
+      <a>sqlType</a>
+      <b>columnType</b>
+    </field>
+    <field>
+      <a>order</a>
+      <b>columnOrder</b>
+    </field>
+  </mapping>
+
 </mappings>

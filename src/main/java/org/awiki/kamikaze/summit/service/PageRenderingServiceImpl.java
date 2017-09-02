@@ -67,6 +67,9 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   @Autowired
   private FieldService fieldService;
   
+  @Autowired
+  private PageProcessingService pageProcessingService;
+  
   /**
    * Overarching method that handles the page rendering
    * This one renders the entire page and all it's contents to a String
@@ -164,17 +167,14 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    * @return Map<String, PageProcessingSourceSelectDto>
    */
   private Map<String, PageProcessingSourceSelectDto> processPageRenderSource(final Collection<PageProcessingDto> pageProcesses, final Map<String, String> parameterMap) {
+    Map<String, PageProcessingSourceSelectDto> allResults = new HashMap<>();
     for(PageProcessingDto process : pageProcesses) {
       for(PageProcessingSourceDto sourceDto : process.getPageProcessingSource()) {
-        final SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(sourceDto.getCodeSourceType());
-        //processor.processSource(sourceDto.getSource(), sourceDto.getCodeSourceType(), )
-        throw new RuntimeException("IMPLEMENT ME");
+        allResults.putAll(pageProcessingService.processSource(sourceDto, parameterMap));
       }
     }
-    return MapUtils.EMPTY_MAP;
-    //throw new RuntimeException("IMPLEMENT ME");
+    return allResults;
   }
-  
   
   private void processRegionsForRender(final PageDto pageDto, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final Map<String, String> parameterMap)  {
     for(PageRegionDto pageRegionDto : pageDto.getPageRegions() ) {

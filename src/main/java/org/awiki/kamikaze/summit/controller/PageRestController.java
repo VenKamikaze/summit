@@ -1,10 +1,10 @@
 package org.awiki.kamikaze.summit.controller;
 
 import org.awiki.kamikaze.summit.dto.render.PageItem;
-import org.awiki.kamikaze.summit.service.PageFilteringService;
 import org.awiki.kamikaze.summit.service.formatter.FormatterService;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
+import org.awiki.kamikaze.summit.service.report.PageFilteringService;
 import org.awiki.kamikaze.summit.util.StringUtils;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;

@@ -1,13 +1,8 @@
-package org.awiki.kamikaze.summit.service;
+package org.awiki.kamikaze.summit.service.report;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
-import org.awiki.kamikaze.summit.dto.render.PageItem;
-import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
-
-public interface QueryBuilderService
+public interface SQLReportQueryBuilderService
 {
   public String buildWrapperCountQuery(final String innerQuery, final String filterType, final String columnToFilter, final Collection<String> columnList, final String searchText);
   

@@ -23,6 +23,8 @@
     <jadira.version>5.0.0.GA</jadira.version>
     <jackson.library>2.8.5</jackson.library>
     <apache.commons.collections.version>4.1</apache.commons.collections.version>
+    <apache.io.version>2.5</apache.io.version>
+    <jsqlparser.version>1.1</jsqlparser.version>
   </properties>
   <dependencies>
     <!-- Spring -->
@@ -126,6 +128,13 @@
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
       <version>1.2</version>
+    </dependency>
+
+    <!-- JSQLParser https://github.com/JSQLParser/wiki -->
+    <dependency>
+      <groupId>com.github.jsqlparser</groupId>
+      <artifactId>jsqlparser</artifactId>
+      <version>${jsqlparser.version}</version>
     </dependency>
 
     <!-- DB -->
@@ -294,6 +303,11 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-collections4</artifactId>
       <version>${apache.commons.collections.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${apache.io.version}</version>
     </dependency>
 
 

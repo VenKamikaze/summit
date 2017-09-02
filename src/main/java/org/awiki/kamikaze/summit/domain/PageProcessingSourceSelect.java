@@ -21,7 +21,7 @@ public class PageProcessingSourceSelect implements java.io.Serializable
 
   /**
    * This domain contains a list of fields that we wish to select values into.
-   * It is associated with a pageProcessingSource of type 'dml_select'
+   * It is associated with a pageProcessingSource of type 'dml_selrow'
    * Values selected within the corresponding 'select' clause associated with the PageProcessingSource.Source are populated by fieldIndex order
    *   and then when region processing occurs, if a field name matches one specified here, values are auto-filled.
    */

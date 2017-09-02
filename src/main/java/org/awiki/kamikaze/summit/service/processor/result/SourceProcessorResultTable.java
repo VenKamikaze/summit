@@ -137,6 +137,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   public class Column {
     private String name;
     private int order;
+    private int sqlType;
     
     @JsonIgnore
     private List<Cell> cellsInColumn = new ArrayList<>();
@@ -146,6 +147,13 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     {
       this.name = name;
       this.order = order;
+    }
+    
+    public Column(String name, int order, int sqlType)
+    {
+      this.name = name;
+      this.order = order;
+      this.sqlType = sqlType;
     }
     
     public String getName()
@@ -166,6 +174,16 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     public void setOrder(int order)
     {
       this.order = order;
+    }
+    
+    public int getSqlType()
+    {
+      return sqlType;
+    }
+    
+    public void setSqlType(int sqlType)
+    {
+      this.sqlType = sqlType;
     }
 
     public List<Cell> getCellsInColumn()

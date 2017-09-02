@@ -1,4 +1,4 @@
-package org.awiki.kamikaze.summit.service;
+package org.awiki.kamikaze.summit.service.report;
 
 import java.util.Map;
 

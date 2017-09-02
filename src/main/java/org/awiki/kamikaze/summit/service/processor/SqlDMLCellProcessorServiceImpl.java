@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
  * For select actions returning a row, a different service should be used
  * For select actions returning a table, use {@link SQLQueryReportRegionSourceProcessorServiceImpl}
  * 
+ * FIXME: does not make sense to have MODIFY type here, this is for a Cell only!?
+ * 
  * @author msaun
  */
 @Service

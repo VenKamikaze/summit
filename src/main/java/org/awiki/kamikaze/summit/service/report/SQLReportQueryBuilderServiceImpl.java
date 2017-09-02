@@ -1,39 +1,31 @@
-package org.awiki.kamikaze.summit.service;
+package org.awiki.kamikaze.summit.service.report;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.awiki.kamikaze.summit.dto.render.PageItem;
-import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
+import org.awiki.kamikaze.summit.service.BindVarService;
+import org.awiki.kamikaze.summit.util.DatabaseUtils;
+import org.awiki.kamikaze.summit.util.SQLUtils;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Service;
 
 @Service("reportSQLQueryBuilder")
-public class SQLReportQueryBuilderServiceImpl implements QueryBuilderService
+public class SQLReportQueryBuilderServiceImpl implements SQLReportQueryBuilderService
 {
-  @Autowired
-  private DriverManagerDataSource dataSource;
+  /** TODO REFACTOR A LOT OF THIS OUT INTO {@link SQLUtils} */
   
   @Autowired
   private BindVarService bindVarService;
   
-  private DatabaseTypeEnum detectedDbType = null;
+  @Autowired
+  private DatabaseUtils databaseUtils;
   
   private static final Logger logger = LoggerFactory.getLogger(SQLReportQueryBuilderServiceImpl.class);
 
-  private static final String ORACLE_VARCHAR = "varchar2(4000)";
-  private static final String VARCHAR = "varchar";
-  
   public String buildWrapperCountQuery(final String innerQuery, final String filterType, final String columnToFilter, final Collection<String> columnList, final String searchText) {
     StringBuilder countQuery = new StringBuilder();
     countQuery.append("SELECT COUNT(1) as TOTALCOUNT");
@@ -47,9 +39,7 @@ public class SQLReportQueryBuilderServiceImpl implements QueryBuilderService
   public String buildWrapperQuery(final String innerQuery, final String filterType, final String columnToFilter, final Collection<String> columnList, final String searchText,
           long page, long rowsPerPage) {
     if(StringUtils.isNotEmpty(searchText)) {
-      StringBuilder fullQuery = new StringBuilder();
-      fullQuery.append("SELECT ").append(StringUtils.join(columnList, ", "));
-      fullQuery.append(" FROM ( " + innerQuery + " ) SUBQUERY ");
+      StringBuilder fullQuery = SQLUtils.buildWrapperQuery(innerQuery, columnList);
       addPredicate(fullQuery, filterType, columnToFilter, columnList);
       if(page > 0)
         fullQuery = addPaginationToQuery(fullQuery, StringUtils.join(columnList, ", "), true, page, rowsPerPage);
@@ -66,12 +56,12 @@ public class SQLReportQueryBuilderServiceImpl implements QueryBuilderService
     if(StringUtils.isNotBlank(columnToFilter)) {
       /* A column is specified - query against the column specified (check it is valid first) */
       if(columnList.contains(columnToFilter)) {
-        query.append(" WHERE ").append(wrapInCast(new ArrayList<String>(1) {{ add(columnToFilter); }}, getVarcharCastType())).append(handleFilterType(FilterTypeEnum.valueOf(filterType.toUpperCase()), ":searchText"));
+        query.append(" WHERE ").append(wrapInCast(new ArrayList<String>(1) {{ add(columnToFilter); }}, databaseUtils.getVarcharCastType())).append(handleFilterType(FilterTypeEnum.valueOf(filterType.toUpperCase()), ":searchText"));
       }
     }
     else {
       /* No column specified - query against ALL columns */
-      query.append(" WHERE ").append(StringUtils.join( wrapInCast(columnList, getVarcharCastType()), handleFilterType(FilterTypeEnum.valueOf(filterType.toUpperCase()), ":searchText")+ " OR ")).append(handleFilterType(FilterTypeEnum.valueOf(filterType), ":searchText"));
+      query.append(" WHERE ").append(StringUtils.join( wrapInCast(columnList, databaseUtils.getVarcharCastType()), handleFilterType(FilterTypeEnum.valueOf(filterType.toUpperCase()), ":searchText")+ " OR ")).append(handleFilterType(FilterTypeEnum.valueOf(filterType), ":searchText"));
     }
     return query.toString();
   }
@@ -105,23 +95,6 @@ public class SQLReportQueryBuilderServiceImpl implements QueryBuilderService
     return predicate;
   }
   
-  /**
-   * Gets the database specific type for varchar (as e.g. it is varchar2 and needs length for oracle)
-   * @return
-   */
-  private String getVarcharCastType() {
-    if(detectedDbType == null)
-      detectDbType();
-    
-    switch(detectedDbType) {
-      case ORACLE:
-        return ORACLE_VARCHAR;
-        
-      default:
-        return VARCHAR;
-    }
-  }
-  
   private Collection<String> wrapInCast(final Collection<String> columnList, final String castType) {
     Collection<String> castedColumns = new ArrayList<String>(columnList.size());
     for(String col : columnList) {
@@ -131,10 +104,8 @@ public class SQLReportQueryBuilderServiceImpl implements QueryBuilderService
   }
   
   private StringBuilder addPaginationToQuery(StringBuilder currentQuery, final String columnList, boolean hasWhereClause, long page, long rowsPerPage) {
-    if(detectedDbType == null)
-      detectDbType();
-    
-    switch(detectedDbType) {
+       
+    switch(databaseUtils.getDetectedDBType()) {
       case ORACLE:
         final String rownumAlias = "RNUM";
         
@@ -157,44 +128,19 @@ public class SQLReportQueryBuilderServiceImpl implements QueryBuilderService
         
       case SQLSERVER:
       {
-        String error = "Not yet supported. FIXME, TODO SQLServer: " + detectedDbType;
+        String error = "Not yet supported. FIXME, TODO SQLServer: " + databaseUtils.getDetectedDBType();
         logger.error(error);
         throw new NotYetImplementedException(error);
       }
       
       default:
       {
-        String error = "Unknown detected DB type enum value: " + detectedDbType;
+        String error = "Unknown detected DB type enum value: " + databaseUtils.getDetectedDBType();
         logger.error(error);
         throw new RuntimeException(error);
       }
     }
     return currentQuery;
   }
-  
-  private void detectDbType() {
-    final String dbConnectionUrl = dataSource.getUrl() != null ? dataSource.getUrl().toLowerCase() : null;
-    if(dbConnectionUrl != null) {
-      if(dbConnectionUrl.contains("oracle")) {
-        detectedDbType = DatabaseTypeEnum.ORACLE;
-      }
-      else if (dbConnectionUrl.contains("postgres")) {
-        detectedDbType = DatabaseTypeEnum.POSTGRES;
-      }
-      else if (dbConnectionUrl.contains("mysql")) {
-        detectedDbType = DatabaseTypeEnum.MYSQL;
-      }
-      else if (dbConnectionUrl.contains("sqlserver")) {
-        detectedDbType = DatabaseTypeEnum.SQLSERVER;
-      }
-      else {
-        logger.warn("Unknown database type detected! This is determined from the database connection URL, which is detected as: " + dbConnectionUrl);
-        logger.warn("Falling back to postgres style pagination. Pagination may not function correctly.");
-        detectedDbType = DatabaseTypeEnum.POSTGRES;
-      }
-      logger.info("Detected DB type enum is: " + detectedDbType);
-    }
-  }
-
 
 }

@@ -1,4 +1,4 @@
-package org.awiki.kamikaze.summit.service;
+package org.awiki.kamikaze.summit.service.report;
 
 import static org.awiki.kamikaze.summit.domain.Region.REGION_TYPE_REPORT;
 
@@ -16,6 +16,8 @@ import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.repository.RegionRepository;
+import org.awiki.kamikaze.summit.service.BindVarService;
+import org.awiki.kamikaze.summit.service.FieldService;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
@@ -55,7 +57,7 @@ public class PageFilteringServiceImpl implements PageFilteringService
   
   @Autowired
   @Qualifier(value="reportSQLQueryBuilder")
-  private QueryBuilderService reportSQLQueryBuilder;
+  private SQLReportQueryBuilderService reportSQLQueryBuilder;
   
   @Autowired
   private BindVarService bindVarService;

@@ -1,6 +1,5 @@
 package org.awiki.kamikaze.summit.service;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.Predicate;
@@ -27,9 +26,10 @@ public interface PageProcessingService {
   /**
    * Process PageProcessingSourceDto, plus any parameters passed in through the HttpServletRequest into a
    *   collection of fieldDtos, inserting any values and processing source as required.
+   * Note: if the passed in source is not of a SELECT type (e.g. may be a 'modify' type) then the result will be an empty list
    * @param PageProcessingSourceDto
    * @param parameterMap
-   * @return Collection of PageProcessingSourceSelectDto (also attached to the processSourceDto)
+   * @return Map of fieldName(String) to PageProcessingSourceSelectDto including populated values
    */
-  public List<PageProcessingSourceSelectDto> processSource(final PageProcessingSourceDto processSourceDto, final Map<String, String> parameterMap);
+  public Map<String, PageProcessingSourceSelectDto> processSource(final PageProcessingSourceDto processSourceDto, final Map<String, String> parameterMap);
 }
