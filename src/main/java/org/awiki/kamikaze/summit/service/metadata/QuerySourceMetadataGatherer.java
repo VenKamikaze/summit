@@ -9,11 +9,11 @@ import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 
 public interface QuerySourceMetadataGatherer
 {
-  public SourceMetadataDto getSourceMetadata(SourceDto sourceDto, final List<BindVar> bindVars);
-  
+  public SourceMetadataDto updateSourceMetadata(SourceDto sourceDto, final List<BindVar> bindVars);
+
+//  public SourceMetadataDto getSourceMetadata(SourceDto sourceDto, final List<BindVar> bindVars);
+
   public void clearSourceMetadata();
-  
-  
   
   ////// can probably remove the following methods when we switch over to sourceMetadata completely
   // For caching

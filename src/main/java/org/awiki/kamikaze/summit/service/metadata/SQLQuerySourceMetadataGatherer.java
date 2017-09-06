@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -67,11 +68,15 @@ public class SQLQuerySourceMetadataGatherer implements QuerySourceMetadataGather
 
   @Override
   @CachePut(value="sourceMetadata", key="sourceDto.id")
-  public SourceMetadataDto getSourceMetadata(SourceDto sourceDto, List<BindVar> bindVars)
+  public SourceMetadataDto updateSourceMetadata(SourceDto sourceDto, List<BindVar> bindVars)
   {
+    logger.debug(SQLQuerySourceMetadataGatherer.class.getCanonicalName() + ": " + "building stripped query to determine metadata");
+    logger.debug(SQLQuerySourceMetadataGatherer.class.getCanonicalName() + ": " + sourceDto.getSource());
     final String strippedSql = SQLUtils.stripCriteriaClause(sourceDto.getSource());
     StringBuilder modifiedQuery = SQLUtils.buildWrapperQuery(strippedSql);
-    SQLUtils.addPaginationToQuery(modifiedQuery, "*", 1, null);
+    modifiedQuery = SQLUtils.addPaginationToQuery(modifiedQuery, "*", 1, null);
+    logger.debug(SQLQuerySourceMetadataGatherer.class.getCanonicalName() + " (stripped query): " + modifiedQuery.toString());
+
     SourceProcessorResultTable res = jdbc.query(strippedSql,  new MapSqlParameterSource(bindVarService.convertBindVarsToSqlParameterMap(bindVars)), new SourceProcessorResultTableExtractor(null));
     
     SourceMetadata metadata = new SourceMetadata();
@@ -81,6 +86,17 @@ public class SQLQuerySourceMetadataGatherer implements QuerySourceMetadataGather
     return mapper.map(repository.save(metadata), SourceMetadataDto.class);
   }
 
+  /*
+  @Override
+  @Cacheable(value="sourceMetadata", key="sourceDto.id")
+  public SourceMetadataDto getSourceMetadata(SourceDto sourceDto, List<BindVar> bindVars)
+  {
+    logger.debug(SQLQuerySourceMetadataGatherer.class.getCanonicalName() + ": " + "getting sourceMetadata for source ID: " + sourceDto.getId());
+    repository.findOne(sourceDto.getSourceMetadata().getId())
+    return mapper.map(repository.save(metadata), SourceMetadataDto.class);
+  }
+  */
+  
   @Override
   @CacheEvict(value="sourceMetadata", allEntries=true)
   public void clearSourceMetadata()

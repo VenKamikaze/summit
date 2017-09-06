@@ -5,12 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import javax.validation.constraints.Size;
 
 import org.apache.commons.collections4.MapUtils;
-import org.awiki.kamikaze.summit.service.formatter.FormatEnums;
 import org.hibernate.validator.constraints.NotBlank;
 
 
@@ -26,7 +24,8 @@ public class FieldDto implements PageItem<String> {
   @NotBlank(message = "Must not be empty.")
   @Size(max = 10)
   private String                codeFieldSourceType;  // e.g. HTML, SQL, JSP
-  private String                source; // actual SQL/HTML/JSP code
+  //private String                source; // actual SQL/HTML/JSP code
+  private List<SourceDto>       source;
   private String                codeFieldDefaultValueSourceType; // e.g. HTML, SQL, JSP
   private String                defaultValueSource; // actual SQL/HTML/JSP code
   private String                notes;
@@ -61,7 +60,13 @@ public class FieldDto implements PageItem<String> {
   public void setCodeFieldSourceType(String codeFieldSourceType) {
     this.codeFieldSourceType = codeFieldSourceType;
   }
-  public String getSource() {
+  public List<SourceDto> getSource() {
+    return source;
+  }
+  public void setSource(List<SourceDto> source) {
+    this.source = source;
+  }
+  /*public String getSource() {
     return source;
   }
   public void setSource(String source) {
@@ -74,7 +79,8 @@ public class FieldDto implements PageItem<String> {
         this.source += src;
       }
     }
-  }
+  }*/
+  
   public String getCodeFieldDefaultValueSourceType() {
     return codeFieldDefaultValueSourceType;
   }
@@ -155,7 +161,7 @@ public class FieldDto implements PageItem<String> {
   @Override
   public void setProcessedSource(String t)
   {
-    // FIXME
+    postProcessedSource.setPostProcessedContent(t);
   }
   @Override
   public String getProcessedSource()

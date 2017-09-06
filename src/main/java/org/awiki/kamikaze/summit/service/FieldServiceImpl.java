@@ -10,6 +10,7 @@ import org.awiki.kamikaze.summit.dto.render.FieldDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
+import org.awiki.kamikaze.summit.dto.render.SourceDto;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,32 +30,34 @@ public class FieldServiceImpl implements FieldService {
       FieldDto.PostProcessedFieldContentDto processedContent = fieldDto.new PostProcessedFieldContentDto();
       FieldDto.PostProcessedFieldContentDto processedDefaultContent = fieldDto.new PostProcessedFieldContentDto();
       
+      // First, populate fields from any pre-region processing if exists.
       if (fieldsToPopulate.containsKey(fieldDto.getName()) ) {
-        // process this first, then override with other options to populate a field below.
-        // order should be: pageProcessing before regions populates a field, but
-        //  parameters can override,
-        //  OR field source can override (as this is the order processing occurs in).
-        throw new RuntimeException("IMPLEMENT ME!");
+        processedContent.setPostProcessedContent(fieldsToPopulate.get(fieldDto.getName()).getFieldValue().getResultValue());
       }
         
-      // Set the value from the page parameter if it exists, and ignore processing.
+      // Parameters in request can override pre-region processing, so second, set the value from the page parameter if it exists
       if(parameterMap.containsKey(fieldDto.getName())) {
         processedContent.setPostProcessedContent(parameterMap.get(fieldDto.getName()));
         fieldDto.setPostProcessedSource(processedContent);
       }
-      else { // process the source content to get the value
+      else { // process the source content to get the value, which can override pre-region processing, but not parameters in a request.
         SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(fieldDto.getCodeFieldSourceType());
-        processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource(), null).getResultValue()); // TODO FIXME handle bind vars
-        fieldDto.setPostProcessedSource(processedContent);
-
-        // Default value is optional
-        if(StringUtils.isNotBlank(fieldDto.getDefaultValueSource()))
-        {
-          processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() , null ).getResultValue() );  // TODO FIXME handle bind vars
-          fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
+        String processedSource = "";
+        for(SourceDto source : fieldDto.getSource()) {
+          processedSource += processor.processSource(source.getSource(), fieldDto.getCodeFieldSourceType(), null).getResultValue(); // TODO FIXME handle bind vars
         }
+        processedContent.setPostProcessedContent(processedSource);      
       }
-
+      
+      // Default value is optional, if set, and there's no processed content, it may be displayed.
+      if(StringUtils.isNotBlank(fieldDto.getDefaultValueSource()))
+      {
+        SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(fieldDto.getCodeFieldDefaultValueSourceType());
+        processedDefaultContent.setPostProcessedContent(processor.processSource( fieldDto.getDefaultValueSource() , fieldDto.getCodeFieldDefaultValueSourceType(), null ).getResultValue() );  // TODO FIXME handle bind vars
+        fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
+      }
+      
+      fieldDto.setPostProcessedSource(processedContent);
       fields.add(fieldDto);
     }
     return fields;

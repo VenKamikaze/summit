@@ -2,6 +2,7 @@ package org.awiki.kamikaze.summit.domain;
 // Generated Oct 31, 2013 9:11:16 PM by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -37,7 +38,7 @@ public class Field implements java.io.Serializable
   private CodeFieldType       codeFieldType;
   private CodeSourceType codeFieldSourceTypeByDefaultValueType;
   
-  private Set<Source>              source;
+  private List<Source>        source;
   
   // TODO: change to ManyToMany 
   //private String              defaultValue;
@@ -52,7 +53,7 @@ public class Field implements java.io.Serializable
 
   public Field(long id, CodeSourceType codeFieldSourceTypeBySourceType,
       CodeFieldType codeFieldType,
-      CodeSourceType codeFieldSourceTypeByDefaultValueType, Set<Source> source)
+      CodeSourceType codeFieldSourceTypeByDefaultValueType, List<Source> source)
   {
     this.id = id;
     this.codeFieldSourceTypeBySourceType = codeFieldSourceTypeBySourceType;
@@ -63,7 +64,7 @@ public class Field implements java.io.Serializable
 
   public Field(long id, CodeSourceType codeFieldSourceTypeBySourceType,
       CodeFieldType codeFieldType,
-      CodeSourceType codeFieldSourceTypeByDefaultValueType, Set<Source> source,
+      CodeSourceType codeFieldSourceTypeByDefaultValueType, List<Source> source,
       /*String defaultValue,*/ String notes, Set<RegionField> regionFields)
   {
     this.id = id;
@@ -141,12 +142,12 @@ public class Field implements java.io.Serializable
   @JoinTable(name="FIELD_SOURCE",
              joinColumns = { @JoinColumn(name="FIELD_ID", referencedColumnName="ID") },
              inverseJoinColumns = { @JoinColumn(name="SOURCE_ID", referencedColumnName="ID") })
-  public Set<Source> getSource()
+  public List<Source> getSource()
   {
     return this.source;
   }
 
-  public void setSource(Set<Source> source)
+  public void setSource(List<Source> source)
   {
     this.source = source;
   }

@@ -29,6 +29,7 @@ public class Source implements java.io.Serializable
   private Set<Field>                fields = new HashSet<Field>(0);
   private Set<PageProcessingSource> pageProcessingSource = new HashSet<PageProcessingSource>(0);
   private SourceMetadata            sourceMetadata = null;
+  // do we need a field that specifies the order to execute the source in (e.g. if you have a many Source attached to one field?)
   
   public Source()
   {

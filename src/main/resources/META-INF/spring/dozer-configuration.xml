@@ -50,10 +50,10 @@
       <a>codeFieldSourceTypeByDefaultValueType.code</a>
       <b>codeFieldDefaultValueSourceType</b>
     </field>
-    <field>
+    <!-- <field>
       <a>source</a>
       <b set-method="setSource(java.util.Set)">source</b>
-    </field>
+    </field> -->
   </mapping>  
 
   <!-- convenience when storing metadata on queries -->
