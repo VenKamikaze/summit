@@ -45,11 +45,13 @@ insert into FIELD values (-10000, -61, 'code', 'static', 'TEXT', null, null);
 insert into FIELD values (-10001, -61, 'description', 'static', 'TEXT', null, null);
 insert into FIELD values (-10002, -62, 'sort_order', 'static', 'NUMBER', null, null);
 insert into FIELD values (-10003, -61, 'source_identifier', 'static', 'TEXT', null, null);
+insert into FIELD values (-10004, -80, 'Save', 'static', 'SUBMIT', null, null);
 
 -- Attach the fields to the region
 insert into REGION_FIELD values (-10000, -10000, -10000, 1);
 insert into REGION_FIELD values (-10001, -10000, -10001, 2);
 insert into REGION_FIELD values (-10002, -10000, -10002, 3);
 insert into REGION_FIELD values (-10003, -10000, -10003, 4);
+insert into REGION_FIELD values (-10004, -10000, -10004, 5);
 
 commit;

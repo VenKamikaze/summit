@@ -36,6 +36,10 @@ insert into CODE_FIELD_TYPE
 insert into CODE_FIELD_TYPE
  values ('DROPDOWN', 'Drop-Down Field', 3);
 
+-- Button type (still treated as a field)
+insert into CODE_FIELD_TYPE
+ values ('SUBMIT', 'Submit Button', 100);
+
 insert into CODE_PROCESSING_TYPE
  values ('RENDER_PG1', 'Page Process On Page Render (before regions)', 1);
 
