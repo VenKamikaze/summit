@@ -24,6 +24,7 @@ public class PageProcessingServiceImpl implements PageProcessingService
   @Autowired
   private BindVarService bindVarService;
   
+  /* FIXME TODO: still relying on varchar only bind variables, allow other types */
   @Override
   public Map<String, PageProcessingSourceSelectDto> processSource(PageProcessingSourceDto processSourceDto,
           Map<String, String> parameterMap)
@@ -43,13 +44,15 @@ public class PageProcessingServiceImpl implements PageProcessingService
       final TabularQuerySourceProcessorService processor = sourceProcessors.getTabularSourceProcessorService(processSourceDto.getCodeSourceType());
       final SourceProcessorResultTable qResult = processor.executeQuery(processSourceDto.getSource(), 
               bindVarService.createVarcharBindVarsFromParameterMap(processSourceDto.getSource(), parameterMap));
-      for(PageProcessingSourceSelectDto res : processSourceDto.getPageProcessingSourceSelect()) {
-        final SourceProcessorResult cell = new SourceProcessorResult();
-        cell.setOutputMessage(SourceProcessorResult.STANDARD_SUCCESS_MESSAGE);
-        cell.setReturnCode(SourceProcessorResult.STANDARD_SUCCESS_CODE);
-        cell.setResultValue(qResult.getCellByXY(new Long(res.getFieldIndex()).intValue(), 1).getValue() ); // row 1 == first data row, since row 0 == header info
-        res.setFieldValue(cell);
-        results.put(res.getFieldName(), res);
+      if(qResult.getCount() > 0) {
+        for(PageProcessingSourceSelectDto res : processSourceDto.getPageProcessingSourceSelect()) {
+          final SourceProcessorResult cell = new SourceProcessorResult();
+          cell.setOutputMessage(SourceProcessorResult.STANDARD_SUCCESS_MESSAGE);
+          cell.setReturnCode(SourceProcessorResult.STANDARD_SUCCESS_CODE);
+          cell.setResultValue(qResult.getCellByXY(new Long(res.getFieldIndex()).intValue(), 1).getValue() ); // row 1 == first data row, since row 0 == header info
+          res.setFieldValue(cell);
+          results.put(res.getFieldName(), res);
+        }
       }
     }
     else {
@@ -57,11 +60,6 @@ public class PageProcessingServiceImpl implements PageProcessingService
     }
 
     return results;
-    // We need to cast the predicate columns to varchar if we have any parameterMap values being bound, so we don't get type conversion errors
-    // 
-    //processor.processSource(sourceDto.getSource(), sourceDto.getCodeSourceType(), )
-    
-    
   }
 
 }

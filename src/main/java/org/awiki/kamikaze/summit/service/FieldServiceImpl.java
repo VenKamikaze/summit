@@ -38,15 +38,13 @@ public class FieldServiceImpl implements FieldService {
       // Parameters in request can override pre-region processing, so second, set the value from the page parameter if it exists
       if(parameterMap.containsKey(fieldDto.getName())) {
         processedContent.setPostProcessedContent(parameterMap.get(fieldDto.getName()));
-        fieldDto.setPostProcessedSource(processedContent);
       }
       else { // process the source content to get the value, which can override pre-region processing, but not parameters in a request.
         SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(fieldDto.getCodeFieldSourceType());
-        String processedSource = "";
         for(SourceDto source : fieldDto.getSource()) {
-          processedSource += processor.processSource(source.getSource(), fieldDto.getCodeFieldSourceType(), null).getResultValue(); // TODO FIXME handle bind vars
+          processedContent.setPostProcessedContent(processedContent.getPostProcessedContent() + 
+                  processor.processSource(source.getSource(), fieldDto.getCodeFieldSourceType(), null).getResultValue()); // TODO FIXME handle bind vars
         }
-        processedContent.setPostProcessedContent(processedSource);      
       }
       
       // Default value is optional, if set, and there's no processed content, it may be displayed.

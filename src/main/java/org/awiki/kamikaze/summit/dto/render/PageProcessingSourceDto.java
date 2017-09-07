@@ -31,7 +31,7 @@ public class PageProcessingSourceDto {
   public List<PageProcessingSourceSelectDto> getPageProcessingSourceSelect() {
     return pageProcessingSourceSelect;
   }
-  public void setPageProcessingSourceSelectDto(List<PageProcessingSourceSelectDto> pageProcessingSourceSelect) {
+  public void setPageProcessingSourceSelect(List<PageProcessingSourceSelectDto> pageProcessingSourceSelect) {
     this.pageProcessingSourceSelect = pageProcessingSourceSelect;
   }
   public String getCodeSourceType() {
