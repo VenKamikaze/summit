@@ -22,6 +22,9 @@ insert into CODE_SOURCE_TYPE
 insert into CODE_REGION_TYPE 
  values ('Report', 'Report Region', 1, 'dml_report');
 
+insert into CODE_REGION_TYPE 
+ values ('Form', 'Form Region', 2, 'static');
+
 -- region position locations
 insert into CODE_REGION_POSITION 
  values ('body1', 'Top most region on template body', 3);
