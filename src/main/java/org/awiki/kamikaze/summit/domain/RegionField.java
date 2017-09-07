@@ -16,7 +16,8 @@ import javax.persistence.Table;
 @Table(name = "REGION_FIELD")
 public class RegionField implements java.io.Serializable
 {
-
+  private static final long serialVersionUID = -5590135847162158293L;
+  
   private long    id;
   private Field  field;
   private Region region;

@@ -2,6 +2,7 @@ package org.awiki.kamikaze.summit.domain;
 // Generated Oct 31, 2013 9:11:16 PM by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -13,6 +14,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.awiki.kamikaze.summit.domain.codetable.CodeRegionPosition;
@@ -28,11 +30,8 @@ public class Region implements java.io.Serializable
 {
 
   public static final String REGION_TYPE_REPORT = "Report";
-  /**
-   * 
-   */
+
   private static final long serialVersionUID = -4342338136016395303L;
-  
   
   private long                id;
   private CodeRegionPosition codeRegionPosition;
@@ -44,7 +43,7 @@ public class Region implements java.io.Serializable
   private Set<Source>        source;
   
   private Set<PageRegion>    pageRegions  = new HashSet<PageRegion>(0);
-  private Set<RegionField>   regionFields = new HashSet<RegionField>(0);
+  private Set<RegionField>   regionFields = new LinkedHashSet<RegionField>(0);
   private Template           template;
   
 
@@ -143,6 +142,7 @@ public class Region implements java.io.Serializable
   }
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "region")
+  @OrderBy(value="fieldNum asc")
   public Set<RegionField> getRegionFields()
   {
     return this.regionFields;

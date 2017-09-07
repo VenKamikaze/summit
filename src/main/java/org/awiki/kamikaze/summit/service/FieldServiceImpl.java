@@ -3,6 +3,7 @@ package org.awiki.kamikaze.summit.service;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +24,7 @@ public class FieldServiceImpl implements FieldService {
   private ProxySourceProcessorService sourceProcessors;
   
   public HashSet<PageItem<String>> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final Map<String, String> parameterMap) {
-    HashSet<PageItem<String>> fields = new HashSet<>();
+    LinkedHashSet<PageItem<String>> fields = new LinkedHashSet<>();
     
     for(RegionFieldDto regionFieldDto : regionFieldDtos) {
       final FieldDto fieldDto = regionFieldDto.getField();
