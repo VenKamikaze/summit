@@ -28,6 +28,8 @@ insert into region  (select -10000, id, 'Summit - Internal Edit - Edit CodeSourc
 
 insert into page_region select -10000, (select id from page where name like 'Summit - Internal Edit - Form Page'), id, id from region where name like 'Summit - Internal Edit - Edit CodeSourceType Form';
 
+--Retrieving values on PAGE_PROCESSING on GET is below
+
 -- Populate fields on page with this source
 insert into source values (-10000, 'select CODE, DESCRIPTION, SORT_ORDER, SOURCE_IDENTIFIER from CODE_SOURCE_TYPE where CODE = :code');
 
@@ -53,5 +55,13 @@ insert into REGION_FIELD values (-10001, -10000, -10001, 2);
 insert into REGION_FIELD values (-10002, -10000, -10002, 3);
 insert into REGION_FIELD values (-10003, -10000, -10003, 4);
 insert into REGION_FIELD values (-10004, -10000, -10004, 5);
+
+--Writing values using PAGE_PROCESSING on POST is below.
+
+-- The source bind values must match the field names that the values are submitted as.
+insert into source values (-10001, 'insert into CODE_SOURCE_TYPE values (:code, :description, :sort_order, :source_identifier)');
+-- Create the PageProcessing so it gets executed on a POST, then link to the source above
+insert into PAGE_PROCESSING (select -10001, id, 'POST1', 1 from PAGE where name like 'Summit - Internal Edit - Form Page');
+insert into PAGE_PROCESSING_SOURCE values (-10001, -10001, -10001, 'dml_modify');
 
 commit;

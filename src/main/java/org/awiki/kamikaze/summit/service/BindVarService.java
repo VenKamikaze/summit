@@ -7,6 +7,7 @@ import java.util.Map;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.util.MultiValueMap;
 
 public interface BindVarService
 {
@@ -24,7 +25,7 @@ public interface BindVarService
    * @param Map<String, String> parameterMap
    * @return List<BindVar> (each of Type varchar)
    */
-  public List<BindVar> createVarcharBindVarsFromParameterMap(final String query, final Map<String, String> parameterMap);
+  public List<BindVar> createVarcharBindVarsFromParameterMap(final String query, final MultiValueMap<String, String> parameterMap);
   
   /**
    * @param fields that have already been processed and have PostProcessed values.

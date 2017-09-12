@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
 @Service
 public class BindVarServiceImpl implements BindVarService
@@ -43,14 +44,14 @@ public class BindVarServiceImpl implements BindVarService
   }
 
   @Override
-  public List<BindVar> createVarcharBindVarsFromParameterMap(String regionQuery, final Map<String, String> parameterMap) {
+  public List<BindVar> createVarcharBindVarsFromParameterMap(String regionQuery, final MultiValueMap<String, String> parameterMap) {
     final Matcher m = bindParameters.matcher(regionQuery);
     
     final List<BindVar> bindVars = new ArrayList<>(parameterMap.size());
     
     while(m.find()) {
       if (parameterMap.containsKey(m.group(1))) {
-        bindVars.add(new BindVar(parameterMap.get(m.group(1)), java.sql.Types.VARCHAR, m.group(1)));
+        bindVars.add(new BindVar(parameterMap.get(m.group(1)).get(0), java.sql.Types.VARCHAR, m.group(1))); // TODO FIXME: work with multiple values!
       }
     }
     

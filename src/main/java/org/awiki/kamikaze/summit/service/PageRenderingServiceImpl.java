@@ -7,13 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.collections4.Predicate;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
-import org.awiki.kamikaze.summit.domain.PageProcessing;
-import org.awiki.kamikaze.summit.domain.codetable.CodeProcessingType;
 import org.awiki.kamikaze.summit.dto.render.PageDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingDto;
@@ -26,15 +20,14 @@ import org.awiki.kamikaze.summit.service.formatter.FormatterService;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
-import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
-import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
 /**
  * This is a top level service that co-ordinates the other sub-services to build up a full page.
@@ -81,17 +74,14 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    * (formatters) 6. Each formatter gets the appropriate template, and builds up a text representation of the page
    *                 appending content at the start of each format call.
    */
-  public String renderPageToString(long applicationId, long pageId, final Map<String, String> parameterMap) {
+  public String renderPageToString(long applicationId, long pageId, final MultiValueMap<String, String> parameterMap) {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     if(appPage != null)
     {
       PageDto pageDto = pageMapper.map(appPage.getPage());
-      
-      DebugUtils.debugObjectGetters(pageDto);
-      
-      return processPageItems(pageDto, parameterMap);
+      return renderPageItems(pageDto, parameterMap);
     }
-    return "Application " + applicationId + " does not exist.";
+    return "Application " + applicationId + ", page " + pageId + "  does not exist.";
   }
   
 
@@ -101,11 +91,11 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    * @param pageDto
    * @return
    */
-  private String processPageItems(final PageDto pageDto, final Map<String, String> parameterMap) {
+  private String renderPageItems(final PageDto pageDto, final MultiValueMap<String, String> parameterMap) {
     // Get the collection of pageItems in each region
     //Map<String, List<PageItem<?>>> regionPageItems = processRegionsForRender(pageDto);
     long start = System.nanoTime();
-    Map<String, PageProcessingSourceSelectDto> fieldsToPopulate = processPageRenderSource(pageDto.getPageRenderPreRegionPageProcessings(), parameterMap);
+    Map<String, PageProcessingSourceSelectDto> fieldsToPopulate = processPageProcessingSource(pageDto.getPageRenderPreRegionPageProcessings(), parameterMap);
     long end = System.nanoTime();
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processPageRenderSource took: " + (end - start) / 1000000 + "ms");
     
@@ -166,7 +156,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    * @param pageDto
    * @return Map<String, PageProcessingSourceSelectDto>
    */
-  private Map<String, PageProcessingSourceSelectDto> processPageRenderSource(final Collection<PageProcessingDto> pageProcesses, final Map<String, String> parameterMap) {
+  private Map<String, PageProcessingSourceSelectDto> processPageProcessingSource(final Collection<PageProcessingDto> pageProcesses, final MultiValueMap<String, String> parameterMap) {
     Map<String, PageProcessingSourceSelectDto> allResults = new HashMap<>();
     for(PageProcessingDto process : pageProcesses) {
       for(PageProcessingSourceDto sourceDto : process.getPageProcessingSource()) {
@@ -176,7 +166,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     return allResults;
   }
   
-  private void processRegionsForRender(final PageDto pageDto, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final Map<String, String> parameterMap)  {
+  private void processRegionsForRender(final PageDto pageDto, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final MultiValueMap<String, String> parameterMap)  {
     for(PageRegionDto pageRegionDto : pageDto.getPageRegions() ) {
       RegionDto regionDto = pageRegionDto.getRegionDto();
       Collection<PageItem<String>> regionItems = new ArrayList<>();
@@ -198,35 +188,59 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       }
     } 
   }
+
   
-  /*
-  private Map<String, List<PageItem<?>>> processRegionsForRender(final PageDto pageDto) {
-    Map<String, List<PageItem<?>>> processedRegions = new LinkedHashMap<>();
-    
-    
-    for(PageRegionDto pageRegionDto : pageDto.getPageRegions() ) {
-      List<PageItem<?>> content = new ArrayList<>();
-      if (processedRegions.containsKey(pageRegionDto.getRegionDto().getCodeRegionPosition()))
-      {
-        content = processedRegions.get(pageRegionDto.getRegionDto().getCodeRegionPosition());
-      }
-      
-      RegionDto regionDto = pageRegionDto.getRegionDto();
-      if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) )
-      {
-        ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
-        SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getSource().iterator().next(), null);
-        content.add(resultTable);
-      }
-      else
-      {
-        log.error("Found a " + regionDto.getCodeRegionType() + " ! FIXME: implement the processor!");
-      }
-      content.addAll(processFieldsForRender(regionDto.getRegionFields()));
-      processedRegions.put(pageRegionDto.getRegionDto().getCodeRegionPosition(), content);
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////// PAGE PROCESSING ON A POST BELOW //////////////////////////////////////////////////
+
+  @Override
+  public String processPageOnSubmit(long applicationId, long pageId, final MultiValueMap<String, String> submittedFormParams)
+  {
+    ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
+    if(appPage != null)
+    {
+      PageDto pageDto = pageMapper.map(appPage.getPage());
+      return processPageItemsOnSubmit(pageDto, submittedFormParams);
     }
-    return processedRegions;
-  }*/
+    return "Application " + applicationId + ", page " + pageId + "  does not exist.";
+  }
   
+  /**
+   * Pages (typically on a POST, but can also be on a GET) can have associated source that advises
+   *   if they should branch to another target page.
+   * This method processes the branching code, and returns the branchTarget (if any) that the client browser
+   *   should be redirected into.
+   * If more than one branch target is processed, the final one is returned only. 
+   * @return String branchTarget or null
+   */
+  private String processPageBranch(final Collection<PageProcessingDto> pageProcesses, final MultiValueMap<String, String> parameterMap) {
+    String branchTarget = null;
+    for(PageProcessingDto process : pageProcesses) {
+      for(PageProcessingSourceDto sourceDto : process.getPageProcessingSource()) { 
+        //branchTarget = pageProcessingService.processSource(sourceDto, parameterMap); // FIXME TODO
+      }
+    }
+    return branchTarget;
+  }
+  
+  /**
+   * 
+   * Renders this to a string. 
+   * @param pageDto
+   * @return
+   */
+  private String processPageItemsOnSubmit(final PageDto pageDto, final MultiValueMap<String, String> submittedFormParams) {
+    long start = System.nanoTime();
+    processPageProcessingSource(pageDto.getPagePostProcessings(), submittedFormParams);
+    long end = System.nanoTime();
+    log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processPageRenderSource took: " + (end - start) / 1000000 + "ms");
+
+    start = System.nanoTime();
+    String branchTarget = processPageBranch(pageDto.getPagePostProcessingBranches(), submittedFormParams); // FIXME TODO
+    end = System.nanoTime();
+    log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processPageBranch took: " + (end - start) / 1000000 + "ms");
+
+    return branchTarget;
+  }  
   
 }

@@ -17,6 +17,8 @@ import javax.persistence.Table;
 public class CodeProcessingType implements java.io.Serializable, CodeTable
 {
   public static final String CODE_PROCESS_BEFORE_REGIONS_1 = "RENDER_PG1";
+  public static final String CODE_PROCESS_POST_1 = "POST1";
+  public static final String CODE_PROCESS_POST_BRANCH_1 = "BRANCH1";
   
   private static final long serialVersionUID = -1417754221592950160L;
   

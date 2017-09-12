@@ -1,9 +1,9 @@
 package org.awiki.kamikaze.summit.util;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Arrays;
 
-import org.apache.commons.collections.MapUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 public class StringUtils
 {
@@ -26,19 +26,19 @@ public class StringUtils
     }
   }
   
-  public static Map<String, String> toParameterMap(final String pageParams)
+  public static MultiValueMap<String, String> toParameterMap(final String pageParams)
   {
     if(pageParams == null || pageParams.indexOf(PAGE_PARAM_KEYVALUE_SEPARATOR) < 1)
-      return MapUtils.EMPTY_MAP;
+      return new LinkedMultiValueMap<String, String>(0);
     
     final String varsAndValues[] = pageParams.split(PAGE_PARAM_KEYVALUE_SEPARATOR);
     final String vars[] = varsAndValues[0].split(PAGE_PARAM_ITEM_SEPARATOR);
     final String values[] = varsAndValues[1].split(PAGE_PARAM_ITEM_SEPARATOR);
     
-    Map<String, String> paramMap = new LinkedHashMap<>(vars.length);
+    MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>(vars.length);
     
     for(int i = 0; i < vars.length; i++) {
-      paramMap.put(vars[i], values[i]);
+      paramMap.put(vars[i], Arrays.asList(values[i])); // TODO handle multiple values in pageParams
     }
     
     return paramMap;

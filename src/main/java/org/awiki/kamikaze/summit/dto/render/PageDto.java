@@ -68,6 +68,24 @@ public class PageDto implements PageItem<String> {
   public Collection<PageProcessingDto> getPageRenderPreRegionPageProcessings() {
     return CollectionUtils.select(this.getPageProcessings(), PageProcessingService.PAGE_RENDER_PRE_REGION_PREDICATE);
   }
+
+  /**
+   * Gets all page processing items associated with this page that should execute on a POST.
+   * @return
+   */
+  @Transient
+  public Collection<PageProcessingDto> getPagePostProcessings() {
+    return CollectionUtils.select(this.getPageProcessings(), PageProcessingService.PAGE_POST_PROCESS_PREDICATE);
+  }
+  
+  /**
+   * Gets all page processing items associated with this page that execute on a POST and return a page branch target.
+   * @return
+   */
+  @Transient
+  public Collection<PageProcessingDto> getPagePostProcessingBranches() {
+    return CollectionUtils.select(this.getPageProcessings(), PageProcessingService.PAGE_RENDER_PRE_REGION_PREDICATE);
+  }
   
   public Set<ApplicationPageDto> getApplicationPages() {
     return applicationPages;

@@ -16,6 +16,7 @@ import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
 @Service
 public class FieldServiceImpl implements FieldService {
@@ -23,7 +24,7 @@ public class FieldServiceImpl implements FieldService {
   @Autowired
   private ProxySourceProcessorService sourceProcessors;
   
-  public HashSet<PageItem<String>> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final Map<String, String> parameterMap) {
+  public HashSet<PageItem<String>> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final MultiValueMap<String, String> parameterMap) {
     LinkedHashSet<PageItem<String>> fields = new LinkedHashSet<>();
     
     for(RegionFieldDto regionFieldDto : regionFieldDtos) {
@@ -38,7 +39,7 @@ public class FieldServiceImpl implements FieldService {
         
       // Parameters in request can override pre-region processing, so second, set the value from the page parameter if it exists
       if(parameterMap.containsKey(fieldDto.getName())) {
-        processedContent.setPostProcessedContent(parameterMap.get(fieldDto.getName()));
+        processedContent.setPostProcessedContent(parameterMap.get(fieldDto.getName()).get(0)); // TODO FIXME make this work with multiple values
       }
       else { // process the source content to get the value, which can override pre-region processing, but not parameters in a request.
         SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(fieldDto.getCodeFieldSourceType());

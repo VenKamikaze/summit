@@ -14,6 +14,7 @@ import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
 @Service
 public class PageProcessingServiceImpl implements PageProcessingService
@@ -27,7 +28,7 @@ public class PageProcessingServiceImpl implements PageProcessingService
   /* FIXME TODO: still relying on varchar only bind variables, allow other types */
   @Override
   public Map<String, PageProcessingSourceSelectDto> processSource(PageProcessingSourceDto processSourceDto,
-          Map<String, String> parameterMap)
+          MultiValueMap<String, String> parameterMap)
   {
     Map<String, PageProcessingSourceSelectDto> results = new HashMap<>(processSourceDto.getPageProcessingSourceSelect().size());
     if(SingularSourceProcessorService.SINGULAR_SOURCE_TYPES.contains(processSourceDto.getCodeSourceType())) {

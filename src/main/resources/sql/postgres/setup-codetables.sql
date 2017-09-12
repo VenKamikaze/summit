@@ -40,7 +40,12 @@ insert into CODE_FIELD_TYPE
 insert into CODE_FIELD_TYPE
  values ('SUBMIT', 'Submit Button', 100);
 
+-- Page RENDER processes. These execute on a page render.
 insert into CODE_PROCESSING_TYPE
  values ('RENDER_PG1', 'Page Process On Page Render (before regions)', 1);
+
+-- Page POST processes. These execute on a page POST/submit.
+insert into CODE_PROCESSING_TYPE
+ values ('POST1', 'Page Process On Page POST', 2);
 
 commit;
