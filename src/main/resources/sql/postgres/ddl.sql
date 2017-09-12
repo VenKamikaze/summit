@@ -289,6 +289,20 @@ create table REGION_FIELD
   FIELD_NUM bigint not null
 );
 
+-- Whether the linked items should be processed or not
+create table CONDITIONAL
+(
+  ID bigint primary key,
+  SOURCE_ID bigint not null references SOURCE(ID)
+);
+
+create table PAGE_PROCESSING_CONDITIONAL
+(
+  ID bigint primary key,
+  PAGE_PROCESSING_ID bigint not null references PAGE_PROCESSING(ID),
+  CONDITIONAL_ID bigint not null references CONDITIONAL(ID)
+);
+
 create sequence application_seq start 1;
 create sequence page_seq start 1;
 create sequence region_seq start 1;

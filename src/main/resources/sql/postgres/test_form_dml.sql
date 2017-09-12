@@ -59,7 +59,8 @@ insert into REGION_FIELD values (-10004, -10000, -10004, 5);
 --Writing values using PAGE_PROCESSING on POST is below.
 
 -- The source bind values must match the field names that the values are submitted as.
-insert into source values (-10001, 'insert into CODE_SOURCE_TYPE values (:code, :description, :sort_order, :source_identifier)');
+insert into source values (-10001, 'insert into CODE_SOURCE_TYPE values (:code, :description, CAST(:sort_order as NUMERIC), :source_identifier)'); -- TODO dynamically handle field types rather than needing a CAST
+
 -- Create the PageProcessing so it gets executed on a POST, then link to the source above
 insert into PAGE_PROCESSING (select -10001, id, 'POST1', 1 from PAGE where name like 'Summit - Internal Edit - Form Page');
 insert into PAGE_PROCESSING_SOURCE values (-10001, -10001, -10001, 'dml_modify');
