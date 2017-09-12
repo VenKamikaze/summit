@@ -9,8 +9,10 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.awiki.kamikaze.summit.domain.codetable.CodeProcessingType;
@@ -35,6 +37,8 @@ public class PageProcessing implements java.io.Serializable
   private CodeProcessingType         codeProcessingType;    // e.g. clear session state, DML, redirect to another page
   private long                       processingNum;         // in which order this processing occurs.
   private List<PageProcessingSource> pageProcessingSource = new ArrayList<>();
+  
+  private Conditional                conditional = null;
 
   public PageProcessing()
   {
@@ -118,4 +122,17 @@ public class PageProcessing implements java.io.Serializable
     this.pageProcessingSource = pageProcessingSource;
   }
 
+  @OneToOne
+  @JoinTable(name = "PAGE_PROCESSING_CONDITIONAL",
+          joinColumns = { @JoinColumn(name = "PAGE_PROCESSING_ID", referencedColumnName = "ID") },
+          inverseJoinColumns = { @JoinColumn(name = "CONDITIONAL_ID", referencedColumnName = "ID") })
+  public Conditional getConditional()
+  {
+    return conditional;
+  }
+
+  public void setConditional(Conditional conditional)
+  {
+    this.conditional = conditional;
+  }
 }

@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -28,6 +29,8 @@ public class Source implements java.io.Serializable
   private Set<Region>               regions = new HashSet<Region>(0);
   private Set<Field>                fields = new HashSet<Field>(0);
   private Set<PageProcessingSource> pageProcessingSource = new HashSet<PageProcessingSource>(0);
+  
+  private Conditional               conditional = null;
   private SourceMetadata            sourceMetadata = null;
   // do we need a field that specifies the order to execute the source in (e.g. if you have a many Source attached to one field?)
   
@@ -106,6 +109,17 @@ public class Source implements java.io.Serializable
   public void setPageProcessingSource(Set<PageProcessingSource> pageProcessingSource)
   {
     this.pageProcessingSource = pageProcessingSource;
+  }
+  
+  @OneToOne(mappedBy = "source", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  public Conditional getConditional()
+  {
+    return conditional;
+  }
+
+  public void setConditional(Conditional conditional)
+  {
+    this.conditional = conditional;
   }
 
   @OneToOne(mappedBy = "source", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
