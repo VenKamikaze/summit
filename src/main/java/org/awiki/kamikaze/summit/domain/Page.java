@@ -3,6 +3,7 @@ package org.awiki.kamikaze.summit.domain;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -26,9 +27,9 @@ public class Page implements java.io.Serializable
   private static final long serialVersionUID = -2500329708942281643L;
   
   private long                  id;
-  private Set<PageRegion>      pageRegions      = new HashSet<PageRegion>(0);
+  private Set<PageRegion>       pageRegions      = new LinkedHashSet<PageRegion>(0);
   private List<PageProcessing>  pageProcessings  = new ArrayList<PageProcessing>(0);
-  private Set<ApplicationPage> applicationPages = new HashSet<ApplicationPage>(0);
+  private Set<ApplicationPage>  applicationPages = new HashSet<ApplicationPage>(0);
 
   //changed definition
   private String               name;
@@ -66,6 +67,7 @@ public class Page implements java.io.Serializable
   }
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "page")
+  @OrderBy(value="regionNum")
   public Set<PageRegion> getPageRegions()
   {
     return this.pageRegions;

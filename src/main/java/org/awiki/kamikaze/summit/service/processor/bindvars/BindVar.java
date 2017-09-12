@@ -39,14 +39,12 @@ public class BindVar
   
   public String getTypeNameAsString() {
     for(Field field : Types.class.getFields()) {
-      try
-      {
+      try {
         if(this.type == (int) field.get(null)) {
           return field.getName();
         }
       }
-      catch (IllegalArgumentException | IllegalAccessException e)
-      {
+      catch (IllegalArgumentException | IllegalAccessException e) {
         throw new RuntimeException("Unexpected exception when determining java.sql.type with int = " + this.type, e);
       }
     }

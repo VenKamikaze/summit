@@ -6,9 +6,9 @@ Limitations:
 * Bind variable scraping is done via a simple regex, that just searches SQL for a word after a ":". This will then probably cause issues for SQL that contains a ':' for something that is not a bind variable (e.g. within a search string predicate etc).
 
 TODO:
+* Page POST processing when using 'dml_modify' as source type requires the SQL query to include CASTs, as all bind variables are treated as VARCHAR.
+** Unsure how to approach a fix for this at present, perhaps we include the field types/java SQL types in the form?
 * Report region HTML templates for mustache are hard coded in javascript, need to add REST call to pull this down from server.
-* Field processing occurs on page render, but has not been implemented when using REST services for page filtering. Do we need this on page filtering as well? Or are we happy to only pass in existing form data to the REST services?
-
 
 
 (done, although may need to add more vars:)
