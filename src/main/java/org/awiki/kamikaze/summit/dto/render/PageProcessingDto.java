@@ -25,6 +25,8 @@ public class PageProcessingDto {
   
   private List<PageProcessingSourceDto> pageProcessingSourceDtos = new ArrayList<>();
 
+  private ConditionalDto conditionalDto;
+  
   public Long getId() {
     return id;
   }
