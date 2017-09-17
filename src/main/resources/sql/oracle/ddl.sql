@@ -7,6 +7,12 @@ create table CODE_SOURCE_TYPE
   SOURCE_IDENTIFIER varchar2(200) not null unique
 );
 
+create table CODE_CONDITIONAL_TYPE
+(
+  CODE varchar2(10) primary key,
+  DESCRIPTION varchar2(200) not null,
+  SORT_ORDER number(19) not null
+);
 
 /*
  * Appears unused as of July 2017
@@ -290,7 +296,9 @@ create table REGION_FIELD
 create table CONDITIONAL
 (
   ID number(19) primary key,
-  SOURCE_ID number(19) not null references SOURCE(ID)
+  SOURCE_ID number(19) not null references SOURCE(ID),
+  SOURCE_TYPE_CODE varchar2(10) references CODE_SOURCE_TYPE(CODE),
+  CONDITIONAL_TYPE_CODE varchar2(10) references CODE_CONDITIONAL_TYPE(CODE)
 );
 
 create table PAGE_PROCESSING_CONDITIONAL

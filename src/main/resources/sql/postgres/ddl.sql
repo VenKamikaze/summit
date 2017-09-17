@@ -8,6 +8,13 @@ create table CODE_SOURCE_TYPE
   SOURCE_IDENTIFIER character varying(200) not null unique
 );
 
+---------- tables - run as summit
+create table CODE_CONDITIONAL_TYPE
+(
+  CODE character varying(10) primary key,
+  DESCRIPTION character varying(200) not null,
+  SORT_ORDER bigint not null
+);
 
 /*
 -- appears unused as of July 2017
@@ -293,7 +300,9 @@ create table REGION_FIELD
 create table CONDITIONAL
 (
   ID bigint primary key,
-  SOURCE_ID bigint not null references SOURCE(ID)
+  SOURCE_ID bigint not null references SOURCE(ID),  
+  SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE),
+  CONDITIONAL_TYPE_CODE character varying(10) references CODE_CONDITIONAL_TYPE(CODE)
 );
 
 create table PAGE_PROCESSING_CONDITIONAL
