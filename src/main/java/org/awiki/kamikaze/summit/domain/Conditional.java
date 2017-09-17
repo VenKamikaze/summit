@@ -7,8 +7,12 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.awiki.kamikaze.summit.domain.codetable.CodeConditionalType;
+import org.awiki.kamikaze.summit.domain.codetable.CodeSourceType;
 
 @Entity
 @Table(name = "CONDITIONAL")
@@ -18,6 +22,9 @@ public class Conditional implements java.io.Serializable
   
   private long     id;
   private Source   source = null;
+  
+  private CodeSourceType codeSourceType;
+  private CodeConditionalType codeConditionalType;
 
   public Conditional()
   {
@@ -53,4 +60,28 @@ public class Conditional implements java.io.Serializable
     this.source = source;
   }
 
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "SOURCE_TYPE_CODE", nullable = false)
+  public CodeSourceType getSourceTypeCode()
+  {
+    return this.codeSourceType;
+  }
+
+  public void setSourceTypeCode(
+          CodeSourceType codeSourceType)
+  {
+    this.codeSourceType = codeSourceType;
+  }
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "CONDITIONAL_TYPE_CODE", nullable = false)
+  public CodeConditionalType getCodeConditionalType()
+  {
+    return codeConditionalType;
+  }
+
+  public void setCodeConditionalType(CodeConditionalType codeConditionalType)
+  {
+    this.codeConditionalType = codeConditionalType;
+  }
 }

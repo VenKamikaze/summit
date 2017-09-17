@@ -7,6 +7,9 @@ public class ConditionalDto
   private long     id;
   private SourceDto   source = null;
 
+  private String                codeSourceType;          // e.g. dml_selcel
+  private String                codeConditionalType;     // e.g. TEXT_TRUE (returns 'true' as text for true result)
+  
   private SourceProcessorResult processedSource;
   
   public enum CONDITIONAL {
@@ -23,6 +26,7 @@ public class ConditionalDto
     }
   }
   
+  // Defaults to ALWAYS_TRUE if not set.
   public static ConditionalDto ALWAYS_TRUE = new ConditionalDto();
   static {
     ALWAYS_TRUE.setProcessedSource(new SourceProcessorResult());
@@ -59,6 +63,26 @@ public class ConditionalDto
   public void setSource(SourceDto source)
   {
     this.source = source;
+  }
+  
+  public String getCodeSourceType()
+  {
+    return codeSourceType;
+  }
+
+  public void setCodeSourceType(String codeSourceType)
+  {
+    this.codeSourceType = codeSourceType;
+  }
+
+  public String getCodeConditionalType()
+  {
+    return codeConditionalType;
+  }
+
+  public void setCodeConditionalType(String codeConditionalType)
+  {
+    this.codeConditionalType = codeConditionalType;
   }
 
   public SourceProcessorResult getProcessedSource()
