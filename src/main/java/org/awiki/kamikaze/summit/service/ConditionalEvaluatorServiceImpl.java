@@ -1,12 +1,8 @@
 package org.awiki.kamikaze.summit.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang3.NotImplementedException;
 import org.awiki.kamikaze.summit.domain.codetable.CodeConditionalType;
 import org.awiki.kamikaze.summit.dto.render.ConditionalDto;
-import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SQLQuerySourceProcessorServiceImpl;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
@@ -14,8 +10,10 @@ import org.awiki.kamikaze.summit.service.processor.TabularQuerySourceProcessorSe
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
+@Service
 public class ConditionalEvaluatorServiceImpl implements ConditionalEvaluatorService
 {
   @Autowired
@@ -30,13 +28,13 @@ public class ConditionalEvaluatorServiceImpl implements ConditionalEvaluatorServ
     
     final SourceProcessorResult sResult;
     
-    if(SingularSourceProcessorService.BUILT_IN_SQL_DML_SELECT_CELL_TYPE.equals(condition.getCodeSourceType())) {
-      final SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(condition.getCodeSourceType());
-      sResult = processor.processSource(condition.getSource().getSource(), condition.getCodeSourceType(), 
+    if(SingularSourceProcessorService.BUILT_IN_SQL_DML_SELECT_CELL_TYPE.equals(condition.getSourceTypeCode())) {
+      final SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(condition.getSourceTypeCode());
+      sResult = processor.processSource(condition.getSource().getSource(), condition.getSourceTypeCode(), 
               bindVarService.createVarcharBindVarsFromParameterMap(condition.getSource().getSource(), parameterMap));
     }
-    else if(SQLQuerySourceProcessorServiceImpl.BUILT_IN_SQL_DML_SELECT_ROW_TYPE.equals(condition.getCodeSourceType())) {
-      final TabularQuerySourceProcessorService processor = sourceProcessors.getTabularSourceProcessorService(condition.getCodeSourceType());
+    else if(SQLQuerySourceProcessorServiceImpl.BUILT_IN_SQL_DML_SELECT_ROW_TYPE.equals(condition.getSourceTypeCode())) {
+      final TabularQuerySourceProcessorService processor = sourceProcessors.getTabularSourceProcessorService(condition.getSourceTypeCode());
       final SourceProcessorResultTable qResult = processor.executeQuery(condition.getSource().getSource(), 
               bindVarService.createVarcharBindVarsFromParameterMap(condition.getSource().getSource(), parameterMap));
       if(qResult.getCount() > 0) {
@@ -47,7 +45,7 @@ public class ConditionalEvaluatorServiceImpl implements ConditionalEvaluatorServ
       }
     }
     else {
-      throw new NotImplementedException("Unknown source type for conditional: " + condition.getCodeSourceType());
+      throw new NotImplementedException("Unknown source type for conditional: " + condition.getSourceTypeCode());
     }
 
     return evaluateConditionResult(sResult, condition.getCodeConditionalType());

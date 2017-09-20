@@ -5,6 +5,9 @@ public class SourceProcessorResult
   public static long STANDARD_SUCCESS_CODE = 0;
   public static String STANDARD_SUCCESS_MESSAGE = "Success";
   
+  public static long STANDARD_NO_RESULT_CODE = -1;
+  public static String STANDARD_NO_RESULT_MESSAGE = "No data found.";
+  
   private Long rowsAffected;
   private long returnCode;
   private String outputMessage;

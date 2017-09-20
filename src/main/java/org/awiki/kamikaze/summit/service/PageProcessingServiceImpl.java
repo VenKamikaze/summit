@@ -25,12 +25,23 @@ public class PageProcessingServiceImpl implements PageProcessingService
   @Autowired
   private BindVarService bindVarService;
   
+  @Autowired
+  private ConditionalEvaluatorService conditionalService;
+  
   /* FIXME TODO: still relying on varchar only bind variables, allow other types */
   @Override
   public Map<String, PageProcessingSourceSelectDto> processSource(PageProcessingSourceDto processSourceDto,
           MultiValueMap<String, String> parameterMap)
   {
     Map<String, PageProcessingSourceSelectDto> results = new HashMap<>(processSourceDto.getPageProcessingSourceSelect().size());
+    
+    // If this is a conditional piece of processing, only continue if we pass the conditional test.
+    if(processSourceDto.getPageProcessing().getConditional() != null) {
+      if (! conditionalService.evaluate(processSourceDto.getPageProcessing().getConditional(), parameterMap)) {
+        return results;
+      }
+    }
+    
     if(SingularSourceProcessorService.SINGULAR_SOURCE_TYPES.contains(processSourceDto.getCodeSourceType())) {
       final SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(processSourceDto.getCodeSourceType());
       final SourceProcessorResult sResult = processor.processSource(processSourceDto.getSource(), processSourceDto.getCodeSourceType(), 

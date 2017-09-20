@@ -29,6 +29,15 @@ Summit.Page = Summit.Page || {
       }
     }
 
+  },
+
+  submit : function(el) {
+    var form = (el != null && el.length > 0) ? el.form : $();
+    if (form) {
+      form.submit();
+      return true;
+    }
+    return false;
   }
 
 }

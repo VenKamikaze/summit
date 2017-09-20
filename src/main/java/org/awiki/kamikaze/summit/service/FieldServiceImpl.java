@@ -1,15 +1,21 @@
 package org.awiki.kamikaze.summit.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.dto.render.FieldDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
+import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.dto.render.SourceDto;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
@@ -71,5 +77,23 @@ public class FieldServiceImpl implements FieldService {
       nameFieldMap.put(field.getName(), field);
     }
     return nameFieldMap;
+  }
+
+  @Override
+  public FieldDto findFieldWithName(final RegionDto regionDto, final String name)
+  {
+    RegionFieldDto rf = IterableUtils.find(regionDto.getRegionFields(), new Predicate<RegionFieldDto>() {
+      @Override
+      public boolean evaluate(RegionFieldDto rf)
+      {
+        return rf != null && rf.getField() != null &&
+                 name.equals(rf.getField().getName());
+      }
+    });
+    
+    if(rf != null) {
+      return rf.getField();
+    }
+    return null;
   }
 }

@@ -1,12 +1,19 @@
 package org.awiki.kamikaze.summit.dto.render;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.persistence.OrderBy;
+import javax.persistence.Transient;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.awiki.kamikaze.summit.service.FieldService;
 import org.awiki.kamikaze.summit.service.formatter.FormatEnums;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -134,7 +141,14 @@ public class RegionDto implements PageItem<String> {
   @Override
   public Map<String, String> getReplacementVariables()
   {
-    return new TreeMap<String, String>() {{ put(FormatEnums.REPLACEMENT_REGION_ID_VARIABLE.toString(), getId().toString()); }}; 
+    Map<String, String> result = new TreeMap<String, String>();
+    result.put(FormatEnums.REPLACEMENT_REGION_ID_VARIABLE.toString(), getId().toString());
+    return result;
   }
 
+  @Transient
+  @OrderBy("fieldNum")
+  public List<RegionFieldDto> getButtons() {
+    return new ArrayList<>(CollectionUtils.select(this.regionFields, FieldService.BUTTONS_PREDICATE));
+  }
 }

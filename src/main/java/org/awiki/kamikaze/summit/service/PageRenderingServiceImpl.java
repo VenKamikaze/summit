@@ -5,9 +5,12 @@ import static org.awiki.kamikaze.summit.domain.Region.REGION_TYPE_REPORT;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
+import org.awiki.kamikaze.summit.dto.render.FieldDto;
 import org.awiki.kamikaze.summit.dto.render.PageDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingDto;
@@ -15,6 +18,7 @@ import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceDto;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
+import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.service.formatter.FormatterService;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
@@ -36,6 +40,8 @@ import org.springframework.util.MultiValueMap;
  */
 @Service
 public class PageRenderingServiceImpl implements PageRenderingService {
+  
+  public static final String REQUEST = "REQUEST"; // reserved bind variable for referencing submit actions in a POST.
   
   private static final Logger log = LoggerFactory.getLogger(PageRenderingServiceImpl.class);
   
@@ -156,7 +162,8 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    * @param pageDto
    * @return Map<String, PageProcessingSourceSelectDto>
    */
-  private Map<String, PageProcessingSourceSelectDto> processPageProcessingSource(final Collection<PageProcessingDto> pageProcesses, final MultiValueMap<String, String> parameterMap) {
+  private Map<String, PageProcessingSourceSelectDto> processPageProcessingSource(final Collection<PageProcessingDto> pageProcesses, 
+          final MultiValueMap<String, String> parameterMap) {
     Map<String, PageProcessingSourceSelectDto> allResults = new HashMap<>();
     for(PageProcessingDto process : pageProcesses) {
       for(PageProcessingSourceDto sourceDto : process.getPageProcessingSource()) {
@@ -213,7 +220,8 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    * If more than one branch target is processed, the final one is returned only. 
    * @return String branchTarget or null
    */
-  private String processPageBranch(final Collection<PageProcessingDto> pageProcesses, final MultiValueMap<String, String> parameterMap) {
+  private String processPageBranch(final Collection<PageProcessingDto> pageProcesses, final MultiValueMap<String, String> parameterMap,
+          final String submitAction) {
     String branchTarget = null;
     for(PageProcessingDto process : pageProcesses) {
       for(PageProcessingSourceDto sourceDto : process.getPageProcessingSource()) { 
@@ -224,19 +232,61 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   }
   
   /**
-   * 
-   * Renders this to a string. 
+   * We validate that the submit action exists as a button in the submitted form.
+   * This means forms MUST have a button type matching the name of the submit action
+   *   for the action to be valid and processed by summit.
    * @param pageDto
-   * @return
+   * @param submittedFormParams
+   * @return buttonName or empty if not found.
+   */
+  private String determineSubmittedButton(final PageDto pageDto, final MultiValueMap<String, String> submittedFormParams) {
+    final List<String> formIds = submittedFormParams.get(FieldService.FIELD_SUBMITTED_FORM_NAME);
+    if(formIds != null && formIds.size() == 1) {
+      if(StringUtils.isNotBlank(formIds.get(0)) && formIds.get(0).length() > FieldService.FORM_ID_PREFIX.length()) {
+        Long regionIdSubmitted = Long.valueOf(formIds.get(0).substring(FieldService.FORM_ID_PREFIX.length()));
+        RegionDto region = getRegionWithId(pageDto, regionIdSubmitted);
+        Collection<RegionFieldDto> rfButtons = region.getButtons();
+        for(RegionFieldDto rfButton: rfButtons) {
+          if(submittedFormParams.containsKey(rfButton.getField().getName())) {
+            return rfButton.getField().getName();
+          }
+        }
+      }
+    }
+    return StringUtils.EMPTY;
+  }
+  
+  private RegionDto getRegionWithId(PageDto pageDto, Long regionId) {
+    for(PageRegionDto pr: pageDto.getPageRegions()) {
+      if(regionId.equals(pr.getRegionDto().getId())) {
+        return pr.getRegionDto();
+      }
+    }
+    return null;
+  }
+  
+  /**
+   * 
+   *  
+   * @param pageDto, Map<String,String> (submittedFormParams)
+   * @return String identifying target page to branch to.
    */
   private String processPageItemsOnSubmit(final PageDto pageDto, final MultiValueMap<String, String> submittedFormParams) {
     long start = System.nanoTime();
-    processPageProcessingSource(pageDto.getPagePostProcessings(), submittedFormParams);
+    final String submitAction = determineSubmittedButton(pageDto, submittedFormParams);
     long end = System.nanoTime();
+    
+    log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": determineSubmittedButton took: " + (end - start) / 1000000 + "ms");
+    submittedFormParams.add(REQUEST, submitAction); // add it even if it's empty, so we don't get null pointers if :REQUEST is used in a source statement.
+    
+    start = System.nanoTime();
+    processPageProcessingSource(pageDto.getPagePostProcessings(), submittedFormParams);
+    end = System.nanoTime();
+    
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processPageRenderSource took: " + (end - start) / 1000000 + "ms");
 
     start = System.nanoTime();
-    String branchTarget = processPageBranch(pageDto.getPagePostProcessingBranches(), submittedFormParams); // FIXME TODO
+    String branchTarget = processPageBranch(pageDto.getPagePostProcessingBranches(), submittedFormParams, submitAction); // FIXME TODO
     end = System.nanoTime();
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processPageBranch took: " + (end - start) / 1000000 + "ms");
 

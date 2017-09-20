@@ -48,4 +48,11 @@ insert into CODE_PROCESSING_TYPE
 insert into CODE_PROCESSING_TYPE
  values ('POST1', 'Page Process On Page POST', 2);
 
+-- Conditions that must evaluate to true for attached code to execute.
+insert into CODE_CONDITIONAL_TYPE
+ values ('TEXT_TRUE', 'Source returns "true" as text', 1);
+
+insert into CODE_CONDITIONAL_TYPE
+ values ('EXISTS', 'Source returns non-null value or row', 2);
+
 commit;

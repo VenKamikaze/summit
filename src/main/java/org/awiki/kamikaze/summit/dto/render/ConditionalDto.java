@@ -65,12 +65,12 @@ public class ConditionalDto
     this.source = source;
   }
   
-  public String getCodeSourceType()
+  public String getSourceTypeCode()
   {
     return codeSourceType;
   }
 
-  public void setCodeSourceType(String codeSourceType)
+  public void setSourceTypeCode(String codeSourceType)
   {
     this.codeSourceType = codeSourceType;
   }

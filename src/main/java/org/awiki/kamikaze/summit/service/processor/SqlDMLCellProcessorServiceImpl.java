@@ -7,6 +7,7 @@ import java.util.List;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -59,9 +60,16 @@ public class SqlDMLCellProcessorServiceImpl implements SingularSourceProcessorSe
     SqlParameterSource params = mapBindVars(bindVars);
     
     SourceProcessorResult result = new SourceProcessorResult();
-    result.setResultValue(jdbc.queryForObject(sql, params, String.class));
-    result.setReturnCode(SourceProcessorResult.STANDARD_SUCCESS_CODE);
-    result.setOutputMessage(SourceProcessorResult.STANDARD_SUCCESS_MESSAGE);
+    try {
+      result.setResultValue(jdbc.queryForObject(sql, params, String.class));
+      result.setReturnCode(SourceProcessorResult.STANDARD_SUCCESS_CODE);
+      result.setOutputMessage(SourceProcessorResult.STANDARD_SUCCESS_MESSAGE);
+    }
+    catch(EmptyResultDataAccessException emptyE) {
+      result.setResultValue(null);
+      result.setReturnCode(SourceProcessorResult.STANDARD_NO_RESULT_CODE);
+      result.setOutputMessage(SourceProcessorResult.STANDARD_NO_RESULT_MESSAGE);
+    }
     return result;
     /*
     List<String> results = jdbc.queryForList(sql, String.class);

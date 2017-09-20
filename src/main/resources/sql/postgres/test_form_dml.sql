@@ -43,11 +43,12 @@ insert into PAGE_PROCESSING_SOURCE_SELECT values (-10002, -10000, 2, 'sort_order
 insert into PAGE_PROCESSING_SOURCE_SELECT values (-10003, -10000, 3, 'source_identifier');
 
 -- Create the fields, make sure the names correspond with the names in PAGE_PROCESSING_SOURCE_SELECT or we won't get values populated.
-insert into FIELD values (-10000, -61, 'code', 'static', 'TEXT', null, null);
-insert into FIELD values (-10001, -61, 'description', 'static', 'TEXT', null, null);
-insert into FIELD values (-10002, -62, 'sort_order', 'static', 'NUMBER', null, null);
-insert into FIELD values (-10003, -61, 'source_identifier', 'static', 'TEXT', null, null);
-insert into FIELD values (-10004, -80, 'Save', 'static', 'SUBMIT', null, null);
+-- not best approach? will put this in the template for the form instead. insert into FIELD values (-10000, -60, '__SUBMITTED_FORM_ID__', 'static', 'TEXT', null, null);
+insert into FIELD values (-10001, -61, 'code', 'static', 'TEXT', null, null);
+insert into FIELD values (-10002, -61, 'description', 'static', 'TEXT', null, null);
+insert into FIELD values (-10003, -62, 'sort_order', 'static', 'NUMBER', null, null);
+insert into FIELD values (-10004, -61, 'source_identifier', 'static', 'TEXT', null, null);
+insert into FIELD values (-10005, -80, 'Save', 'static', 'SUBMIT', null, null);
 
 -- Attach the fields to the region
 insert into REGION_FIELD values (-10000, -10000, -10000, 1);
@@ -64,5 +65,10 @@ insert into source values (-10001, 'insert into CODE_SOURCE_TYPE values (:code, 
 -- Create the PageProcessing so it gets executed on a POST, then link to the source above
 insert into PAGE_PROCESSING (select -10001, id, 'POST1', 1 from PAGE where name like 'Summit - Internal Edit - Form Page');
 insert into PAGE_PROCESSING_SOURCE values (-10001, -10001, -10001, 'dml_modify');
+
+-- Conditional processing of insert above.
+insert into source values (-10002, 'select ''true'' where :REQUEST = ''Save''');
+insert into CONDITIONAL values (-10000, -10002, 'dml_selcel', 'TEXT_TRUE');
+insert into PAGE_PROCESSING_CONDITIONAL values (-10000, -10001, -10000); -- links it to the PAGE_PROCESSING_SOURCE
 
 commit;
