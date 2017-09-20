@@ -6,12 +6,15 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.awiki.kamikaze.summit.domain.codetable.CodeConditionalType;
 import org.awiki.kamikaze.summit.dto.render.ConditionalDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.service.formatter.GenericFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SQLQuerySourceProcessorServiceImpl;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.TabularQuerySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
@@ -19,6 +22,8 @@ import org.springframework.util.MultiValueMap;
 @Service
 public class ConditionalEvaluatorServiceImpl implements ConditionalEvaluatorService
 {
+  private static final Logger log = LoggerFactory.getLogger(ConditionalEvaluatorServiceImpl.class);
+  
   @Autowired
   private ProxySourceProcessorService sourceProcessors;
   
@@ -64,7 +69,12 @@ public class ConditionalEvaluatorServiceImpl implements ConditionalEvaluatorServ
       
       case CodeConditionalType.CODE_CONDITIONAL_EXISTS:
       {
-        return null != conditionResult && null != conditionResult.getResultValue();
+        return null != conditionResult && SourceProcessorResult.STANDARD_SUCCESS_CODE == conditionResult.getReturnCode();
+      }
+      
+      case CodeConditionalType.CODE_CONDITIONAL_NOT_EXISTS:
+      {
+        return null == conditionResult || SourceProcessorResult.STANDARD_NO_RESULT_CODE == conditionResult.getReturnCode();
       }
       
       default:
@@ -97,7 +107,9 @@ public class ConditionalEvaluatorServiceImpl implements ConditionalEvaluatorServ
       throw new NotImplementedException("Unknown source type for conditional: " + condition.getSourceTypeCode());
     }
 
-    return evaluateConditionResult(sResult, condition.getCodeConditionalType());
+    boolean result = evaluateConditionResult(sResult, condition.getCodeConditionalType());
+    log.debug("Conditional eval result was: " + result + " for source: " + condition.getSource().getSource());
+    return result;
   }
   
 }

@@ -49,13 +49,16 @@ insert into FIELD values (-10002, -61, 'description', 'static', 'TEXT', null, nu
 insert into FIELD values (-10003, -62, 'sort_order', 'static', 'NUMBER', null, null);
 insert into FIELD values (-10004, -61, 'source_identifier', 'static', 'TEXT', null, null);
 insert into FIELD values (-10005, -80, 'Save', 'static', 'SUBMIT', null, null);
+insert into FIELD values (-10006, -80, 'Update', 'static', 'SUBMIT', null, null);
 
 -- Attach the fields to the region
-insert into REGION_FIELD values (-10000, -10000, -10000, 1);
+--insert into REGION_FIELD values (-10000, -10000, -10000, 1);
 insert into REGION_FIELD values (-10001, -10000, -10001, 2);
 insert into REGION_FIELD values (-10002, -10000, -10002, 3);
 insert into REGION_FIELD values (-10003, -10000, -10003, 4);
 insert into REGION_FIELD values (-10004, -10000, -10004, 5);
+insert into REGION_FIELD values (-10005, -10000, -10005, 6);
+insert into REGION_FIELD values (-10006, -10000, -10006, 7);
 
 --Writing values using PAGE_PROCESSING on POST is below.
 
@@ -69,6 +72,18 @@ insert into PAGE_PROCESSING_SOURCE values (-10001, -10001, -10001, 'dml_modify')
 -- Conditional processing of insert above.
 insert into source values (-10002, 'select ''true'' where :REQUEST = ''Save''');
 insert into CONDITIONAL values (-10000, -10002, 'dml_selcel', 'TEXT_TRUE');
-insert into PAGE_PROCESSING_CONDITIONAL values (-10000, -10001, -10000); -- links it to the PAGE_PROCESSING_SOURCE
+insert into PAGE_PROCESSING_CONDITIONAL values (-10000, -10001, -10000); -- links it to the PAGE_PROCESSING
+
+-- Conditional display of submit button 'Save' (FIELD -10005).
+--   If the code wanted does not exist, then display the 'Save' button
+insert into source values (-10003, 'select 1 from CODE_SOURCE_TYPE where code = :code');
+insert into CONDITIONAL values (-10001, -10003, 'dml_selcel', 'NOTEXISTS');
+insert into FIELD_CONDITIONAL values (-10001, -10005, -10001);
+
+-- Conditional display of submit button 'Update' (FIELD -10006)
+--   If the code wanted does exist, then display the 'Update' button
+insert into source values (-10004, 'select 1 from CODE_SOURCE_TYPE where code = :code');
+insert into CONDITIONAL values (-10002, -10004, 'dml_selcel', 'EXISTS');
+insert into FIELD_CONDITIONAL values (-10002, -10006, -10002);
 
 commit;

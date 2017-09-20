@@ -37,7 +37,7 @@ public class Conditional implements java.io.Serializable
   }
 
   @Id
-  @Column(name = "id", unique = true, nullable = false)
+  @Column(name = "ID", unique = true, nullable = false)
   public long getId()
   {
     return this.id;

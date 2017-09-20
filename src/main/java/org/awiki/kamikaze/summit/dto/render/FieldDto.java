@@ -35,7 +35,7 @@ public class FieldDto implements PageItem<String> {
   private PostProcessedFieldContentDto postProcessedSource;
   private PostProcessedFieldContentDto postProcessedDefaultValue;
   
-  private ConditionalDto        conditional = ConditionalDto.ALWAYS_TRUE; // the default.
+  private ConditionalDto        conditional = new ConditionalDto();
   
   public Long getId() {
     return id;
@@ -202,6 +202,7 @@ public class FieldDto implements PageItem<String> {
   {
     return MapUtils.EMPTY_SORTED_MAP; 
   }
+  
   @Override
   public ConditionalDto getConditional()
   {

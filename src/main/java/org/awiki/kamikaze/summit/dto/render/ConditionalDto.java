@@ -26,15 +26,6 @@ public class ConditionalDto
     }
   }
   
-  // Defaults to ALWAYS_TRUE if not set.
-  public static ConditionalDto ALWAYS_TRUE = new ConditionalDto();
-  static {
-    ALWAYS_TRUE.setProcessedSource(new SourceProcessorResult());
-    ALWAYS_TRUE.getProcessedSource().setResultValue(CONDITIONAL.TRUE.toString());
-    ALWAYS_TRUE.getProcessedSource().setReturnCode(SourceProcessorResult.STANDARD_SUCCESS_CODE);
-    ALWAYS_TRUE.getProcessedSource().setOutputMessage(SourceProcessorResult.STANDARD_SUCCESS_MESSAGE);
-  }
-  
   public ConditionalDto()
   {
   }

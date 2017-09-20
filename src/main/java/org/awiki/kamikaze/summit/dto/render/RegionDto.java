@@ -37,7 +37,7 @@ public class RegionDto implements PageItem<String> {
   ////// post-processed page items, not mapped.
   private Collection<PageItem<String>> subPageItems = new LinkedHashSet<>(0);
   
-  private ConditionalDto conditional = ConditionalDto.ALWAYS_TRUE; // the default.
+  private ConditionalDto conditional = null;
   
   public Long getId() {
     return id;

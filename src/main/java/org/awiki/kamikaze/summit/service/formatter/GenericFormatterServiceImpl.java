@@ -17,7 +17,6 @@ import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.dto.render.TemplateDto;
 import org.awiki.kamikaze.summit.repository.TemplateRepository;
 import org.awiki.kamikaze.summit.service.ConditionalEvaluatorService;
-import org.awiki.kamikaze.summit.service.FieldService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.component.VariableManager;
 import org.slf4j.Logger;

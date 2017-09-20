@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -200,10 +201,10 @@ public class Field implements java.io.Serializable
     this.template = template;
   }
 
-  @OneToOne
+  @OneToOne(cascade=CascadeType.ALL)
   @JoinTable(name = "FIELD_CONDITIONAL",
-          joinColumns = { @JoinColumn(name = "FIELD_ID", referencedColumnName = "ID") },
-          inverseJoinColumns = { @JoinColumn(name = "CONDITIONAL_ID", referencedColumnName = "ID") })
+          joinColumns = { @JoinColumn(name = "FIELD_ID") },
+          inverseJoinColumns = { @JoinColumn(name = "CONDITIONAL_ID") })
   public Conditional getConditional()
   {
     return conditional;

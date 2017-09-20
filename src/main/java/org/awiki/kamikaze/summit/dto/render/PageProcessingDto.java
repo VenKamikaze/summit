@@ -25,7 +25,7 @@ public class PageProcessingDto {
   
   private List<PageProcessingSourceDto> pageProcessingSourceDtos = new ArrayList<>();
 
-  private ConditionalDto conditionalDto = ConditionalDto.ALWAYS_TRUE; // the default.
+  private ConditionalDto conditionalDto = null; // the default.
   
   public Long getId() {
     return id;

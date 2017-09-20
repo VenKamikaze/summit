@@ -15,6 +15,7 @@ public class CodeConditionalType implements java.io.Serializable, CodeTable
 {
   public static final String CODE_CONDITIONAL_TEXT_TRUE = "TEXT_TRUE";
   public static final String CODE_CONDITIONAL_EXISTS = "EXISTS";
+  public static final String CODE_CONDITIONAL_NOT_EXISTS = "NOTEXISTS";
   
   public static final String CODE_CONDITIONAL_TEXT_TRUE_VALUE = "true"; // TEXT_TRUE codes should return exactly this value if true.
   

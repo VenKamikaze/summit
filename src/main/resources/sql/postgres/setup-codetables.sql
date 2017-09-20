@@ -53,6 +53,9 @@ insert into CODE_CONDITIONAL_TYPE
  values ('TEXT_TRUE', 'Source returns "true" as text', 1);
 
 insert into CODE_CONDITIONAL_TYPE
- values ('EXISTS', 'Source returns non-null value or row', 2);
+ values ('EXISTS', 'Source returns some value or record', 2);
+
+insert into CODE_CONDITIONAL_TYPE
+ values ('NOTEXISTS', 'Source returns no records', 3);
 
 commit;
