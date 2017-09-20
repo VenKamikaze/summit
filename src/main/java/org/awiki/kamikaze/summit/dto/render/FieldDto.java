@@ -35,6 +35,8 @@ public class FieldDto implements PageItem<String> {
   private PostProcessedFieldContentDto postProcessedSource;
   private PostProcessedFieldContentDto postProcessedDefaultValue;
   
+  private ConditionalDto        conditional = ConditionalDto.ALWAYS_TRUE; // the default.
+  
   public Long getId() {
     return id;
   }
@@ -171,12 +173,12 @@ public class FieldDto implements PageItem<String> {
   }
   
   @Override
-  public boolean hasSubPageItems()
+  public boolean hasChildPageItems()
   {
     return false;
   }
   @Override
-  public List<PageItem<String>> getSubPageItems()
+  public List<PageItem<String>> getChildPageItems()
   {
     return new ArrayList<>(0);
   }
@@ -199,5 +201,15 @@ public class FieldDto implements PageItem<String> {
   public Map<String, String> getReplacementVariables()
   {
     return MapUtils.EMPTY_SORTED_MAP; 
+  }
+  @Override
+  public ConditionalDto getConditional()
+  {
+    return conditional;
+  }
+  
+  public void setConditional(ConditionalDto c)
+  {
+    this.conditional = c;
   }
 }

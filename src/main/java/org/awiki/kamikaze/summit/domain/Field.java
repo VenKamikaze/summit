@@ -14,6 +14,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.awiki.kamikaze.summit.domain.codetable.CodeFieldType;
@@ -46,6 +47,7 @@ public class Field implements java.io.Serializable
   private Set<RegionField>    regionFields = new HashSet<RegionField>(0);
   private Template             template;
   
+  private Conditional         conditional = null;
 
   public Field()
   {
@@ -198,4 +200,17 @@ public class Field implements java.io.Serializable
     this.template = template;
   }
 
+  @OneToOne
+  @JoinTable(name = "FIELD_CONDITIONAL",
+          joinColumns = { @JoinColumn(name = "FIELD_ID", referencedColumnName = "ID") },
+          inverseJoinColumns = { @JoinColumn(name = "CONDITIONAL_ID", referencedColumnName = "ID") })
+  public Conditional getConditional()
+  {
+    return conditional;
+  }
+
+  public void setConditional(Conditional conditional)
+  {
+    this.conditional = conditional;
+  }
 }

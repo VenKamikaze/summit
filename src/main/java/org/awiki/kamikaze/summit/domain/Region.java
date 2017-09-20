@@ -14,6 +14,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
@@ -46,6 +47,7 @@ public class Region implements java.io.Serializable
   private Set<RegionField>   regionFields = new LinkedHashSet<RegionField>(0);
   private Template           template;
   
+  private Conditional        conditional = null;
 
   public Region()
   {
@@ -176,5 +178,17 @@ public class Region implements java.io.Serializable
     this.template = template;
   }
 
+  @OneToOne
+  @JoinTable(name = "REGION_CONDITIONAL",
+          joinColumns = { @JoinColumn(name = "REGION_ID", referencedColumnName = "ID") },
+          inverseJoinColumns = { @JoinColumn(name = "CONDITIONAL_ID", referencedColumnName = "ID") })
+  public Conditional getConditional()
+  {
+    return conditional;
+  }
 
+  public void setConditional(Conditional conditional)
+  {
+    this.conditional = conditional;
+  }
 }

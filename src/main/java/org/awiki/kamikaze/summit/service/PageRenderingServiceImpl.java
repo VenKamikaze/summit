@@ -116,7 +116,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     final StringBuilder builder = new StringBuilder();
     start = System.nanoTime();
     FormatterService service = sourceFormatters.getFormatterService(PageDto.class.getCanonicalName());
-    final String result = service.format(builder, pageDto, 0, new HashMap<String,String>()).toString();
+    final String result = service.format(builder, pageDto, 0, new HashMap<String,String>(), fieldService.getAllFields(pageDto)).toString();
     end = System.nanoTime();
 
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": service.format took: " + (end - start) / 1000000 + "ms");

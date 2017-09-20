@@ -1,10 +1,11 @@
 package org.awiki.kamikaze.summit.service.formatter;
 
-import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_NAME_VARIABLE;
-import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_ID_VARIABLE;
 import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_DATA_AND_SUBREGION_VARIABLE;
+import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_ID_VARIABLE;
+import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_NAME_VARIABLE;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,8 @@ import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.dto.render.TemplateDto;
 import org.awiki.kamikaze.summit.repository.TemplateRepository;
+import org.awiki.kamikaze.summit.service.ConditionalEvaluatorService;
+import org.awiki.kamikaze.summit.service.FieldService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.component.VariableManager;
 import org.slf4j.Logger;
@@ -38,6 +41,9 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   @Autowired
   private ProxyFormatterService formatters;
   
+  @Autowired
+  private ConditionalEvaluatorService conditionalService;
+  
   @Override
   @SuppressWarnings("serial")
   public List<String> getResponsibilities()
@@ -53,9 +59,17 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   }
 
   @Override
-  public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt, Map<String, String> replacementVariableCache)
+  public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt, Map<String, String> replacementVariableCache, 
+          final Collection<PageItem<String>> pageFields)
   {
     replacementVariableCache.putAll(item.getReplacementVariables());
+    
+    // If condition says to not render this item, then return immediately
+    if(item.getConditional() != null) {
+      if(! conditionalService.evaluate(item.getConditional(), pageFields) ) {
+        return builder;
+      }
+    }
     
     final TemplateDto template = item.getTemplateDto(); 
     // A template can be null, for example with Mustache templating you can handle Row/HeaderRow/Cell objects at a higher level template
@@ -67,10 +81,10 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
       int nextInsertAt = templateSourceReplaceLocation + insertAt;
       builder.insert(insertAt, templateSource.replace(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
   
-      if(item.hasSubPageItems()) {
-        for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getSubPageItems())) ) {
+      if(item.hasChildPageItems()) {
+        for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getChildPageItems())) ) {
           FormatterService<PageItem<?>> formatter = formatters.getFormatterService(innerItem.getClass().getCanonicalName());
-          formatter.format(builder, innerItem, nextInsertAt, replacementVariableCache);
+          formatter.format(builder, innerItem, nextInsertAt, replacementVariableCache, pageFields);
         }
       }
     }

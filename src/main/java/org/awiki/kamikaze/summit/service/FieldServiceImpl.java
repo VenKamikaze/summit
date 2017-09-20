@@ -1,20 +1,19 @@
 package org.awiki.kamikaze.summit.service;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.dto.render.FieldDto;
+import org.awiki.kamikaze.summit.dto.render.PageDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
+import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.dto.render.SourceDto;
@@ -95,5 +94,17 @@ public class FieldServiceImpl implements FieldService {
       return rf.getField();
     }
     return null;
+  }
+
+  @Override
+  public Collection<PageItem<String>> getAllFields(PageDto pageDto)
+  {
+    Collection<PageItem<String>> fields = new LinkedHashSet<>();
+    for(PageRegionDto pr : pageDto.getPageRegions()) {
+      for(RegionFieldDto rf : pr.getRegionDto().getRegionFields()) {
+        fields.add(rf.getField());
+      }
+    }
+    return fields;
   }
 }

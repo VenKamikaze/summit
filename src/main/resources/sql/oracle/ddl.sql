@@ -308,6 +308,20 @@ create table PAGE_PROCESSING_CONDITIONAL
   CONDITIONAL_ID number(19) not null references CONDITIONAL(ID)
 );
 
+create table FIELD_CONDITIONAL
+(
+  ID number(19) primary key,
+  FIELD_ID number(19) not null references FIELD(ID),
+  CONDITIONAL_ID number(19) not null references CONDITIONAL(ID)
+);
+
+create table REGION_CONDITIONAL
+(
+  ID number(19) primary key,
+  REGION_ID number(19) not null references REGION(ID),
+  CONDITIONAL_ID number(19) not null references CONDITIONAL(ID)
+);
+
 create sequence application_seq start with 1;
 create sequence page_seq start with 1;
 create sequence region_seq start with 1;

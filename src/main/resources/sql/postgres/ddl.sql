@@ -312,6 +312,20 @@ create table PAGE_PROCESSING_CONDITIONAL
   CONDITIONAL_ID bigint not null references CONDITIONAL(ID)
 );
 
+create table FIELD_CONDITIONAL
+(
+  ID bigint primary key,
+  FIELD_ID bigint not null references FIELD(ID),
+  CONDITIONAL_ID bigint not null references CONDITIONAL(ID)
+);
+
+create table REGION_CONDITIONAL
+(
+  ID bigint primary key,
+  REGION_ID bigint not null references REGION(ID),
+  CONDITIONAL_ID bigint not null references CONDITIONAL(ID)
+);
+
 create sequence application_seq start 1;
 create sequence page_seq start 1;
 create sequence region_seq start 1;

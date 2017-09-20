@@ -105,12 +105,12 @@ public class PageDto implements PageItem<String> {
     return null;
   }
   @Override
-  public boolean hasSubPageItems()
+  public boolean hasChildPageItems()
   {
     return pageRegions.size() > 0;
   }
   @Override
-  public Collection<PageItem<String>> getSubPageItems()
+  public Collection<PageItem<String>> getChildPageItems()
   {
     Collection<PageItem<String>> regions = new ArrayList<>(pageRegions.size());
     for(PageRegionDto pageRegionDto : pageRegions) {
@@ -129,5 +129,11 @@ public class PageDto implements PageItem<String> {
   public Map<String, String> getReplacementVariables()
   {
     return new TreeMap<String, String>() {{ put(FormatEnums.REPLACEMENT_PAGE_ID_VARIABLE.toString(), getId().toString()); }};
+  }
+  
+  @Override
+  public ConditionalDto getConditional()
+  {
+    return null; // pages cannot be conditional.
   }
 }

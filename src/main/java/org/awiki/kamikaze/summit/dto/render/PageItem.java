@@ -29,20 +29,26 @@ public interface PageItem<T> // Where T is the processed source type
    * This helps control the order that the items are processed in (inner first, then outer).
    * @return
    */
-  public boolean hasSubPageItems();
+  public boolean hasChildPageItems();
   
   /**
    * If this pageItem contains it's own page items, then this will return the list of those items.
    * Otherwise, should return an empty list.
    * @return
    */
-  public Collection<PageItem<T>> getSubPageItems();
+  public Collection<PageItem<T>> getChildPageItems();
   
   /**
    * If the instance of this pageItem has an associated template, then return it.
    * @return TemplateDto
    */
   public TemplateDto getTemplateDto();
+  
+  /**
+   * If the instance of this pageItem has a condition that must evaluate before it is rendered, then return it.
+   * @return ConditionalDto
+   */
+  public ConditionalDto getConditional();
   
   public void setProcessedSource(T t); //unsure if needed
 

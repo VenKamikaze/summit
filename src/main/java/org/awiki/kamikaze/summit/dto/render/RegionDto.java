@@ -37,6 +37,8 @@ public class RegionDto implements PageItem<String> {
   ////// post-processed page items, not mapped.
   private Collection<PageItem<String>> subPageItems = new LinkedHashSet<>(0);
   
+  private ConditionalDto conditional = ConditionalDto.ALWAYS_TRUE; // the default.
+  
   public Long getId() {
     return id;
   }
@@ -94,13 +96,13 @@ public class RegionDto implements PageItem<String> {
   }
   
   @Override
-  public boolean hasSubPageItems()
+  public boolean hasChildPageItems()
   {
     return subPageItems.size() > 0;
   }
   
   @Override
-  public Collection<PageItem<String>> getSubPageItems()
+  public Collection<PageItem<String>> getChildPageItems()
   {
     return subPageItems;
     /*
@@ -144,6 +146,17 @@ public class RegionDto implements PageItem<String> {
     Map<String, String> result = new TreeMap<String, String>();
     result.put(FormatEnums.REPLACEMENT_REGION_ID_VARIABLE.toString(), getId().toString());
     return result;
+  }
+  
+  @Override
+  public ConditionalDto getConditional()
+  {
+    return conditional;
+  }
+  
+  public void setConditional(ConditionalDto c)
+  {
+    this.conditional = c;
   }
 
   @Transient

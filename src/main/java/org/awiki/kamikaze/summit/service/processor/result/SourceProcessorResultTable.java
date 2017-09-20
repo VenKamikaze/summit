@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.iterators.ArrayListIterator;
 import org.apache.commons.collections4.MapUtils;
+import org.awiki.kamikaze.summit.dto.render.ConditionalDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.TemplateDto;
 import org.awiki.kamikaze.summit.service.formatter.Formattable;
@@ -306,14 +307,14 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     }
 
     @Override
-    public boolean hasSubPageItems()
+    public boolean hasChildPageItems()
     {
       return this.cells.size() > 0;
     }
 
     @JsonIgnore
     @Override
-    public Collection<PageItem<String>> getSubPageItems()
+    public Collection<PageItem<String>> getChildPageItems()
     {
       return new ArrayList<PageItem<String>>(this.cells);
     }
@@ -371,6 +372,13 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       logger.warn("getName() called on " + this.getClass().getCanonicalName() + " but we have no name. Returning null");
       return null;
     }
+
+    @Override
+    public ConditionalDto getConditional()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
   }
 
   
@@ -419,7 +427,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     }
 
     @Override
-    public boolean hasSubPageItems()
+    public boolean hasChildPageItems()
     {
       return false;
     }
@@ -438,7 +446,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
 
     @JsonIgnore
     @Override
-    public Collection<PageItem<String>> getSubPageItems()
+    public Collection<PageItem<String>> getChildPageItems()
     {
       return new ArrayList<>(0);
     }
@@ -474,6 +482,13 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       logger.warn("getName() called on " + this.getClass().getCanonicalName() + " but we have no name. Returning null");
       return null;
     }
+
+    @Override
+    public ConditionalDto getConditional()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
   }
   
   @JsonIgnore
@@ -500,14 +515,14 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   }
 
   @Override
-  public boolean hasSubPageItems()
+  public boolean hasChildPageItems()
   {
     return this.rows.size() > 0;
   }
 
   @Override
   @JsonIgnore
-  public Collection<PageItem<String>> getSubPageItems()
+  public Collection<PageItem<String>> getChildPageItems()
   {
     return new ArrayList<PageItem<String>>(this.rows);
   }
@@ -594,6 +609,13 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   public String getName()
   {
     logger.warn("getName() called on " + this.getClass().getCanonicalName() + " but we have no name. Returning null");
+    return null;
+  }
+
+  @Override
+  public ConditionalDto getConditional()
+  {
+    // TODO Auto-generated method stub
     return null;
   }
 }

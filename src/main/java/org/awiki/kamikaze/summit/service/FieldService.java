@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.apache.commons.collections4.Predicate;
 import org.awiki.kamikaze.summit.dto.render.FieldDto;
+import org.awiki.kamikaze.summit.dto.render.PageDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
@@ -47,4 +48,6 @@ public interface FieldService {
   public Map<String, PageItem<String>> fieldsToMap(Collection<PageItem<String>> fields);
 
   public FieldDto findFieldWithName(final RegionDto regionDto, final String name);
+  
+  public Collection<PageItem<String>> getAllFields(final PageDto pageDto);
 }
