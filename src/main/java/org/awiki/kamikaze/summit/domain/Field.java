@@ -44,8 +44,6 @@ public class Field implements java.io.Serializable
   private List<Source>        source;
   private List<Source>        defaultValueSource;
   
-  // TODO: change to ManyToMany 
-  //private String              defaultValue;
   private String              notes;
   private Set<RegionField>    regionFields = new HashSet<RegionField>(0);
   private Template             template;

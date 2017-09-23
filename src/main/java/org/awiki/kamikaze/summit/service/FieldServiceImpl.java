@@ -34,20 +34,25 @@ public class FieldServiceImpl implements FieldService {
     
     for(RegionFieldDto regionFieldDto : regionFieldDtos) {
       final FieldDto fieldDto = regionFieldDto.getField();
-      FieldDto.PostProcessedFieldContentDto processedContent = fieldDto.new PostProcessedFieldContentDto();
+      FieldDto.PostProcessedFieldContentDto processedContent = null;
       FieldDto.PostProcessedFieldContentDto processedDefaultContent = fieldDto.new PostProcessedFieldContentDto();
       
       // First, populate fields from any pre-region processing if exists.
       if (fieldsToPopulate.containsKey(fieldDto.getName()) ) {
+        processedContent = fieldDto.new PostProcessedFieldContentDto();
         processedContent.setPostProcessedContent(fieldsToPopulate.get(fieldDto.getName()).getFieldValue().getResultValue());
       }
         
       // Parameters in request can override pre-region processing, so second, set the value from the page parameter if it exists
       if(parameterMap.containsKey(fieldDto.getName())) {
+        processedContent = fieldDto.new PostProcessedFieldContentDto();
         processedContent.setPostProcessedContent(parameterMap.get(fieldDto.getName()).get(0)); // TODO FIXME make this work with multiple values
       }
       else { // process the source content to get the value, which can override pre-region processing, but not parameters in a request.
         SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(fieldDto.getCodeFieldSourceType());
+        if(fieldDto.getSource() != null && fieldDto.getSource().size() > 0) {
+          processedContent = fieldDto.new PostProcessedFieldContentDto();
+        }
         for(SourceDto source : fieldDto.getSource()) {
           processedContent.setPostProcessedContent((processedContent.getPostProcessedContent() != null ? processedContent.getPostProcessedContent() : StringUtils.EMPTY) + 
                   processor.processSource(source.getSource(), fieldDto.getCodeFieldSourceType(), null).getResultValue()); // TODO FIXME handle bind vars
@@ -55,10 +60,13 @@ public class FieldServiceImpl implements FieldService {
       }
       
       // Default value is optional, if set, and there's no processed content, it may be displayed.
-      if(StringUtils.isNotBlank(fieldDto.getDefaultValueSource()))
+      if(fieldDto.getDefaultValueSource() != null && fieldDto.getDefaultValueSource().size() > 0)
       {
         SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(fieldDto.getCodeFieldDefaultValueSourceType());
-        processedDefaultContent.setPostProcessedContent(processor.processSource( fieldDto.getDefaultValueSource() , fieldDto.getCodeFieldDefaultValueSourceType(), null ).getResultValue() );  // TODO FIXME handle bind vars
+        for(SourceDto source : fieldDto.getDefaultValueSource()) {
+          processedDefaultContent.setPostProcessedContent((processedDefaultContent.getPostProcessedContent() != null ? processedDefaultContent.getPostProcessedContent() : StringUtils.EMPTY) + 
+                  processor.processSource(source.getSource(), fieldDto.getCodeFieldSourceType(), null).getResultValue()); // TODO FIXME handle bind vars
+        }
         fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
       }
       

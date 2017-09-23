@@ -174,8 +174,13 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements OldPag
       for(SourceDto source : fieldDto.getSource()) {
         processedSource += processor.processSource(source.getSource(), fieldDto.getCodeFieldSourceType(), null).getResultValue(); // TODO FIXME handle bind vars
       }
-      processedContent.setPostProcessedContent(processedSource);   
-      processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() , null ).getResultValue() );  // TODO FIXME handle bind vars
+      processedContent.setPostProcessedContent(processedSource);
+      String processedDefaultSource = "";
+      for(SourceDto source : fieldDto.getDefaultValueSource()) {
+        processedDefaultSource += processor.processSource( source.getSource() , fieldDto.getCodeFieldDefaultValueSourceType(), null ).getResultValue();  // TODO FIXME handle bind vars
+      }
+      processedDefaultContent.setPostProcessedContent(processedDefaultSource);
+      
       fieldDto.setPostProcessedSource(processedContent);
       fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
       

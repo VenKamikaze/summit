@@ -76,9 +76,11 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
       logger.debug("Formatting item : " + item.getClass().getCanonicalName());
       String templateSource = replaceInternalVariables(template.getSource(), item, replacementVariableCache);
       templateSource = replaceApplicationVariables(templateSource, variableManager.getReplacementVars());
+      String dataSource = item.getProcessedSource() == null ? StringUtils.EMPTY : replaceInternalVariables(item.getProcessedSource(), item, replacementVariableCache);
+      dataSource = replaceApplicationVariables(dataSource, variableManager.getReplacementVars());
       int templateSourceReplaceLocation = templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString()) == -1 ? 0 : templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString());
       int nextInsertAt = templateSourceReplaceLocation + insertAt;
-      builder.insert(insertAt, templateSource.replace(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
+      builder.insert(insertAt, templateSource.replace(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString(), dataSource));
   
       if(item.hasChildPageItems()) {
         for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getChildPageItems())) ) {

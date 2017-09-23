@@ -23,11 +23,11 @@ public class FieldDto implements PageItem<String> {
   
   @NotBlank(message = "Must not be empty.")
   @Size(max = 10)
-  private String                codeFieldSourceType;  // e.g. HTML, SQL, JSP
-  //private String                source; // actual SQL/HTML/JSP code
+  private String                codeFieldSourceType;
+
   private List<SourceDto>       source;
-  private String                codeFieldDefaultValueSourceType; // e.g. HTML, SQL, JSP
-  private String                defaultValueSource; // actual SQL/HTML/JSP code
+  private String                codeFieldDefaultValueSourceType;
+  private List<SourceDto>       defaultValueSource;
   private String                notes;
   private Set<RegionFieldDto>   regionFields = new HashSet<>(0);
   private TemplateDto           template;
@@ -90,11 +90,11 @@ public class FieldDto implements PageItem<String> {
       String codeFieldDefaultValueSourceType) {
     this.codeFieldDefaultValueSourceType = codeFieldDefaultValueSourceType;
   }
-  public String getDefaultValueSource() {
+  public List<SourceDto> getDefaultValueSource() {
     return defaultValueSource;
   }
-  public void setDefaultValueSource(String defaultValueSource) {
-    this.defaultValueSource = defaultValueSource;
+  public void setDefaultValueSource(List<SourceDto> source) {
+    this.defaultValueSource = source;
   }
   public String getNotes() {
     return notes;
