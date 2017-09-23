@@ -242,7 +242,7 @@ create table FIELD
 (
   ID bigint primary key,
   TEMPLATE_ID bigint not null references TEMPLATE(ID),
-  NAME character varying(200),
+  NAME character varying(200) not null,
   SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE),
   FIELD_TYPE_CODE character varying(10) references CODE_FIELD_TYPE(CODE),
   DEFAULT_SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE),

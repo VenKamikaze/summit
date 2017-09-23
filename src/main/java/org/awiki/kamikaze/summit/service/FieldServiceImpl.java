@@ -49,7 +49,7 @@ public class FieldServiceImpl implements FieldService {
       else { // process the source content to get the value, which can override pre-region processing, but not parameters in a request.
         SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(fieldDto.getCodeFieldSourceType());
         for(SourceDto source : fieldDto.getSource()) {
-          processedContent.setPostProcessedContent(processedContent.getPostProcessedContent() + 
+          processedContent.setPostProcessedContent((processedContent.getPostProcessedContent() != null ? processedContent.getPostProcessedContent() : StringUtils.EMPTY) + 
                   processor.processSource(source.getSource(), fieldDto.getCodeFieldSourceType(), null).getResultValue()); // TODO FIXME handle bind vars
         }
       }
