@@ -3,7 +3,6 @@ package org.awiki.kamikaze.summit.util.mapper;
 import java.math.BigDecimal;
 
 import org.apache.commons.collections4.Transformer;
-import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.dto.render.FieldDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
