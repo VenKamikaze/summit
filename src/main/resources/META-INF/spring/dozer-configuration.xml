@@ -18,11 +18,6 @@
         <class-a>org.awiki.kamikaze.summit.domain.Source</class-a>
         <class-b>java.lang.String</class-b>
       </converter>
-      <!-- this does not seem to be necessary for regionType, so why is it needed for sourceType? 31-07-2016 -->
-      <!--      <converter type="org.awiki.kamikaze.summit.util.converter.CodeSourceTypeToStringConverter" >
-        <class-a>org.awiki.kamikaze.summit.domain.codetable.CodeSourceType</class-a>
-        <class-b>java.lang.String</class-b>
-      </converter> -->
       <converter type="org.awiki.kamikaze.summit.util.converter.CodeTableToStringConverter" >
         <class-a>org.awiki.kamikaze.summit.domain.codetable.CodeTable</class-a>
         <class-b>java.lang.String</class-b>

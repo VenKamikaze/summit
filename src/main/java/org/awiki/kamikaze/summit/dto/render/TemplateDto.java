@@ -3,6 +3,9 @@ package org.awiki.kamikaze.summit.dto.render;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 public class TemplateDto {
 
   private long       id;
@@ -10,7 +13,10 @@ public class TemplateDto {
   private String     source;
   private String     mimeType;
   
+  @JsonBackReference("templateChildren")
   private TemplateDto parent;
+  
+  @JsonManagedReference("templateChildren")
   private Set<TemplateDto> children = new HashSet<>(0);
   
   private Set<PageDto> pages = new HashSet<>(0);

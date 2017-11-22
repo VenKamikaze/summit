@@ -1,4 +1,29 @@
 
+Fields and postProcessed values:
+Current implementation (2017-Nov):
+* A field domain/dto describes the metadata of a field that should be output on page rendering.
+* FieldDto is mapped as part of the page mapping
+* FieldDto contains a postProcessedSource String
+* This string gets populated after mapping and before formatting
+* The processing is done in PageRenderingServiceImpl.processRegionsForRender and in PageFilteringServiceImpl.filterQueryOnRegion
+* A ProxyFieldProcessor is called, this retrieves the FieldProcessorServiceImpl relevant for the FieldDto class.
+** ^^^^^ Currently this will always retrieve the same processor, as the fields are always a FieldDto class.
+** +++++ Perhaps we should store a 'PROCESSOR_CLASS' column on the FIELD domain and DTO to direct us to the appropriate processor?
+* In the case of a simple field (non-KvP fields, single result) the field source is then 'processed' and stored as a string.
+* In the case of a dropdown field (or KvP fields/complex multi result source processing) the child items of the field are populated, these are stored as a List<PageItem<String>>.
+** With these complex fields, replacement variables handle the replacement of the values of the child items in the appropriate place in the template. This also means a template must be setup for the child items to be handled appropriately on page rendering.
+
+Formatting - On formatting to a string for page render:
+* 
+
+Ideas to sort this mess out:
+* Standardise on fields having:
+** Get rid of post processed source on FieldDto
+** Instead use similar method to the dropdown items - that is a List<PageItem<String>> which is a very simple object that contains the processed source as a string, with replacment variable for use by the formatter instead of the formatter using 'getProcessedSource' directly.
+** PROCESSOR_CLASS to direct to appropriate processor
+** A template for each child page item where appropriate (check if this is OK for the simple field approach).
+
+
 Limitations:
 * Page parameters must populate a field on a page to be used.
 * Fields can only be used as bind variables when they exist in the same region as the query using them.

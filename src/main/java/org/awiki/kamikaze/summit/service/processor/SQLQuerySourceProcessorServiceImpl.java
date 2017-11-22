@@ -23,15 +23,17 @@ import org.springframework.stereotype.Service;
 public class SQLQuerySourceProcessorServiceImpl implements TabularQuerySourceProcessorService {
   
   public static final String BUILT_IN_SQL_DML_SELECT_ROW_TYPE = "dml_selrow"; // query for a select statement, expects single row or no rows return.
-  
+  public static final String BUILT_IN_SQL_DML_SELECT_TYPE = "dml_select"; // query for a select statement, expects allow for zero or many rows return.
+
   @Autowired
   private BindVarService bindVarService;
   
   @Autowired
   private NamedParameterJdbcTemplate jdbc;
 
-  static final List<String> RESPONSIBILITIES = new ArrayList<String>(1);
-  static { RESPONSIBILITIES.add(BUILT_IN_SQL_DML_SELECT_ROW_TYPE); }
+  public static final List<String> RESPONSIBILITIES = new ArrayList<String>(2);
+  static { RESPONSIBILITIES.add(BUILT_IN_SQL_DML_SELECT_ROW_TYPE);
+           RESPONSIBILITIES.add(BUILT_IN_SQL_DML_SELECT_TYPE); }
   
   @Override
   public List<String> getResponsibilities()

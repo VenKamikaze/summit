@@ -1,6 +1,7 @@
-package org.awiki.kamikaze.summit.service;
+package org.awiki.kamikaze.summit.service.field;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,9 +46,28 @@ public interface FieldService {
    */
   public Set<PageItem<String>> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final MultiValueMap<String, String> parameterMap);
   
+  /**
+   * Process a fields, plus any parameters passed in through the HttpServletRequest into a
+   *   fieldDto, inserting any values and processing source as required.
+   * @param fieldDtos
+   * @param parameterMap
+   * @return FieldDtos
+   */
+  public FieldDto processFieldForRender(final FieldDto fieldDto, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final MultiValueMap<String, String> parameterMap);
+  
+  
+  /**
+   * Get a FieldDto represented by fieldId not performing any processing/leaving the source unprocessed.
+   * @param fieldId
+   * @return FieldDto
+   */
+  public FieldDto getUnprocessedFieldById(final Long fieldId);
+  
   public Map<String, PageItem<String>> fieldsToMap(Collection<PageItem<String>> fields);
 
   public FieldDto findFieldWithName(final RegionDto regionDto, final String name);
   
   public Collection<PageItem<String>> getAllFields(final PageDto pageDto);
+  
+  public List<String> getResponsibilities();
 }

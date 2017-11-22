@@ -11,7 +11,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.awiki.kamikaze.summit.dto.render.ConditionalDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.TemplateDto;
-import org.awiki.kamikaze.summit.service.formatter.Formattable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,13 +24,10 @@ import com.google.common.base.Objects;
  * It consists of {@link Column}s, {@link Row}s and {@link Cell}s.
  * Cells know about their parent column and row. Each Cell should know what x and y position it has within the table.
  *  
- * (NOTE: ignore the following -- removed the implements Formattable while I decide how this should work) The whole table is {@link Formattable}, but further to that, each Row is also {@link Formattable}
- * This allows dynamic styling of reports, which means you can produce HTML style reports or CSV style reports
- * easily.
  * @author msaun
  *
  */
-public class SourceProcessorResultTable implements PageItem<String>, Formattable<org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Row>
+public class SourceProcessorResultTable implements PageItem<String>
 {  
   private static final Logger logger = LoggerFactory.getLogger(SourceProcessorResultTable.class);
   
@@ -233,7 +229,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   }
   
   
-  public class Row implements PageItem<String>, Iterable<Cell>, Formattable<String> {
+  public class Row implements PageItem<String>, Iterable<Cell> {
 
     @JsonIgnore
     private TemplateDto templateDto;
@@ -273,29 +269,6 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       return new ArrayListIterator(this.cells);
     }
 
-    @Override
-    @JsonIgnore
-    public Collection<String> getHeaderElements()
-    {
-      logger.debug("getHeaderElements called on row(), but row() cannot have non-body elements"); 
-      return new ArrayList<String>(0);
-    }
-
-    @Override
-    @JsonIgnore
-    public Collection<String> getBodyElements()
-    {
-      return convertToStringCollection(this);
-    }
-
-    @Override
-    @JsonIgnore
-    public Collection<String> getFooterElements()
-    {
-      logger.debug("getFooterElements called on row(), but row() cannot have non-body elements");
-      return new ArrayList<String>(0);
-    }
-
     private Collection<String> convertToStringCollection(final Row row)
     {
       final Collection<String> elements = new ArrayList<>(row.getCells().size());
@@ -317,13 +290,6 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     public Collection<PageItem<String>> getChildPageItems()
     {
       return new ArrayList<PageItem<String>>(this.cells);
-    }
-
-    @Override
-    public void setProcessedSource(String t)
-    {
-      // TODO Auto-generated method stub
-      
     }
 
     @Override
@@ -433,12 +399,6 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     }
 
     @Override
-    public void setProcessedSource(String t)
-    {
-      // TODO Auto-generated method stub
-    }
-
-    @Override
     public String getProcessedSource()
     {
       return this.getValue();
@@ -491,29 +451,6 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     }
   }
   
-  @JsonIgnore
-  @SuppressWarnings("serial")
-  @Override
-  public Collection<Row> getHeaderElements()
-  {
-    return new ArrayList<Row>(1) {{ add(getHeader()); }};
-  }
-
-  @JsonIgnore
-  @Override
-  public Collection<Row> getBodyElements()
-  {
-    return this.getBody();
-  }
-
-  @JsonIgnore
-  @SuppressWarnings("serial")
-  @Override
-  public Collection<Row> getFooterElements()
-  {
-    return new ArrayList<Row>(1) {{ add(getFooter()); }};
-  }
-
   @Override
   public boolean hasChildPageItems()
   {
@@ -525,14 +462,6 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   public Collection<PageItem<String>> getChildPageItems()
   {
     return new ArrayList<PageItem<String>>(this.rows);
-  }
-
-
-  @Override
-  public void setProcessedSource(String t)
-  {
-    // TODO Auto-generated method stub
-    
   }
 
   @Override

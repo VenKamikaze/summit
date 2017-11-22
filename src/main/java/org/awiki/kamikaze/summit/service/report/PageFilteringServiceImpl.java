@@ -16,7 +16,7 @@ import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.repository.RegionRepository;
 import org.awiki.kamikaze.summit.service.BindVarService;
-import org.awiki.kamikaze.summit.service.FieldService;
+import org.awiki.kamikaze.summit.service.field.FieldService;
 import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;

@@ -17,6 +17,9 @@ insert into CODE_SOURCE_TYPE
 insert into CODE_SOURCE_TYPE
  values ('dml_selrow', 'text/plain; sql; dml; select; row', 5, 'dml_selrow');
 
+-- used for selecting a recordset but not for report regions.
+insert into CODE_SOURCE_TYPE
+ values ('dml_select', 'text/plain; sql; dml; select', 6, 'dml_select');
 
 -- used by reports only
 insert into CODE_REGION_TYPE 

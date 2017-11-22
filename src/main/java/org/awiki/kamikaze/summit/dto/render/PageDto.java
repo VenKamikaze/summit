@@ -93,12 +93,6 @@ public class PageDto implements PageItem<String> {
     this.applicationPages = applicationPages;
   }
   @Override
-  public void setProcessedSource(String t)
-  {
-    // TODO Auto-generated method stub
-    
-  }
-  @Override
   public String getProcessedSource()
   {
     // TODO Auto-generated method stub

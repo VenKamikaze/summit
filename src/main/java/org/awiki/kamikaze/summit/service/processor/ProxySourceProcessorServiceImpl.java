@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.xml.crypto.NoSuchMechanismException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,26 +75,26 @@ public class ProxySourceProcessorServiceImpl implements ProxySourceProcessorServ
   
   @Override
   public SingularSourceProcessorService getSingularSourceProcessorService(final String sourceType) {
-    if (singularSourceServiceCache.get(sourceType) == null)
-      throw new NoSuchMechanismException("No service found for sourceType=" + sourceType);
+    if (! singularSourceServiceCache.containsKey(sourceType))
+      throw new UnsupportedOperationException("No service found for sourceType=" + sourceType);
 
     return singularSourceServiceCache.get(sourceType);
   }
   
   @Override
   public TabularQuerySourceProcessorService getTabularSourceProcessorService(final String sourceType) {
-    if (tabularSourceServiceCache.get(sourceType) == null)
-      throw new NoSuchMechanismException("No service found for sourceType=" + sourceType);
+    if (! tabularSourceServiceCache.containsKey(sourceType))
+      throw new UnsupportedOperationException("No service found for sourceType=" + sourceType);
 
     return tabularSourceServiceCache.get(sourceType);
   }
   
   @Override
   public ReportSourceProcessorService getReportSourceProcessorService(final String sourceType) {
-    if (tabularSourceServiceCache.get(sourceType) == null)
-      throw new NoSuchMechanismException("No service found for sourceType=" + sourceType);
+    if (! tabularSourceServiceCache.containsKey(sourceType))
+      throw new UnsupportedOperationException("No service found for sourceType=" + sourceType);
     else if (! (tabularSourceServiceCache.get(sourceType) instanceof ReportSourceProcessorService))
-      throw new NoSuchMechanismException("No ReportSourceProcessor for sourceType=" + sourceType);
+      throw new UnsupportedOperationException("No ReportSourceProcessor for sourceType=" + sourceType);
 
     return (ReportSourceProcessorService) tabularSourceServiceCache.get(sourceType);
   }

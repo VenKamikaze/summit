@@ -51,6 +51,7 @@ insert into FIELD values (-10004, -61, 'source_identifier', 'static', 'TEXT', nu
 insert into FIELD values (-10005, -80, 'Save', 'static', 'SUBMIT', null, null);
 insert into FIELD values (-10006, -80, 'Update', 'static', 'SUBMIT', null, null);
 
+
 -- Attach the fields to the region
 --insert into REGION_FIELD values (-10000, -10000, -10000, 1);
 insert into REGION_FIELD values (-10001, -10000, -10001, 2);
@@ -85,5 +86,46 @@ insert into FIELD_CONDITIONAL values (-10001, -10005, -10001);
 insert into source values (-10004, 'select 1 from CODE_SOURCE_TYPE where code = :code');
 insert into CONDITIONAL values (-10002, -10004, 'dml_selcel', 'EXISTS');
 insert into FIELD_CONDITIONAL values (-10002, -10006, -10002);
+
+commit;
+
+--Dropdown test, separate page. 
+-- Page 101, separate test
+insert into page (select -10001, -100, 'Summit - Internal Edit - Form Page2' from template where class_name = 'org.awiki.kamikaze.summit.dto.edit.EditPageDto');
+
+insert into application_page (select -10001, id, (select id from page where name = 'Summit - Internal Edit - Form Page2'), 1 from application where name = 'Summit - Test Application');
+
+insert into region  (select -10001, id, 'Summit - Internal Edit - Edit CodeSourceType Form2', 'body1', 'Form', 'static' from template where class_name = 'org.awiki.kamikaze.summit.dto.edit.EditRegionDto' and description like 'Summit - Internal Edit - Form Region');
+
+insert into page_region select -10001, (select id from page where name like 'Summit - Internal Edit - Form Page2'), id, id from region where name like 'Summit - Internal Edit - Edit CodeSourceType Form2';
+
+--Retrieving values on PAGE_PROCESSING on GET is below
+
+-- Populate fields on page with this source
+insert into source values (-10005, 'select CODE, DESCRIPTION, SORT_ORDER, SOURCE_IDENTIFIER from CODE_SOURCE_TYPE where CODE = :code');
+
+-- Create the PageProcessing so it gets executed before regions are rendered, then link to the source above
+insert into PAGE_PROCESSING (select -10002, id, 'RENDER_PG1', 1 from PAGE where name like 'Summit - Internal Edit - Form Page2');
+insert into PAGE_PROCESSING_SOURCE values (-10002, -10002, -10005, 'dml_selrow');
+
+-- Link each fieldname to the resultset columns in the corresponding source by column index.
+insert into PAGE_PROCESSING_SOURCE_SELECT values (-10004, -10002, 0, 'code');
+insert into PAGE_PROCESSING_SOURCE_SELECT values (-10005, -10002, 1, 'description');
+insert into PAGE_PROCESSING_SOURCE_SELECT values (-10006, -10002, 2, 'sort_order');
+insert into PAGE_PROCESSING_SOURCE_SELECT values (-10007, -10002, 3, 'source_identifier');
+
+insert into FIELD values (-10007, -63, 'code', 'dml_select', 'DROPDOWN', null, null);
+insert into FIELD values (-10008, -61, 'description', 'static', 'TEXT', null, null);
+insert into FIELD values (-10009, -62, 'sort_order', 'static', 'NUMBER', null, null);
+insert into FIELD values (-10010, -61, 'source_identifier', 'static', 'TEXT', null, null);
+insert into FIELD values (-10011, -80, 'Save', 'static', 'SUBMIT', null, null);
+insert into FIELD values (-10012, -80, 'Update', 'static', 'SUBMIT', null, null);
+
+insert into REGION_FIELD values (-10007, -10001, -10007, 2);
+insert into REGION_FIELD values (-10008, -10001, -10008, 3);
+insert into REGION_FIELD values (-10009, -10001, -10009, 4);
+insert into REGION_FIELD values (-10010, -10001, -10010, 5);
+insert into REGION_FIELD values (-10011, -10001, -10011, 6);
+insert into REGION_FIELD values (-10012, -10001, -10012, 7);
 
 commit;

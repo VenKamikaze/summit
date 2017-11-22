@@ -37,8 +37,8 @@ public class ProxyFormatterServiceImpl implements ProxyFormatterService {
   }
   
   public FormatterService<PageItem<?>> getFormatterService(final String canonicalClassNameToFormat) {
-    if (formatterServiceCache.get(canonicalClassNameToFormat) == null)
-      throw new NoSuchMechanismException("No service found for formatter type=" + canonicalClassNameToFormat);
+    if (! formatterServiceCache.containsKey(canonicalClassNameToFormat))
+      throw new UnsupportedOperationException("No service found for formatter type=" + canonicalClassNameToFormat);
 
     return formatterServiceCache.get(canonicalClassNameToFormat);
   }

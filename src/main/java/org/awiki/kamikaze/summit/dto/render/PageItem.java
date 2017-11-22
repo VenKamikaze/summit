@@ -50,8 +50,6 @@ public interface PageItem<T> // Where T is the processed source type
    */
   public ConditionalDto getConditional();
   
-  public void setProcessedSource(T t); //unsure if needed
-
   /**
    * @return processed, but unformatted/styled source. E.g. if a field source consists of an expression "1+1"
    *           then this should return it's result, "2" rather than the raw source of "1+1".

@@ -11,6 +11,8 @@ import javax.validation.constraints.Size;
 import org.apache.commons.collections4.MapUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 public class FieldDto implements PageItem<String> {
   
@@ -29,7 +31,11 @@ public class FieldDto implements PageItem<String> {
   private String                codeFieldDefaultValueSourceType;
   private List<SourceDto>       defaultValueSource;
   private String                notes;
+  
+  @JsonIgnore
   private Set<RegionFieldDto>   regionFields = new HashSet<>(0);
+  
+  @JsonIgnore
   private TemplateDto           template;
   
   private PostProcessedFieldContentDto postProcessedSource;
@@ -68,21 +74,7 @@ public class FieldDto implements PageItem<String> {
   public void setSource(List<SourceDto> source) {
     this.source = source;
   }
-  /*public String getSource() {
-    return source;
-  }
-  public void setSource(String source) {
-    this.source = source;
-  }
-  // FIXME HACK for mapping Set<String> to singular string with dozer.
-  public void setSource(Set<String> sources) {
-    if(sources != null && ! sources.isEmpty()) {
-      for(String src : sources) {
-        this.source += src;
-      }
-    }
-  }*/
-  
+
   public String getCodeFieldDefaultValueSourceType() {
     return codeFieldDefaultValueSourceType;
   }
@@ -137,6 +129,15 @@ public class FieldDto implements PageItem<String> {
       this.postProcessedContent = postProcessedContent;
     }
     
+    public void addPostProcessedContent(String additionalPostProcessedContent) {
+      if(this.postProcessedContent == null) {
+        this.postProcessedContent = additionalPostProcessedContent;
+      }
+      else {
+        this.postProcessedContent += additionalPostProcessedContent;
+      }
+    }
+    
     @Override
     public String toString() {
       return postProcessedContent;
@@ -161,15 +162,13 @@ public class FieldDto implements PageItem<String> {
   }
 
   @Override
-  public void setProcessedSource(String t)
-  {
-    postProcessedSource.setPostProcessedContent(t);
-  }
-  @Override
   public String getProcessedSource()
   {
-    return postProcessedSource != null ? postProcessedSource.getPostProcessedContent() :
-                                         postProcessedDefaultValue.getPostProcessedContent();
+    if(postProcessedSource != null) {
+      return postProcessedSource.getPostProcessedContent();
+    }
+    return postProcessedDefaultValue != null ? postProcessedDefaultValue.getPostProcessedContent() : null;
+                                         
   }
   
   @Override

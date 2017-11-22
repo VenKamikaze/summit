@@ -43,18 +43,20 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   @Autowired
   private ConditionalEvaluatorService conditionalService;
   
+  public static final List<String> RESPONSIBILITIES = new ArrayList<String>(7);
+  static {  RESPONSIBILITIES.add(PageDto.class.getCanonicalName());
+            RESPONSIBILITIES.add(RegionDto.class.getCanonicalName());
+            RESPONSIBILITIES.add(FieldDto.class.getCanonicalName()); 
+            RESPONSIBILITIES.add(SourceProcessorResultTable.class.getCanonicalName());
+            RESPONSIBILITIES.add(SourceProcessorResultTable.HeaderRow.class.getCanonicalName()); 
+            RESPONSIBILITIES.add(SourceProcessorResultTable.Row.class.getCanonicalName()); 
+            RESPONSIBILITIES.add(SourceProcessorResultTable.Cell.class.getCanonicalName()); };
+  
+  
   @Override
-  @SuppressWarnings("serial")
   public List<String> getResponsibilities()
   {
-    return new ArrayList<String>(7) {{ add(PageDto.class.getCanonicalName());
-                                       add(RegionDto.class.getCanonicalName());
-                                       add(FieldDto.class.getCanonicalName()); 
-                                       add(SourceProcessorResultTable.class.getCanonicalName());
-                                       add(SourceProcessorResultTable.HeaderRow.class.getCanonicalName()); 
-                                       add(SourceProcessorResultTable.Row.class.getCanonicalName()); 
-                                       add(SourceProcessorResultTable.Cell.class.getCanonicalName()); 
-                                    }};
+    return RESPONSIBILITIES;
   }
 
   @Override
@@ -76,11 +78,11 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
       logger.debug("Formatting item : " + item.getClass().getCanonicalName());
       String templateSource = replaceInternalVariables(template.getSource(), item, replacementVariableCache);
       templateSource = replaceApplicationVariables(templateSource, variableManager.getReplacementVars());
-      String dataSource = item.getProcessedSource() == null ? StringUtils.EMPTY : replaceInternalVariables(item.getProcessedSource(), item, replacementVariableCache);
-      dataSource = replaceApplicationVariables(dataSource, variableManager.getReplacementVars());
+      String processedSource = item.getProcessedSource() == null ? StringUtils.EMPTY : replaceInternalVariables(item.getProcessedSource(), item, replacementVariableCache);
+      processedSource = replaceApplicationVariables(processedSource, variableManager.getReplacementVars());
       int templateSourceReplaceLocation = templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString()) == -1 ? 0 : templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString());
       int nextInsertAt = templateSourceReplaceLocation + insertAt;
-      builder.insert(insertAt, templateSource.replace(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString(), dataSource));
+      builder.insert(insertAt, templateSource.replace(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString(), processedSource));
   
       if(item.hasChildPageItems()) {
         for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getChildPageItems())) ) {

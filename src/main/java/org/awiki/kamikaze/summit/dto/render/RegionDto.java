@@ -13,7 +13,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.awiki.kamikaze.summit.service.FieldService;
+import org.awiki.kamikaze.summit.service.field.FieldService;
 import org.awiki.kamikaze.summit.service.formatter.FormatEnums;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -114,11 +114,6 @@ public class RegionDto implements PageItem<String> {
     */
   }
   
-  @Override
-  public void setProcessedSource(String t)
-  {
-    // postProcessedValue = t;
-  }
   @Override
   public String getProcessedSource()
   {
