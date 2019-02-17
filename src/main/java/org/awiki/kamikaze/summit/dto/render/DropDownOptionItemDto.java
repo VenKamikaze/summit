@@ -3,12 +3,13 @@ package org.awiki.kamikaze.summit.dto.render;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.awiki.kamikaze.summit.dto.render.field.KeyValuePairItem;
 import org.awiki.kamikaze.summit.service.formatter.FormatEnums;
 
-public class DropDownOptionItemDto extends KeyValuePairItemDto
+public class DropDownOptionItemDto extends KeyValuePairItem
 {
   private String selected = StringUtils.EMPTY;
-  public static final String SELECTED_TRUE = "selected";
+  public static final String SELECTED_TRUE = "selected=\"selected\"";
   
   public DropDownOptionItemDto(String key, String value)
   {
@@ -28,9 +29,9 @@ public class DropDownOptionItemDto extends KeyValuePairItemDto
   }
   
   @Override
-  public Map<String, String> getReplacementVariables()
+  public Map<String, String> getCustomReplacementVariables()
   {
-    Map<String, String> replacementVars = super.getReplacementVariables();
+    Map<String, String> replacementVars = super.getCustomReplacementVariables();
     replacementVars.put(FormatEnums.REPLACEMENT_SELECTED_VARIABLE.toString(), getSelected());
     return replacementVars;
   }

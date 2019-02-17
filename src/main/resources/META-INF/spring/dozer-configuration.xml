@@ -22,6 +22,10 @@
         <class-a>org.awiki.kamikaze.summit.domain.codetable.CodeTable</class-a>
         <class-b>java.lang.String</class-b>
       </converter>
+      <converter type="org.awiki.kamikaze.summit.util.converter.FieldConverter" >
+        <class-a>org.awiki.kamikaze.summit.domain.Field</class-a>
+        <class-b>org.awiki.kamikaze.summit.dto.render.FieldDto</class-b>
+      </converter>
     </custom-converters>
 
    <!-- This makes all JODA time types copy by reference
@@ -34,6 +38,7 @@
 
   </configuration>
 
+  <!-- Disabled 2019-02-14: Use the custom converter so we instantiate correct FieldDto types.
   <mapping> 
     <class-a>org.awiki.kamikaze.summit.domain.Field</class-a>
     <class-b>org.awiki.kamikaze.summit.dto.render.FieldDto</class-b>   
@@ -45,11 +50,8 @@
       <a>codeFieldSourceTypeByDefaultValueType.code</a>
       <b>codeFieldDefaultValueSourceType</b>
     </field>
-    <!-- <field>
-      <a>source</a>
-      <b set-method="setSource(java.util.Set)">source</b>
-    </field> -->
   </mapping>  
+  -->
 
   <!-- convenience when storing metadata on queries -->
   <mapping>

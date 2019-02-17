@@ -249,7 +249,10 @@ create table FIELD
   --WAS: SOURCE character varying(32000),
   --WAS: DEFAULT_SOURCE character varying(32000),
   -- Note: joins through FIELD_SOURCE to store source.
-  NOTES character varying(4000)
+  NOTES character varying(4000),
+  PROCESSOR_CLASS character varying(4000)
+  --HAS_LABEL character varying(1),
+  --LABEL character varying(4000)
 );
 
 -- TODO: this seems like the better method than including Source on FIELD and REGION

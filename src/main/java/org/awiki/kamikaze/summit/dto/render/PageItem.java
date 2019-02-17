@@ -22,7 +22,7 @@ public interface PageItem<T> // Where T is the processed source type
    * Value = value to replace with.
    * @return Map<String, String> or empty Map
    */
-  public Map<String, String> getReplacementVariables();
+  public Map<String, String> getCustomReplacementVariables();
   
   /**
    * whether this pageItem contains PageItems itself.

@@ -1,4 +1,4 @@
-package org.awiki.kamikaze.summit.dto.render;
+package org.awiki.kamikaze.summit.dto.render.field;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -7,15 +7,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.awiki.kamikaze.summit.dto.render.ConditionalDto;
+import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.dto.render.TemplateDto;
 import org.awiki.kamikaze.summit.service.formatter.FormatEnums;
 
-public class KeyValuePairItemDto implements PageItem<String>
+public class KeyValuePairItem implements PageItem<String>
 {
   private Map.Entry<String, String> optionsKeyValue = null;
   private TemplateDto         template;
-  private String              processedSource;
   
-  public KeyValuePairItemDto(String key, String value)
+  public KeyValuePairItem(String key, String value)
   {
     this.optionsKeyValue = new AbstractMap.SimpleImmutableEntry<String, String>(key, value);
   }
@@ -48,7 +50,7 @@ public class KeyValuePairItemDto implements PageItem<String>
   }
 
   @Override
-  public Map<String, String> getReplacementVariables()
+  public Map<String, String> getCustomReplacementVariables()
   {
     Map<String, String> result = new TreeMap<String, String>();
     result.put(FormatEnums.REPLACEMENT_KEY_VARIABLE.toString(), optionsKeyValue == null ? StringUtils.EMPTY : optionsKeyValue.getKey());
@@ -92,6 +94,6 @@ public class KeyValuePairItemDto implements PageItem<String>
   @Override
   public String getProcessedSource()
   {
-    return processedSource;
+    return getValue();
   }
 }

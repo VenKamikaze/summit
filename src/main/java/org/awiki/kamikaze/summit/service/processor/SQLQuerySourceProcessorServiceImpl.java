@@ -3,10 +3,14 @@ package org.awiki.kamikaze.summit.service.processor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.awiki.kamikaze.summit.controller.edit.PageEditController;
 import org.awiki.kamikaze.summit.service.BindVarService;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTableExtractor;
+import org.awiki.kamikaze.summit.util.DebugUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -24,6 +28,8 @@ public class SQLQuerySourceProcessorServiceImpl implements TabularQuerySourcePro
   
   public static final String BUILT_IN_SQL_DML_SELECT_ROW_TYPE = "dml_selrow"; // query for a select statement, expects single row or no rows return.
   public static final String BUILT_IN_SQL_DML_SELECT_TYPE = "dml_select"; // query for a select statement, expects allow for zero or many rows return.
+
+  private static final Logger logger = LoggerFactory.getLogger(SQLQuerySourceProcessorServiceImpl.class);
 
   @Autowired
   private BindVarService bindVarService;
@@ -51,6 +57,8 @@ public class SQLQuerySourceProcessorServiceImpl implements TabularQuerySourcePro
   
   @Override
   public SourceProcessorResultTable executeQuery(final String source, final List<BindVar> bindVars) {
+    logger.trace(source);
+    DebugUtils.traceObjectGetters(bindVars);
     return jdbc.query(source,  new MapSqlParameterSource(bindVarService.convertBindVarsToSqlParameterMap(bindVars)), new SourceProcessorResultTableExtractor(null));
   }
 

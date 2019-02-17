@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.awiki.kamikaze.summit.dto.render.DropDownFieldDto;
+import org.awiki.kamikaze.summit.dto.render.DropDownOptionItemDto;
 import org.awiki.kamikaze.summit.dto.render.FieldDto;
 import org.awiki.kamikaze.summit.dto.render.PageDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
@@ -47,6 +49,8 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   static {  RESPONSIBILITIES.add(PageDto.class.getCanonicalName());
             RESPONSIBILITIES.add(RegionDto.class.getCanonicalName());
             RESPONSIBILITIES.add(FieldDto.class.getCanonicalName()); 
+            RESPONSIBILITIES.add(DropDownFieldDto.class.getCanonicalName());
+            RESPONSIBILITIES.add(DropDownOptionItemDto.class.getCanonicalName()); 
             RESPONSIBILITIES.add(SourceProcessorResultTable.class.getCanonicalName());
             RESPONSIBILITIES.add(SourceProcessorResultTable.HeaderRow.class.getCanonicalName()); 
             RESPONSIBILITIES.add(SourceProcessorResultTable.Row.class.getCanonicalName()); 
@@ -63,7 +67,7 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt, Map<String, String> replacementVariableCache, 
           final Collection<PageItem<String>> pageFields)
   {
-    replacementVariableCache.putAll(item.getReplacementVariables());
+    replacementVariableCache.putAll(item.getCustomReplacementVariables());
     
     // If condition says to not render this item, then return immediately
     if(item.getConditional() != null) {

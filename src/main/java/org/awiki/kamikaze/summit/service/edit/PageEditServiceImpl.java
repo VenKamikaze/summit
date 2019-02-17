@@ -2,6 +2,7 @@ package org.awiki.kamikaze.summit.service.edit;
 
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
 import org.awiki.kamikaze.summit.dto.edit.EditPageDto;
+import org.awiki.kamikaze.summit.exception.ResourceNotFoundException;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.awiki.kamikaze.summit.util.mapper.edit.PageToEditPageDtoMapper;
@@ -25,6 +26,11 @@ public class PageEditServiceImpl implements PageEditService
   public EditPageDto loadPage(long applicationId, long pageId)
   {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
+    
+    if(appPage == null || appPage.getPage() == null)
+    {
+      throw new ResourceNotFoundException("Could not find edit page for application: " + applicationId + " and page: " + pageId);
+    }
     //PageDto pageDto = mapper.map(appPage.getPage(), PageDto.class);
     EditPageDto pageDto = pageMapper.map(appPage.getPage());
     

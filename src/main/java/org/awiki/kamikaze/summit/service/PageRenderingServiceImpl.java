@@ -200,6 +200,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////// PAGE PROCESSING ON A POST BELOW //////////////////////////////////////////////////
 
+  // TODO this should be moved to a different service as it's distinct from just rendering a page.
   @Override
   public String processPageOnSubmit(long applicationId, long pageId, final MultiValueMap<String, String> submittedFormParams)
   {

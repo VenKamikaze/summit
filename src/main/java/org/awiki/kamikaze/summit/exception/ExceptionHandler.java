@@ -9,11 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExceptionHandler {
+public class ExceptionHandler
+{
   private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
 
   /* Request attribute where {@link LogException} is stored. */
-  public static final String LOGGED_EXCEPTION = "loggedException";
+  public static final String EXCEPTION_ATTR = "exceptionStackTrace";
 
   /* Request attribute indicating if stack traces should be shown. */
   public static final String SHOW_STACK_TRACE = "showStackTraces";
@@ -25,15 +26,17 @@ public class ExceptionHandler {
     this.showStackTraces = showStackTraces;
   }
 
-  public void recordException(HttpServletRequest request, Exception ex, String message)
+  public void exceptionLogging(HttpServletRequest request, Exception ex, String message)
   {
     String stackTrace = getFullStackTrace(ex);
     if (!message.isEmpty())
     {
       stackTrace = message + "\n" + stackTrace;
     }
-    logger.error("Exception encountered: "+ message +". stacktrace to follow");
+    logger.error("Exception encountered: " + message + ". stacktrace to follow");
     logger.error(stackTrace);
+    request.setAttribute(EXCEPTION_ATTR, stackTrace);
+    request.setAttribute(SHOW_STACK_TRACE, showStackTraces);
   }
 
   private static String getFullStackTrace(Exception ex)

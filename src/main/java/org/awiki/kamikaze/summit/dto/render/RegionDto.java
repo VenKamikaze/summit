@@ -136,7 +136,7 @@ public class RegionDto implements PageItem<String> {
   }
   
   @Override
-  public Map<String, String> getReplacementVariables()
+  public Map<String, String> getCustomReplacementVariables()
   {
     Map<String, String> result = new TreeMap<String, String>();
     result.put(FormatEnums.REPLACEMENT_REGION_ID_VARIABLE.toString(), getId().toString());

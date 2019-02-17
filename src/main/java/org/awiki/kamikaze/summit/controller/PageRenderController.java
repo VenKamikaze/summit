@@ -47,7 +47,13 @@ public class PageRenderController {
          final RedirectAttributes redirectAttributes) {
    logger.info("Hit POST on page /run/" + applicationId + "/" + pageId);
 
-   return renderService.processPageOnSubmit(Long.parseLong(applicationId), Long.parseLong(pageId), formData);
+   final String branchTo = renderService.processPageOnSubmit(Long.parseLong(applicationId), Long.parseLong(pageId), formData);
+   if(branchTo == null) {
+     // If we have no branch target, redirect back to this page including the specified form data.
+     redirectAttributes.addAllAttributes(formData);
+     return "redirect:/run/" + applicationId + "/" + pageId;
+   }
+   return branchTo; // TODO need attributes included.
  }
   
 }

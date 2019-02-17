@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.collections4.MapUtils;
+import org.awiki.kamikaze.summit.dto.render.field.FieldInstance;
 import org.hibernate.validator.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -42,6 +43,8 @@ public class FieldDto implements PageItem<String> {
   private PostProcessedFieldContentDto postProcessedDefaultValue;
   
   private ConditionalDto        conditional = new ConditionalDto();
+  
+  private FieldInstance fieldInstance;
   
   public Long getId() {
     return id;
@@ -197,7 +200,7 @@ public class FieldDto implements PageItem<String> {
   }
 
   @Override
-  public Map<String, String> getReplacementVariables()
+  public Map<String, String> getCustomReplacementVariables()
   {
     return MapUtils.EMPTY_SORTED_MAP; 
   }
@@ -211,5 +214,14 @@ public class FieldDto implements PageItem<String> {
   public void setConditional(ConditionalDto c)
   {
     this.conditional = c;
+  }
+  
+  public FieldInstance getFieldInstance()
+  {
+    return fieldInstance;
+  }
+  public void setFieldInstance(FieldInstance fieldInstance)
+  {
+    this.fieldInstance = fieldInstance;
   }
 }

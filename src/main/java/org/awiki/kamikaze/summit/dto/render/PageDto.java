@@ -120,7 +120,7 @@ public class PageDto implements PageItem<String> {
   }
   
   @Override
-  public Map<String, String> getReplacementVariables()
+  public Map<String, String> getCustomReplacementVariables()
   {
     return new TreeMap<String, String>() {{ put(FormatEnums.REPLACEMENT_PAGE_ID_VARIABLE.toString(), getId().toString()); }};
   }

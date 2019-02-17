@@ -60,4 +60,10 @@ public class BindVar
   {
     this.bindParameter = bindParameter;
   }
+
+  @Override
+  public String toString()
+  {
+    return "BindVar [bindParameter=" + bindParameter + ", value=" + value + ", type=" + type + "]";
+  }
 }

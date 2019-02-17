@@ -327,7 +327,7 @@ public class SourceProcessorResultTable implements PageItem<String>
     
     @JsonIgnore
     @Override
-    public Map<String, String> getReplacementVariables()
+    public Map<String, String> getCustomReplacementVariables()
     {
       return MapUtils.EMPTY_SORTED_MAP;
     }
@@ -431,7 +431,7 @@ public class SourceProcessorResultTable implements PageItem<String>
     
     @JsonIgnore
     @Override
-    public Map<String, String> getReplacementVariables()
+    public Map<String, String> getCustomReplacementVariables()
     {
       return MapUtils.EMPTY_SORTED_MAP;
     }
@@ -529,7 +529,7 @@ public class SourceProcessorResultTable implements PageItem<String>
 
   @JsonIgnore
   @Override
-  public Map<String, String> getReplacementVariables()
+  public Map<String, String> getCustomReplacementVariables()
   {
     return MapUtils.EMPTY_SORTED_MAP;
   }

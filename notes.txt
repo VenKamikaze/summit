@@ -1,4 +1,17 @@
 
+DropDown (2019-02-14):
+* Now renders. Needed a 'FieldConverter' Dozer type to map the appropriate field instance types.
+* (FIXED) We are missing FIELD_SOURCE for the dropdown field on page -10001
+** (FIXED)Add in the FIELD_SOURCE to populate the options list, and go from there.
+* 2019-02-17: now working - renders full dropdown with options and selected
+* TODO: bind variables are not yet supported.
+* Oracle setup SQL needs to be updated.
+
+Edit page:
+* Use PageRenderController to render form pages, e.g.: http://127.0.0.1:8080/summit/run/-10000/-10000?pageParams=code:dml_report
+** I _think_ the purpose of PageEditController was to be for creating/editing summit apps, e.g. the internal pages.
+** That said, the setup-backend.sql looks like an attempt to begin creating edit pages for summit itself???
+
 Fields and postProcessed values:
 Current implementation (2017-Nov):
 * A field domain/dto describes the metadata of a field that should be output on page rendering.
@@ -35,6 +48,9 @@ TODO:
 * Page POST processing when using 'dml_modify' as source type requires the SQL query to include CASTs, as all bind variables are treated as VARCHAR.
 ** Unsure how to approach a fix for this at present, perhaps we include the field types/java SQL types in the form?
 * Report region HTML templates for mustache are hard coded in javascript, need to add REST call to pull this down from server.
+* Exception page always prints ResourceNotFound?
+
+* PageProcessingSourceSelect is a bit of an unusual concept - it populates fields on a page for a PageProcessing source, but does so based on their field index... maybe medium term look at other options.
 
 
 (done, although may need to add more vars:)

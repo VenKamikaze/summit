@@ -26,7 +26,7 @@ insert into template select -62, null, 'Input Item - Number', 'org.awiki.kamikaz
 insert into template select -63, null, 'Input Item - DropDown', 'org.awiki.kamikaze.summit.dto.render.DropDownFieldDto', '<div class="field"><select name="##__NAME__##" id="##__ID__##">##__DATA__##</select></div>'; 
 
 -- Non-selectable template items belong in the -1000 range - the following is a dropdown 'option' kvp which is a child template of dropdown
-insert into template select -1063, -63, 'DropDown Option Item', 'org.awiki.kamikaze.summit.dto.render.DropDownOptionItemDto', '<option selected="##__SELECTED__##" value="##__KEY__##">##__DATA__##</option>'; 
+insert into template select -1063, -63, 'DropDown Option Item', 'org.awiki.kamikaze.summit.dto.render.DropDownOptionItemDto', '<option ##__SELECTED__## value="##__KEY__##">##__DATA__##</option>'; 
 
 -- Numbers -89 through -80 are reserved for button items.
 insert into template select -80, null, 'Input Item - Submit', 'org.awiki.kamikaze.summit.dto.render.FieldDto', '<div class="field"><input type="submit" name="__summitaction__" id="##__ID__##" value="##__NAME__##" onclick="Summit.Page.submit(this);" /></div>';

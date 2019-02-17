@@ -49,8 +49,8 @@ public class PageProcessingServiceImpl implements PageProcessingService
       PageProcessingSourceSelectDto res = processSourceDto.getPageProcessingSourceSelect().size() > 0 ? processSourceDto.getPageProcessingSourceSelect().get(0) : null;
       if (res != null) {
         res.setFieldValue(sResult);
+        results.put(res.getFieldName(), res);
       }
-      results.put(res.getFieldName(), res);
     }
     else if(SQLQuerySourceProcessorServiceImpl.BUILT_IN_SQL_DML_SELECT_ROW_TYPE.equals(processSourceDto.getCodeSourceType())) {
       final TabularQuerySourceProcessorService processor = sourceProcessors.getTabularSourceProcessorService(processSourceDto.getCodeSourceType());

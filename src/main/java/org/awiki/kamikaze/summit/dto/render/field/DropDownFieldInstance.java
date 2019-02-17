@@ -1,14 +1,22 @@
-package org.awiki.kamikaze.summit.dto.render;
+package org.awiki.kamikaze.summit.dto.render.field;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.MapUtils;
+import org.awiki.kamikaze.summit.dto.render.DropDownOptionItemDto;
+import org.awiki.kamikaze.summit.dto.render.FieldDto;
+import org.awiki.kamikaze.summit.dto.render.PageItem;
 
 
-public class DropDownFieldDto extends FieldDto {
+public class DropDownFieldInstance extends FieldInstance {
   
+  public DropDownFieldInstance(FieldDto field)
+  {
+    super(field);
+  }
+
   private List<PageItem<String>> options = new ArrayList<>();
   
   public void setOptions(List<DropDownOptionItemDto> options)
