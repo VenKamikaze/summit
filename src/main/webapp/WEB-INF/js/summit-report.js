@@ -143,6 +143,10 @@ Summit.Report = Summit.Report || {
     var rowCount = withTotalCount ? "{{rowFrom}} - {{rowTo}} of {{totalCount}}" : "{{rowFrom}} - {{rowTo}}";
     var template = "<a id=\"navPrev-" + reportInstance.regionId + "\" href=\"javascript:Summit.Report.navigate(" + reportInstance.regionId + ", 'prev')\"><img src=\"" + Summit.Page.contextPath + "/images/arrow-left-xs.png\" title=\"Prev\" alt=\"Prev\" align=\"absmiddle\"></a>" + rowCount + "<a id=\"navNext-" + reportInstance.regionId + "\" href=\"javascript:Summit.Report.navigate(" + reportInstance.regionId + ",'next')\"><img src=\"" + Summit.Page.contextPath + "/images/arrow-right-xs.png\" title=\"Next\" alt=\"Next\" align=\"absmiddle\"></a>";
     var currentPage = $("#searchPage-" + reportInstance.regionId).val();
+    if (currentPage == null) {
+      currentPage = "1";
+    }
+    var rowsDisplayed = $("#searchRows-" + reportInstance.regionId).val();
     var data = {
       rowFrom: function() {
         if( currentPage == "1" ) {
@@ -152,11 +156,11 @@ Summit.Report = Summit.Report || {
           return 1; // we have records, and we start from 1 on the first page.
         }
 
-        return ((currentPage -1) * reportInstance.data.count) + 1; //we have records and we are not on the first page.
+        return ((currentPage -1) * rowsDisplayed) + 1; //we have records and we are not on the first page.
       },
 
       rowTo: function() {
-        return (currentPage * reportInstance.data.count);
+        return (this.rowFrom() + (reportInstance.data.count -1) );
       },
 
       totalCount: reportInstance.data.totalCount
