@@ -91,7 +91,7 @@ public class PageRestController {
 	 /**
 	  * Checks specified columnName with a LIKE '%' + term + '%' clause to find results.
    */
-  @RequestMapping(value = "/api/filter/{applicationId}/{pageId}/{columnName}", method = RequestMethod.POST)
+  @RequestMapping(value = "/api/filter/{applicationId}/{pageId}/{columnName}", method = { RequestMethod.GET, RequestMethod.POST })
   public SourceProcessorResultTable filterColumn(@PathVariable String applicationId, @PathVariable String pageId, @PathVariable String columnName,
           @RequestParam(required=false,name="filterType") final String filterType,
           @RequestParam(required=false,name="search") final String searchValue,

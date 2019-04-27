@@ -1,6 +1,7 @@
 package org.awiki.kamikaze.summit.service.report;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +57,10 @@ public class SQLReportQueryBuilderServiceImpl implements SQLReportQueryBuilderSe
     if(StringUtils.isNotBlank(columnToFilter)) {
       /* A column is specified - query against the column specified (check it is valid first) */
       if(columnList.contains(columnToFilter)) {
-        query.append(" WHERE ").append(wrapInCast(new ArrayList<String>(1) {{ add(columnToFilter); }}, databaseUtils.getVarcharCastType())).append(handleFilterType(FilterTypeEnum.valueOf(filterType.toUpperCase()), ":searchText"));
+        query.append(" WHERE ").append(
+                wrapInCast(Arrays.asList(columnToFilter), databaseUtils.getVarcharCastType()).iterator().next()
+                )
+        .append(handleFilterType(FilterTypeEnum.valueOf(filterType.toUpperCase()), ":searchText"));
       }
     }
     else {

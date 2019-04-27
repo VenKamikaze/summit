@@ -1,27 +1,12 @@
 package org.awiki.kamikaze.summit.service.processor;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-import org.awiki.kamikaze.summit.dto.render.RegionDto;
-import org.awiki.kamikaze.summit.repository.RegionRepository;
-import org.awiki.kamikaze.summit.service.BindVarService;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
-import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Column;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTableExtractor;
-import org.dozer.Mapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
 /**
