@@ -66,6 +66,9 @@ Summit.Report = Summit.Report || {
   },
 
 
+  doRequest : function(reportInstance) {
+    this.doRequest(reportInstance, true);
+  },
 
   /**
    * Performs the actual AJAX request to the server,
@@ -73,7 +76,7 @@ Summit.Report = Summit.Report || {
    * Params : formData - serialised formData to send to the remote server.
    *        : reportInstance - an initialised Summit.Report.ReportInstance object, without JSON data (or with JSON data that can be replaced).
    */
-  doRequest : function(reportInstance) {
+  doRequest : function(reportInstance, resetPagination) {
     if(reportInstance != null && reportInstance.isInitialised() ) {
       var formElement = "";
       if(reportInstance.formId != null) {
@@ -83,6 +86,9 @@ Summit.Report = Summit.Report || {
         formElement += reportInstance.formId;
       }
       var that = this;
+      if (resetPagination) {
+        that.resetPagination(reportInstance.regionId);
+      }
       var formData = $(formElement).serialize();
       var pageParams = Summit.Page.getUrlParameter('pageParams');
       formData = (formData == null ? "pageParams=" + pageParams : formData + "&pageParams=" + pageParams);
@@ -174,6 +180,18 @@ Summit.Report = Summit.Report || {
 
     if(data.rowFrom() <= 1) {
       $("#mustacheReportNav-" + reportInstance.regionId).find("#navPrev-" + reportInstance.regionId).hide();
+    }
+  },
+
+  /**
+   * Resets the pagination to search from the first page
+   * Avoids pagination errors when performing new searches (always defaults to first page)
+   */
+  resetPagination: function(regionId) {
+    var formElement = $("#searchForm-" + regionId);
+    if(formElement != null) {
+      var pageElement = formElement.find("#searchPage-" + regionId);
+      $(pageElement).val("1");
     }
   },
 
