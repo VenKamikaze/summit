@@ -6,25 +6,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
-import org.awiki.kamikaze.summit.dto.entry.FieldDto;
-import org.awiki.kamikaze.summit.dto.entry.PageDto;
-import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
-import org.awiki.kamikaze.summit.dto.entry.RegionDto;
-import org.awiki.kamikaze.summit.dto.entry.RegionFieldDto;
+import org.awiki.kamikaze.summit.dto.render.FieldDto;
+import org.awiki.kamikaze.summit.dto.render.PageDto;
+import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
+import org.awiki.kamikaze.summit.dto.render.RegionDto;
+import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
+import org.awiki.kamikaze.summit.dto.render.SourceDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
-import org.awiki.kamikaze.summit.service.processor.SourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
 import org.dozer.Mapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 /**
@@ -33,7 +32,7 @@ import org.springframework.util.StringUtils;
  *
  */
 //@Service
-public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRenderingService {
+public class OldPageRenderingServiceImplBeforeTemplateRefactor implements OldPageRenderingServiceBeforeTemplateRefactor {
   
   private static final Logger log = LoggerFactory.getLogger(OldPageRenderingServiceImplBeforeTemplateRefactor.class);
   
@@ -137,7 +136,7 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRe
       RegionDto regionDto = pageRegionDto.getRegionDto();
       if(REGION_TYPE_REPORT.equals(regionDto.getCodeRegionType()) )
       {
-        ReportSourceProcessorService reportService = (ReportSourceProcessorService) sourceProcessors.getSourceProcessorService(regionDto.getCodeSourceType());
+        ReportSourceProcessorService reportService = sourceProcessors.getReportSourceProcessorService(regionDto.getCodeSourceType());
         
         // TODO, split+call out to a formatter here to apply styling & formatting as needed to the results.
         SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getId(), regionDto.getSource().iterator().next(), null);
@@ -170,9 +169,18 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRe
       final FieldDto fieldDto = regionFieldDto.getField();
       FieldDto.PostProcessedFieldContentDto processedContent = fieldDto.new PostProcessedFieldContentDto();
       FieldDto.PostProcessedFieldContentDto processedDefaultContent = fieldDto.new PostProcessedFieldContentDto();
-      SingularSourceProcessorService processor = (SingularSourceProcessorService) sourceProcessors.getSourceProcessorService(fieldDto.getCodeFieldSourceType());
-      processedContent.setPostProcessedContent(processor.querySource(fieldDto.getSource(), null).getResultValue()); // TODO FIXME handle bind vars
-      processedDefaultContent.setPostProcessedContent(processor.querySource( fieldDto.getDefaultValueSource() , null ).getResultValue() );  // TODO FIXME handle bind vars
+      SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(fieldDto.getCodeFieldSourceType());
+      String processedSource = "";
+      for(SourceDto source : fieldDto.getSource()) {
+        processedSource += processor.processSource(source.getSource(), fieldDto.getCodeFieldSourceType(), null).getResultValue(); // TODO FIXME handle bind vars
+      }
+      processedContent.setPostProcessedContent(processedSource);
+      String processedDefaultSource = "";
+      for(SourceDto source : fieldDto.getDefaultValueSource()) {
+        processedDefaultSource += processor.processSource( source.getSource() , fieldDto.getCodeFieldDefaultValueSourceType(), null ).getResultValue();  // TODO FIXME handle bind vars
+      }
+      processedDefaultContent.setPostProcessedContent(processedDefaultSource);
+      
       fieldDto.setPostProcessedSource(processedContent);
       fieldDto.setPostProcessedDefaultValue(processedDefaultContent);
       
@@ -184,13 +192,6 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements PageRe
         sb.append(processedContent.getPostProcessedContent());
     }
     return sb.toString();
-  }
-
-  @Override
-  public String renderPageToString(long applicationId, long pageId)
-  {
-    // TODO Auto-generated method stub
-    return null;
   }
 
 }

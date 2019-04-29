@@ -1,6 +1,10 @@
 package org.awiki.kamikaze.summit.service.formatter;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import org.awiki.kamikaze.summit.dto.render.PageItem;
 
 public interface FormatterService<T>
 {
@@ -17,5 +21,5 @@ public interface FormatterService<T>
    * @param item
    * @return the StringBuilder object passed into this function.
    */
-  public StringBuilder format(final StringBuilder builder, final T item, int insertAt);
+  public StringBuilder format(final StringBuilder builder, final T item, int insertAt, Map<String, String> replacementVariableCache, Collection<PageItem<String>> pageFields);
 }

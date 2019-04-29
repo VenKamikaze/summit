@@ -1,0 +1,45 @@
+#main {
+  margin: 1em 0em 0em 1em !important;
+}
+
+.region {
+  width: 55%;
+  background: #e8edff;
+}
+
+.region form {
+  padding: 2em;
+}
+
+form .field label {
+  font-weight: bold;
+  text-align: right;
+}
+
+form input {
+  width: 18em;
+  margin-bottom: 0.3em;
+}
+
+form input .sml {
+  width: 10em;
+}
+
+
+form input .large {
+  width: 25em;
+}
+
+form input[type=submit] {
+  margin-top: 1em;
+  width: auto;
+}
+
+.field .fielderror {
+  position: absolute;
+  left: 50em;
+  font-weight: bold;
+  color: darkorange;
+  padding-top: 3pt;
+  text-decoration: underline;
+}

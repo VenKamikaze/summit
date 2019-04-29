@@ -31,11 +31,23 @@
 
 
     <definition name="basic" extends="base.definition">
-        <put-attribute name="title" value="Test Minimal" />
+        <put-attribute name="title" value="Application Error" />
         <put-attribute name="header" value="" />
         <put-attribute name="menu" value="" />
-        <put-attribute name="body" value="/WEB-INF/views/entry/main.jspx" />
+        <put-attribute name="body" value="/WEB-INF/views/template/minimal-body.jspx" />
         <put-attribute name="footer" value="" />
     </definition>
 
+    <!--
+  <definition name="error/resourceNotFound" extends="basic">
+    <put-attribute name="body"
+      value="/WEB-INF/views/error/uncaughtException.jspx" />
+  </definition>
+  <definition name="error/uncaughtException" extends="basic">
+    <put-attribute name="body"
+      value="/WEB-INF/views/error/uncaughtException.jspx" />
+  </definition>
+    -->
+
 </tiles-definitions>
+

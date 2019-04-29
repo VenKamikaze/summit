@@ -1,7 +1,7 @@
 package org.awiki.kamikaze.summit.service;
 
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
-import org.awiki.kamikaze.summit.dto.entry.ApplicationPageDto;
+import org.awiki.kamikaze.summit.dto.render.ApplicationPageDto;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.dozer.Mapper;
 import org.slf4j.Logger;

@@ -4,3 +4,7 @@ The following replacment variables are processed by the generic formatter and re
 ##__APIPATH__## : /summit/api
 
 You can modify the above to suit your environment, for example if you have summit behind a proxy you may need to modify the generated path for CONTEXTPATH or APIPATH. You can also add your own and then use them within your templates.
+
+Reserved bind variable names:
+
+REQUEST - Use this to reference a button name posted as part of your form.

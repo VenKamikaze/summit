@@ -1,6 +1,6 @@
 package org.awiki.kamikaze.summit.service;
 
-import org.awiki.kamikaze.summit.dto.entry.ApplicationPageDto;
+import org.awiki.kamikaze.summit.dto.render.ApplicationPageDto;
 
 public interface ApplicationPageService {
 

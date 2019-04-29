@@ -6,7 +6,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.xml.crypto.NoSuchMechanismException;
 
-import org.awiki.kamikaze.summit.dto.entry.PageItem;
+import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +37,8 @@ public class ProxyFormatterServiceImpl implements ProxyFormatterService {
   }
   
   public FormatterService<PageItem<?>> getFormatterService(final String canonicalClassNameToFormat) {
-    if (formatterServiceCache.get(canonicalClassNameToFormat) == null)
-      throw new NoSuchMechanismException("No service found for formatter type=" + canonicalClassNameToFormat);
+    if (! formatterServiceCache.containsKey(canonicalClassNameToFormat))
+      throw new UnsupportedOperationException("No service found for formatter type=" + canonicalClassNameToFormat);
 
     return formatterServiceCache.get(canonicalClassNameToFormat);
   }

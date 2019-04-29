@@ -66,6 +66,9 @@ Summit.Report = Summit.Report || {
   },
 
 
+  doRequest : function(reportInstance) {
+    this.doRequest(reportInstance, true);
+  },
 
   /**
    * Performs the actual AJAX request to the server,
@@ -73,16 +76,24 @@ Summit.Report = Summit.Report || {
    * Params : formData - serialised formData to send to the remote server.
    *        : reportInstance - an initialised Summit.Report.ReportInstance object, without JSON data (or with JSON data that can be replaced).
    */
-  doRequest : function(reportInstance) {
+  doRequest : function(reportInstance, resetPagination) {
     if(reportInstance != null && reportInstance.isInitialised() ) {
       var formElement = "";
-      if(reportInstance.formId.charAt(0) != '#') {
-        formElement = "#";
+      if(reportInstance.formId != null) {
+        if (reportInstance.formId.charAt(0) != '#') {
+          formElement = "#";
+        }
+        formElement += reportInstance.formId;
       }
-      formElement += reportInstance.formId;
       var that = this;
+      if (resetPagination) {
+        that.resetPagination(reportInstance.regionId);
+      }
+      var formData = $(formElement).serialize();
+      var pageParams = Summit.Page.getUrlParameter('pageParams');
+      formData = (formData == null ? "pageParams=" + pageParams : formData + "&pageParams=" + pageParams);
       var data = $.ajax({ url: reportInstance.filterPath,
-                        data: $(formElement).serialize(),
+                        data: formData,
                         cache: false,
                         success: function(response) {
                             reportInstance.setData(response);
@@ -138,6 +149,10 @@ Summit.Report = Summit.Report || {
     var rowCount = withTotalCount ? "{{rowFrom}} - {{rowTo}} of {{totalCount}}" : "{{rowFrom}} - {{rowTo}}";
     var template = "<a id=\"navPrev-" + reportInstance.regionId + "\" href=\"javascript:Summit.Report.navigate(" + reportInstance.regionId + ", 'prev')\"><img src=\"" + Summit.Page.contextPath + "/images/arrow-left-xs.png\" title=\"Prev\" alt=\"Prev\" align=\"absmiddle\"></a>" + rowCount + "<a id=\"navNext-" + reportInstance.regionId + "\" href=\"javascript:Summit.Report.navigate(" + reportInstance.regionId + ",'next')\"><img src=\"" + Summit.Page.contextPath + "/images/arrow-right-xs.png\" title=\"Next\" alt=\"Next\" align=\"absmiddle\"></a>";
     var currentPage = $("#searchPage-" + reportInstance.regionId).val();
+    if (currentPage == null) {
+      currentPage = "1";
+    }
+    var rowsDisplayed = $("#searchRows-" + reportInstance.regionId).val();
     var data = {
       rowFrom: function() {
         if( currentPage == "1" ) {
@@ -147,11 +162,11 @@ Summit.Report = Summit.Report || {
           return 1; // we have records, and we start from 1 on the first page.
         }
 
-        return ((currentPage -1) * reportInstance.data.count) + 1; //we have records and we are not on the first page.
+        return ((currentPage -1) * rowsDisplayed) + 1; //we have records and we are not on the first page.
       },
 
       rowTo: function() {
-        return (currentPage * reportInstance.data.count);
+        return (this.rowFrom() + (reportInstance.data.count -1) );
       },
 
       totalCount: reportInstance.data.totalCount
@@ -165,6 +180,18 @@ Summit.Report = Summit.Report || {
 
     if(data.rowFrom() <= 1) {
       $("#mustacheReportNav-" + reportInstance.regionId).find("#navPrev-" + reportInstance.regionId).hide();
+    }
+  },
+
+  /**
+   * Resets the pagination to search from the first page
+   * Avoids pagination errors when performing new searches (always defaults to first page)
+   */
+  resetPagination: function(regionId) {
+    var formElement = $("#searchForm-" + regionId);
+    if(formElement != null) {
+      var pageElement = formElement.find("#searchPage-" + regionId);
+      $(pageElement).val("1");
     }
   },
 

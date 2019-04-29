@@ -28,9 +28,15 @@ public class SqlDDLProcessorServiceImpl implements SingularSourceProcessorServic
   {
     return new ArrayList<String>(Arrays.asList(SingularSourceProcessorService.BUILT_IN_SQL_DDL_TYPE));
   }
+  
+  @Override
+  public SourceProcessorResult processSource(final String source, final String sourceType, final List<BindVar> bindVars)
+  {
+    return executeSource(source, bindVars);
+  }
 
   @Override
-  public SourceProcessorResult executeSource(final String ddl, List<BindVar> bindVars) {
+  public SourceProcessorResult executeSource(final String ddl, final List<BindVar> bindVars) {
     Assert.isTrue(bindVars == null || bindVars.isEmpty()); // execute immediate can support bind? consider..
     try {
       jdbc.execute(ddl);
@@ -44,7 +50,7 @@ public class SqlDDLProcessorServiceImpl implements SingularSourceProcessorServic
   }
   
   @Override
-  public SourceProcessorResult querySource(final String ddl, List<BindVar> bindVars) {
+  public SourceProcessorResult querySource(final String ddl, final List<BindVar> bindVars) {
     throw new NotImplementedException("Cannot querySource with DDL! Maybe you want SqlDMLProcessor?");
   }
 

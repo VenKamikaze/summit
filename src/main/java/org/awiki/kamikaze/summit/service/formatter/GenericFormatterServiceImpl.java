@@ -1,19 +1,24 @@
 package org.awiki.kamikaze.summit.service.formatter;
 
+import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_DATA_AND_SUBREGION_VARIABLE;
 import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_ID_VARIABLE;
-import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_SUBREGION_VARIABLE;
+import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMENT_NAME_VARIABLE;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.awiki.kamikaze.summit.dto.entry.FieldDto;
-import org.awiki.kamikaze.summit.dto.entry.PageDto;
-import org.awiki.kamikaze.summit.dto.entry.PageItem;
-import org.awiki.kamikaze.summit.dto.entry.RegionDto;
-import org.awiki.kamikaze.summit.dto.entry.TemplateDto;
+import org.awiki.kamikaze.summit.dto.render.DropDownFieldDto;
+import org.awiki.kamikaze.summit.dto.render.DropDownOptionItemDto;
+import org.awiki.kamikaze.summit.dto.render.FieldDto;
+import org.awiki.kamikaze.summit.dto.render.PageDto;
+import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.dto.render.RegionDto;
+import org.awiki.kamikaze.summit.dto.render.TemplateDto;
 import org.awiki.kamikaze.summit.repository.TemplateRepository;
+import org.awiki.kamikaze.summit.service.ConditionalEvaluatorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.component.VariableManager;
 import org.slf4j.Logger;
@@ -37,37 +42,56 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
   @Autowired
   private ProxyFormatterService formatters;
   
+  @Autowired
+  private ConditionalEvaluatorService conditionalService;
+  
+  public static final List<String> RESPONSIBILITIES = new ArrayList<String>(7);
+  static {  RESPONSIBILITIES.add(PageDto.class.getCanonicalName());
+            RESPONSIBILITIES.add(RegionDto.class.getCanonicalName());
+            RESPONSIBILITIES.add(FieldDto.class.getCanonicalName()); 
+            RESPONSIBILITIES.add(DropDownFieldDto.class.getCanonicalName());
+            RESPONSIBILITIES.add(DropDownOptionItemDto.class.getCanonicalName()); 
+            RESPONSIBILITIES.add(SourceProcessorResultTable.class.getCanonicalName());
+            RESPONSIBILITIES.add(SourceProcessorResultTable.HeaderRow.class.getCanonicalName()); 
+            RESPONSIBILITIES.add(SourceProcessorResultTable.Row.class.getCanonicalName()); 
+            RESPONSIBILITIES.add(SourceProcessorResultTable.Cell.class.getCanonicalName()); };
+  
+  
   @Override
-  @SuppressWarnings("serial")
   public List<String> getResponsibilities()
   {
-    return new ArrayList<String>(7) {{ add(PageDto.class.getCanonicalName());
-                                       add(RegionDto.class.getCanonicalName());
-                                       add(FieldDto.class.getCanonicalName()); 
-                                       add(SourceProcessorResultTable.class.getCanonicalName());
-                                       add(SourceProcessorResultTable.HeaderRow.class.getCanonicalName()); 
-                                       add(SourceProcessorResultTable.Row.class.getCanonicalName()); 
-                                       add(SourceProcessorResultTable.Cell.class.getCanonicalName()); 
-                                    }};
+    return RESPONSIBILITIES;
   }
 
   @Override
-  public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt)
-  { 
+  public StringBuilder format(StringBuilder builder, PageItem<String> item, int insertAt, Map<String, String> replacementVariableCache, 
+          final Collection<PageItem<String>> pageFields)
+  {
+    replacementVariableCache.putAll(item.getCustomReplacementVariables());
+    
+    // If condition says to not render this item, then return immediately
+    if(item.getConditional() != null) {
+      if(! conditionalService.evaluate(item.getConditional(), pageFields) ) {
+        return builder;
+      }
+    }
+    
     final TemplateDto template = item.getTemplateDto(); 
     // A template can be null, for example with Mustache templating you can handle Row/HeaderRow/Cell objects at a higher level template
     if(null != template) {
       logger.debug("Formatting item : " + item.getClass().getCanonicalName());
-      String templateSource = replaceInternalVariables(template.getSource(), item);
+      String templateSource = replaceInternalVariables(template.getSource(), item, replacementVariableCache);
       templateSource = replaceApplicationVariables(templateSource, variableManager.getReplacementVars());
-      int templateSourceReplaceLocation = templateSource.indexOf(REPLACEMENT_SUBREGION_VARIABLE.toString()) == -1 ? 0 : templateSource.indexOf(REPLACEMENT_SUBREGION_VARIABLE.toString());
+      String processedSource = item.getProcessedSource() == null ? StringUtils.EMPTY : replaceInternalVariables(item.getProcessedSource(), item, replacementVariableCache);
+      processedSource = replaceApplicationVariables(processedSource, variableManager.getReplacementVars());
+      int templateSourceReplaceLocation = templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString()) == -1 ? 0 : templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString());
       int nextInsertAt = templateSourceReplaceLocation + insertAt;
-      builder.insert(insertAt, templateSource.replace(REPLACEMENT_SUBREGION_VARIABLE.toString(), item.getProcessedSource() == null ? "" : item.getProcessedSource()));
+      builder.insert(insertAt, templateSource.replace(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString(), processedSource));
   
-      if(item.hasSubPageItems()) {
-        for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getSubPageItems())) ) {
+      if(item.hasChildPageItems()) {
+        for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getChildPageItems())) ) {
           FormatterService<PageItem<?>> formatter = formatters.getFormatterService(innerItem.getClass().getCanonicalName());
-          formatter.format(builder, innerItem, nextInsertAt);
+          formatter.format(builder, innerItem, nextInsertAt, replacementVariableCache, pageFields);
         }
       }
     }
@@ -82,9 +106,14 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
    * 
    * @param builder
    * @param item
+   * @param replacementVariableCache - a running cache that is built up of unique replacement variables per PageItem processed.
    * @return recalculated length of insertAt variable after replacements have run.
    */
-  private String replaceInternalVariables(String templateSource, PageItem<String> item) {
+  private String replaceInternalVariables(String templateSource, final PageItem<String> item, final Map<String, String> replacementVariableCache) {
+    for(Map.Entry<String, String> kvp : replacementVariableCache.entrySet()) {
+      templateSource = StringUtils.replace(templateSource, kvp.getKey(), kvp.getValue());
+    }
+    templateSource = StringUtils.replace(templateSource, REPLACEMENT_NAME_VARIABLE.toString(), item.getName() );
     return StringUtils.replace(templateSource, REPLACEMENT_ID_VARIABLE.toString(), item.getId().toString());
   }
   

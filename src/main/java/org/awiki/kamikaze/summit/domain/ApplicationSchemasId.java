@@ -29,7 +29,7 @@ public class ApplicationSchemasId implements java.io.Serializable
     this.schemaName = schemaName;
   }
 
-  @Column(name = "application_id", nullable = false)
+  @Column(name = "APPLICATION_ID", nullable = false)
   public long getApplicationId()
   {
     return this.applicationId;
@@ -40,7 +40,7 @@ public class ApplicationSchemasId implements java.io.Serializable
     this.applicationId = applicationId;
   }
 
-  @Column(name = "schema_name", nullable = false, length = 100)
+  @Column(name = "SCHEMA_NAME", nullable = false, length = 100)
   public String getSchemaName()
   {
     return this.schemaName;

@@ -12,7 +12,6 @@
   <jsp:output doctype-root-element="html" doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" doctype-system="http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"/>
 
   <jsp:scriptlet>
-        response.setHeader("Cache-Control","no-cache"); // HTTP 1.1
         response.setHeader("Pragma","no-cache");        // HTTP 1.0
         response.setDateHeader ("Expires", 0);          //proxy server
         response.setHeader("Cache-Control","no-store"); //HTTP 1.1

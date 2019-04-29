@@ -13,7 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "template", schema = "public")
+@Table(name = "TEMPLATE")
 public class Template  implements java.io.Serializable {
 
   /**
@@ -68,7 +68,9 @@ public class Template  implements java.io.Serializable {
   }
 
 
-  @Column(name = "source", nullable = true)
+  //@Lob
+  //@Type(type="org.hibernate.type.MaterializedClobType")
+  @Column(name = "SOURCE", nullable = true)
   public String getSource()
   {
     return this.source;

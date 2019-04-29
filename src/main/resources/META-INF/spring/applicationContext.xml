@@ -112,6 +112,6 @@
   <bean id="exceptionHandler" class="org.awiki.kamikaze.summit.exception.ExceptionHandler" />
     
   <bean class="org.awiki.kamikaze.summit.exception.LoggingSimpleMappingExceptionResolver"
-    p:defaultErrorView="uncaughtException" p:message="Exception caught in handler processing" />
+    p:defaultErrorView="/error/uncaughtException" p:message="Exception caught in handler processing" p:showStackTraces="true"/>
 
 </beans>

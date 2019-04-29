@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
  * of the source code into rendered content. 
  */
 @Entity
-@Table(name = "code_source_type", schema = "public")
+@Table(name = "code_source_type")
 public class CodeSourceType implements java.io.Serializable, CodeTable
 {
 

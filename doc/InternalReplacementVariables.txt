@@ -1,5 +1,7 @@
 The following replacment variables are processed by the internal formatters and replaced with identifiers unique to each section:
 
-##__DATA__## : This identifies sub-region replacement locations.
-##__ID__## : This identifies an ID for the current region.
+##__DATA__## : This identifies sub-region or data driven replacement locations.
+##__REGION-ID__## : This identifies an ID for the current region. This value does not exist if you are not within a region. Also used to identify a form within a region (only one form per region is expected).
+##__PAGE-ID__## : This identifies an ID for the current page.
+##__ID__## : This identifies an ID for the current item being processed. May not be unique between item types, e.g. will be unique per field on a page, but a field id may be shared with e.g. a region.
 

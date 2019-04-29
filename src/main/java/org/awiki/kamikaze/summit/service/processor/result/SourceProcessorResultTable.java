@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.iterators.ArrayListIterator;
-import org.awiki.kamikaze.summit.dto.entry.PageItem;
-import org.awiki.kamikaze.summit.dto.entry.TemplateDto;
-import org.awiki.kamikaze.summit.service.formatter.Formattable;
+import org.apache.commons.collections4.MapUtils;
+import org.awiki.kamikaze.summit.dto.render.ConditionalDto;
+import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.dto.render.TemplateDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,13 +24,10 @@ import com.google.common.base.Objects;
  * It consists of {@link Column}s, {@link Row}s and {@link Cell}s.
  * Cells know about their parent column and row. Each Cell should know what x and y position it has within the table.
  *  
- * (NOTE: ignore the following -- removed the implements Formattable while I decide how this should work) The whole table is {@link Formattable}, but further to that, each Row is also {@link Formattable}
- * This allows dynamic styling of reports, which means you can produce HTML style reports or CSV style reports
- * easily.
  * @author msaun
  *
  */
-public class SourceProcessorResultTable implements PageItem<String>, Formattable<org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Row>
+public class SourceProcessorResultTable implements PageItem<String>
 {  
   private static final Logger logger = LoggerFactory.getLogger(SourceProcessorResultTable.class);
   
@@ -55,9 +54,13 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   
   public SourceProcessorResultTable(String id)
   {
-    this.id = id;
+    setId(id);
   }
 
+  public void setId(String id) {
+    this.id = id;
+  }
+  
   public Long getPages()
   {
     return pages;
@@ -131,6 +134,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   public class Column {
     private String name;
     private int order;
+    private int sqlType;
     
     @JsonIgnore
     private List<Cell> cellsInColumn = new ArrayList<>();
@@ -140,6 +144,13 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     {
       this.name = name;
       this.order = order;
+    }
+    
+    public Column(String name, int order, int sqlType)
+    {
+      this.name = name;
+      this.order = order;
+      this.sqlType = sqlType;
     }
     
     public String getName()
@@ -161,6 +172,16 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     {
       this.order = order;
     }
+    
+    public int getSqlType()
+    {
+      return sqlType;
+    }
+    
+    public void setSqlType(int sqlType)
+    {
+      this.sqlType = sqlType;
+    }
 
     public List<Cell> getCellsInColumn()
     {
@@ -181,6 +202,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     public String toString() {
       return getName();
     }
+    
   }
   
   public class HeaderRow extends SourceProcessorResultTable.Row {
@@ -207,7 +229,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
   }
   
   
-  public class Row implements PageItem<String>, Iterable<Cell>, Formattable<String> {
+  public class Row implements PageItem<String>, Iterable<Cell> {
 
     @JsonIgnore
     private TemplateDto templateDto;
@@ -247,29 +269,6 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       return new ArrayListIterator(this.cells);
     }
 
-    @Override
-    @JsonIgnore
-    public Collection<String> getHeaderElements()
-    {
-      logger.debug("getHeaderElements called on row(), but row() cannot have non-body elements"); 
-      return new ArrayList<String>(0);
-    }
-
-    @Override
-    @JsonIgnore
-    public Collection<String> getBodyElements()
-    {
-      return convertToStringCollection(this);
-    }
-
-    @Override
-    @JsonIgnore
-    public Collection<String> getFooterElements()
-    {
-      logger.debug("getFooterElements called on row(), but row() cannot have non-body elements");
-      return new ArrayList<String>(0);
-    }
-
     private Collection<String> convertToStringCollection(final Row row)
     {
       final Collection<String> elements = new ArrayList<>(row.getCells().size());
@@ -281,23 +280,16 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     }
 
     @Override
-    public boolean hasSubPageItems()
+    public boolean hasChildPageItems()
     {
       return this.cells.size() > 0;
     }
 
     @JsonIgnore
     @Override
-    public Collection<PageItem<String>> getSubPageItems()
+    public Collection<PageItem<String>> getChildPageItems()
     {
       return new ArrayList<PageItem<String>>(this.cells);
-    }
-
-    @Override
-    public void setProcessedSource(String t)
-    {
-      // TODO Auto-generated method stub
-      
     }
 
     @Override
@@ -333,6 +325,26 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       return hashCode();
     }
     
+    @JsonIgnore
+    @Override
+    public Map<String, String> getCustomReplacementVariables()
+    {
+      return MapUtils.EMPTY_SORTED_MAP;
+    }
+
+    @Override
+    public String getName()
+    {
+      logger.warn("getName() called on " + this.getClass().getCanonicalName() + " but we have no name. Returning null");
+      return null;
+    }
+
+    @Override
+    public ConditionalDto getConditional()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
   }
 
   
@@ -381,15 +393,9 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
     }
 
     @Override
-    public boolean hasSubPageItems()
+    public boolean hasChildPageItems()
     {
       return false;
-    }
-
-    @Override
-    public void setProcessedSource(String t)
-    {
-      // TODO Auto-generated method stub
     }
 
     @Override
@@ -400,7 +406,7 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
 
     @JsonIgnore
     @Override
-    public Collection<PageItem<String>> getSubPageItems()
+    public Collection<PageItem<String>> getChildPageItems()
     {
       return new ArrayList<>(0);
     }
@@ -422,50 +428,40 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
       logger.warn("getId() called on " + this.getClass().getCanonicalName() + " but we have no specific ID. Return hashCode()");
       return hashCode();
     }
+    
+    @JsonIgnore
+    @Override
+    public Map<String, String> getCustomReplacementVariables()
+    {
+      return MapUtils.EMPTY_SORTED_MAP;
+    }
+
+    @Override
+    public String getName()
+    {
+      logger.warn("getName() called on " + this.getClass().getCanonicalName() + " but we have no name. Returning null");
+      return null;
+    }
+
+    @Override
+    public ConditionalDto getConditional()
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
   }
   
-  @JsonIgnore
-  @SuppressWarnings("serial")
   @Override
-  public Collection<Row> getHeaderElements()
-  {
-    return new ArrayList<Row>(1) {{ add(getHeader()); }};
-  }
-
-  @JsonIgnore
-  @Override
-  public Collection<Row> getBodyElements()
-  {
-    return this.getBody();
-  }
-
-  @JsonIgnore
-  @SuppressWarnings("serial")
-  @Override
-  public Collection<Row> getFooterElements()
-  {
-    return new ArrayList<Row>(1) {{ add(getFooter()); }};
-  }
-
-  @Override
-  public boolean hasSubPageItems()
+  public boolean hasChildPageItems()
   {
     return this.rows.size() > 0;
   }
 
   @Override
   @JsonIgnore
-  public Collection<PageItem<String>> getSubPageItems()
+  public Collection<PageItem<String>> getChildPageItems()
   {
     return new ArrayList<PageItem<String>>(this.rows);
-  }
-
-
-  @Override
-  public void setProcessedSource(String t)
-  {
-    // TODO Auto-generated method stub
-    
   }
 
   @Override
@@ -529,5 +525,26 @@ public class SourceProcessorResultTable implements PageItem<String>, Formattable
         this.pages = (long) Math.ceil(this.getTotalCount().doubleValue() / (1.0 * this.getCount()) ) ;
       }
     }
+  }
+
+  @JsonIgnore
+  @Override
+  public Map<String, String> getCustomReplacementVariables()
+  {
+    return MapUtils.EMPTY_SORTED_MAP;
+  }
+
+  @Override
+  public String getName()
+  {
+    logger.warn("getName() called on " + this.getClass().getCanonicalName() + " but we have no name. Returning null");
+    return null;
+  }
+
+  @Override
+  public ConditionalDto getConditional()
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

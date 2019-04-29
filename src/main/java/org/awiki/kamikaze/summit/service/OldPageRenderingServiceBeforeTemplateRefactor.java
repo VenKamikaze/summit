@@ -1,6 +1,6 @@
 package org.awiki.kamikaze.summit.service;
 
-import org.awiki.kamikaze.summit.dto.entry.PageDto;
+import org.awiki.kamikaze.summit.dto.render.PageDto;
 
 public interface OldPageRenderingServiceBeforeTemplateRefactor {
   

@@ -1,16 +1,17 @@
 package org.awiki.kamikaze.summit.util.mapper;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.awiki.kamikaze.summit.domain.Page;
 import org.awiki.kamikaze.summit.domain.PageRegion;
-import org.awiki.kamikaze.summit.dto.entry.ApplicationPageDto;
-import org.awiki.kamikaze.summit.dto.entry.PageDto;
-import org.awiki.kamikaze.summit.dto.entry.PageProcessingDto;
-import org.awiki.kamikaze.summit.dto.entry.PageRegionDto;
-import org.awiki.kamikaze.summit.dto.entry.RegionDto;
-import org.awiki.kamikaze.summit.dto.entry.RegionFieldDto;
+import org.awiki.kamikaze.summit.dto.render.ApplicationPageDto;
+import org.awiki.kamikaze.summit.dto.render.PageDto;
+import org.awiki.kamikaze.summit.dto.render.PageProcessingDto;
+import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
+import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.util.DebugUtils;
 import org.dozer.Mapper;
 import org.dozer.MappingException;
@@ -24,7 +25,7 @@ public class PageToPageDtoMapper
 {
   @Autowired
   private Mapper mapper;
-
+  
   private static final Logger logger = LoggerFactory.getLogger(PageToPageDtoMapper.class);
   
   public PageDto map(Page page)
@@ -32,7 +33,7 @@ public class PageToPageDtoMapper
     logger.info("in PageToPageDtoMapper");
     PageDto pageDto = mapper.map(page, PageDto.class);
     pageDto.getApplicationPages().addAll(mapSet(page.getApplicationPages(), ApplicationPageDto.class));
-    pageDto.getPageProcessings().addAll(mapSet(page.getPageProcessings(), PageProcessingDto.class));
+    pageDto.getPageProcessings().addAll(mapList(page.getPageProcessings(), PageProcessingDto.class));
     //not required. duplicated by getApplicationPages. pageDto.getPageRegions().addAll(mapSet(page.getPageRegions(), PageRegionDto.class));
 
     DebugUtils.debugObjectGetters(pageDto);
@@ -50,7 +51,6 @@ public class PageToPageDtoMapper
             DebugUtils.debugObjectGetters(dto);
             dto.setRegionDto(mapper.map(pr.getRegion(), RegionDto.class));
             DebugUtils.debugObjectGetters(dto.getRegionDto());
-            dto.getRegionDto().getRegionFields().addAll(mapSet(pr.getRegion().getRegionFields(), RegionFieldDto.class));
             break;
           }
         }
@@ -66,7 +66,7 @@ public class PageToPageDtoMapper
       Set<D> destSet = new HashSet<D>(source.size());
       for (S src : source)
       {
-        destSet.add( (D) mapper.map(src, dest));
+        destSet.add( mapper.map(src, dest));
       }
       return destSet;
     }
@@ -75,4 +75,19 @@ public class PageToPageDtoMapper
     }
   }
   
+  public <S, D> List<D> mapList(List<S> source, Class<D> dest)
+  {
+    try
+    {
+      List<D> destSet = new ArrayList<D>(source.size());
+      for (S src : source)
+      {
+        destSet.add( mapper.map(src, dest));
+      }
+      return destSet;
+    }
+    catch(MappingException e){
+      throw new RuntimeException("Unable to map from " + source.toArray()[0].getClass().getCanonicalName() + " to: " + dest.getCanonicalName(), e);
+    }
+  }
 }
