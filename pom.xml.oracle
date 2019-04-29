@@ -14,8 +14,8 @@
     <spring-jpa.version>1.10.1.RELEASE</spring-jpa.version>
     <!-- <spring-jpa.version>1.9.2.RELEASE</spring-jpa.version> -->
     <!--    <spring-security.version>3.2.4.RELEASE</spring-security.version> -->
-    <spring-security.version>4.1.1.RELEASE</spring-security.version>
-    <hibernate-orm.version>5.1.3.Final</hibernate-orm.version> <!-- later versions have issues with oracle and schema validation -->
+    <spring-security.version>4.1.5.RELEASE</spring-security.version>
+    <hibernate-orm.version>5.1.8.Final</hibernate-orm.version> <!-- later versions have issues with oracle and schema validation -->
     <org.aspectj-version>1.6.10</org.aspectj-version>
     <org.slf4j-version>1.7.2</org.slf4j-version>
     <tiles.version>3.0.5</tiles.version>
