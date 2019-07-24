@@ -69,6 +69,13 @@ create table CODE_FIELD_TYPE
   SORT_ORDER bigint not null
 );
 
+create table CODE_LABEL_TYPE
+(
+  CODE character varying(10) primary key,
+  DESCRIPTION character varying(200) not null,
+  SORT_ORDER bigint not null
+);
+
 
 ------- Main tables
 
@@ -249,8 +256,8 @@ create table FIELD
   --WAS: SOURCE character varying(32000),
   --WAS: DEFAULT_SOURCE character varying(32000),
   -- Note: joins through FIELD_SOURCE to store source.
-  NOTES character varying(4000),
-  PROCESSOR_CLASS character varying(4000)
+  NOTES character varying(4000)
+  --added 2019-02-17, but was not used. maybe something to consider for future? PROCESSOR_CLASS character varying(4000)
   --HAS_LABEL character varying(1),
   --LABEL character varying(4000)
 );
@@ -262,6 +269,21 @@ create table FIELD_SOURCE
   FIELD_ID bigint not null references FIELD(ID),
   SOURCE_ID bigint not null references SOURCE(ID),
   FLAG_DEFAULT_VALUE character varying(1)
+);
+
+create table FIELD_LABEL
+(
+  ID bigint primary key,
+  FIELD_ID bigint not null references FIELD(ID),
+  LABEL_ID bigint not null references LABEL(ID)
+);
+
+create table LABEL
+(
+  ID bigint primary key,
+  LABEL_TYPE_CODE character varying(10) references CODE_LABEL_TYPE(CODE),
+  TEXT character varying(4000),
+  NOTES character varying(4000)
 );
 
 -- Regions may be a report region, hence needing source.

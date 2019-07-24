@@ -45,6 +45,7 @@ insert into PAGE_PROCESSING_SOURCE_SELECT values (-10004, -10000, 4, 'source_ide
 
 -- Create the fields, make sure the names correspond with the names in PAGE_PROCESSING_SOURCE_SELECT or we won't get values populated.
 -- not best approach? will put this in the template for the form instead. insert into FIELD values (-10000, -60, '__SUBMITTED_FORM_ID__', 'static', 'TEXT', null, null);
+--                     ID, TEMPLATE_ID, NAME, SOURCE_TYPE_CODE, FIELD_TYPE_CODE, DEFAULT_SOURCE_TYPE_CODE, NOTES
 insert into FIELD values (-10013, -60, 'hiddencode', 'static', 'TEXT', null, null);
 insert into FIELD values (-10001, -61, 'code', 'static', 'TEXT', null, null);
 insert into FIELD values (-10002, -61, 'description', 'static', 'TEXT', null, null);

@@ -67,6 +67,12 @@ create table CODE_FIELD_TYPE
   SORT_ORDER number(19) not null
 );
 
+create table CODE_LABEL_TYPE
+(
+  CODE varchar2(10) primary key,
+  DESCRIPTION varchar2(200) not null,
+  SORT_ORDER number(19) not null
+);
 
 ------- Main tables
 
@@ -247,6 +253,22 @@ create table FIELD
   DEFAULT_SOURCE_TYPE_CODE varchar2(10) references CODE_SOURCE_TYPE(CODE),
   NOTES varchar2(4000)
 );
+
+create table FIELD_LABEL
+(
+  ID number(19) primary key,
+  FIELD_ID number(19) not null references FIELD(ID),
+  LABEL_ID number(19) not null references LABEL(ID)
+);
+
+create table LABEL
+(
+  ID number(19) primary key,
+  LABEL_TYPE_CODE varchar2(10) references CODE_LABEL_TYPE(CODE),
+  TEXT varchar2(4000),
+  NOTES varchar2(4000)
+);
+
 
 -- TODO: this seems like the better method than including Source on FIELD and REGION
 create table FIELD_SOURCE
