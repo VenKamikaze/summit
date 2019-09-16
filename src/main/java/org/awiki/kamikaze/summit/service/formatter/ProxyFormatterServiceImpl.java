@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.xml.crypto.NoSuchMechanismException;
 
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.slf4j.Logger;

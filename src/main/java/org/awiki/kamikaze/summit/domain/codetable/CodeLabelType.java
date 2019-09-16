@@ -13,6 +13,11 @@ import javax.persistence.Table;
 @Table(name = "CODE_LABEL_TYPE")
 public class CodeLabelType implements java.io.Serializable, CodeTable
 {
+  public static final String IS_LEFT_PREFIX  = "LEFT_";
+  public static final String IS_RIGHT_PREFIX = "RIGHT_";
+
+  public static final String PARTIAL_OPTIONAL_CODE = "_OPT";
+  public static final String PARTIAL_MANDATORY_CODE  = "_MAND";
 
   /**
    * 

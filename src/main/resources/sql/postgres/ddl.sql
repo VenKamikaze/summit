@@ -281,6 +281,7 @@ create table FIELD_LABEL
 create table LABEL
 (
   ID bigint primary key,
+  TEMPLATE_ID bigint not null references TEMPLATE(ID),
   LABEL_TYPE_CODE character varying(10) references CODE_LABEL_TYPE(CODE),
   TEXT character varying(4000),
   NOTES character varying(4000)

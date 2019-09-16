@@ -1,23 +1,18 @@
 package org.awiki.kamikaze.summit.util.converter;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import org.apache.commons.lang3.StringUtils;
-import org.awiki.kamikaze.summit.domain.Conditional;
 import org.awiki.kamikaze.summit.domain.Field;
 import org.awiki.kamikaze.summit.domain.RegionField;
 import org.awiki.kamikaze.summit.domain.Source;
-import org.awiki.kamikaze.summit.domain.Template;
-import org.awiki.kamikaze.summit.domain.codetable.CodeFieldType;
-import org.awiki.kamikaze.summit.domain.codetable.CodeSourceType;
 import org.awiki.kamikaze.summit.dto.render.ConditionalDto;
 import org.awiki.kamikaze.summit.dto.render.FieldDto;
+import org.awiki.kamikaze.summit.dto.render.LabelDto;
 import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.dto.render.SourceDto;
 import org.awiki.kamikaze.summit.dto.render.TemplateDto;
 import org.dozer.CustomConverter;
-import org.dozer.DozerConverter;
 import org.dozer.Mapper;
 import org.dozer.MapperAware;
 import org.hibernate.Hibernate;
@@ -230,6 +225,10 @@ public class FieldConverter implements CustomConverter, MapperAware
             source.getCodeFieldSourceTypeByDefaultValueType().getCode() != null) {
       dto.setCodeFieldDefaultValueSourceType(source.getCodeFieldSourceTypeByDefaultValueType().getCode());
     }
+    if(source.getLabel() != null) {
+      dto.setLabel(mapper.map(source.getLabel(), LabelDto.class));
+    }
+    
     existingDestinationFieldValue = dto;
     return existingDestinationFieldValue;
 

@@ -28,6 +28,7 @@ public class Label implements java.io.Serializable
   private String                    notes;
   private CodeLabelType             codeLabelType;
   private Field                     field = null;
+  private Template                  template;
   
   private Conditional         conditional = null;
   
@@ -102,6 +103,16 @@ public class Label implements java.io.Serializable
   public void setField(Field field)
   {
     this.field = field;
+  }
+  
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "TEMPLATE_ID", nullable = false)
+  public Template getTemplate() {
+    return template;
+  }
+
+  public void setTemplate(Template template) {
+    this.template = template;
   }
 
   @OneToOne(cascade=CascadeType.ALL)

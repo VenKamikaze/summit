@@ -1,6 +1,6 @@
 package org.awiki.kamikaze.summit.dto.render;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +9,6 @@ import java.util.Set;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.collections4.MapUtils;
-import org.awiki.kamikaze.summit.dto.render.field.FieldInstance;
 import org.hibernate.validator.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -42,9 +41,8 @@ public class FieldDto implements PageItem<String> {
   private PostProcessedFieldContentDto postProcessedSource;
   private PostProcessedFieldContentDto postProcessedDefaultValue;
   
+  private LabelDto              label = null;
   private ConditionalDto        conditional = new ConditionalDto();
-  
-  private FieldInstance fieldInstance;
   
   public Long getId() {
     return id;
@@ -179,10 +177,11 @@ public class FieldDto implements PageItem<String> {
   {
     return false;
   }
+  @SuppressWarnings("unchecked")
   @Override
   public List<PageItem<String>> getChildPageItems()
   {
-    return new ArrayList<>(0);
+    return Collections.EMPTY_LIST;
   }
   public TemplateDto getTemplate()
   {
@@ -199,10 +198,11 @@ public class FieldDto implements PageItem<String> {
     return getTemplate();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public Map<String, String> getCustomReplacementVariables()
   {
-    return MapUtils.EMPTY_SORTED_MAP; 
+    return MapUtils.EMPTY_SORTED_MAP;
   }
   
   @Override
@@ -216,12 +216,18 @@ public class FieldDto implements PageItem<String> {
     this.conditional = c;
   }
   
-  public FieldInstance getFieldInstance()
-  {
-    return fieldInstance;
+  public boolean hasLabel() {
+    return label != null;
   }
-  public void setFieldInstance(FieldInstance fieldInstance)
+  
+  public LabelDto getLabel()
   {
-    this.fieldInstance = fieldInstance;
+    return label;
   }
+  
+  public void setLabel(LabelDto l)
+  {
+    this.label = l;
+  }
+  
 }
