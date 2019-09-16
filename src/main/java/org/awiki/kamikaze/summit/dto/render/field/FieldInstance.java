@@ -5,6 +5,7 @@ import org.awiki.kamikaze.summit.dto.render.FieldDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.TemplateDto;
 
+//2019-08-06: This looks unused. TB deleted.
 public abstract class FieldInstance implements PageItem<String>
 {
   private FieldDto associatedFieldDto;

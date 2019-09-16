@@ -10,6 +10,7 @@ import org.awiki.kamikaze.summit.dto.render.FieldDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 
 
+// 2019-08-06: This looks unused. TB deleted.
 public class DropDownFieldInstance extends FieldInstance {
   
   public DropDownFieldInstance(FieldDto field)

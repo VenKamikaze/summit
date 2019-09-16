@@ -37,16 +37,18 @@ public class Field implements java.io.Serializable
   
   private long                id;
   private String              name;
-  private CodeSourceType codeFieldSourceTypeBySourceType;
+  private CodeSourceType      codeFieldSourceTypeBySourceType;
   private CodeFieldType       codeFieldType;
-  private CodeSourceType codeFieldSourceTypeByDefaultValueType;
+  private CodeSourceType      codeFieldSourceTypeByDefaultValueType;
   
   private List<Source>        source;
   private List<Source>        defaultValueSource;
-  
+
+  private Label               label;
+
   private String              notes;
   private Set<RegionField>    regionFields = new HashSet<RegionField>(0);
-  private Template             template;
+  private Template            template;
   
   private Conditional         conditional = null;
 
@@ -156,6 +158,21 @@ public class Field implements java.io.Serializable
     this.source = source;
   }
 
+  @OneToOne
+  @JoinTable(name="FIELD_LABEL",
+             joinColumns = { @JoinColumn(name="FIELD_ID", referencedColumnName="ID") },
+             inverseJoinColumns = { @JoinColumn(name="LABEL_ID", referencedColumnName="ID") })
+  public Label getLabel()
+  {
+    return this.label;
+  }
+
+  public void setLabel(Label label)
+  {
+    this.label = label;
+  }
+
+  
   @ManyToMany
   @JoinTable(name="FIELD_SOURCE",
              joinColumns = { @JoinColumn(name="FIELD_ID", referencedColumnName="ID") },

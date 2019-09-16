@@ -351,8 +351,17 @@ create table REGION_CONDITIONAL
   CONDITIONAL_ID bigint not null references CONDITIONAL(ID)
 );
 
+create table LABEL_CONDITIONAL
+(
+  ID bigint primary key,
+  LABEL_ID bigint not null references LABEL(ID),
+  CONDITIONAL_ID bigint not null references CONDITIONAL(ID)
+);
+
 create sequence application_seq start 1;
 create sequence page_seq start 1;
 create sequence region_seq start 1;
 create sequence field_seq start 1;
 create sequence spare_seq start 1;
+
+--GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO summit;
