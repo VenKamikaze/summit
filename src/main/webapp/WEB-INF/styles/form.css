@@ -13,7 +13,22 @@
 
 form .field label {
   font-weight: bold;
-  text-align: right;
+  text-align: left;
+  float: left;
+  width: 12em;
+  font-size: 11pt;
+  padding-left: 10px !important;
+}
+
+label.label_mandatory {
+  background-image: url('images/mandatory.png');
+  background-repeat: no-repeat;
+  background-size: 8px 8px;
+  background-position: left top;
+}
+
+label .label_optional {
+
 }
 
 form input {
@@ -43,3 +58,4 @@ form input[type=submit] {
   padding-top: 3pt;
   text-decoration: underline;
 }
+
