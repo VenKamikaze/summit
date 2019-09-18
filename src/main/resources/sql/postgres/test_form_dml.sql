@@ -148,8 +148,8 @@ insert into FIELD_SOURCE values (-10007,-10007,-10008,'N');
 insert into LABEL (ID, TEMPLATE_ID, LABEL_TYPE_CODE, TEXT, NOTES) values (-20007, -1000, 'LEFT_MAND', 'Code', 'The type of field');
 insert into LABEL (ID, TEMPLATE_ID, LABEL_TYPE_CODE, TEXT, NOTES) values (-20008, -1000, 'LEFT_OPT', 'Description', 'The human readable field description');
 
-insert into FIELD_LABEL (ID, FIELD_ID, LABEL_ID) values (-10007, -10007, -10007);
-insert into FIELD_LABEL (ID, FIELD_ID, LABEL_ID) values (-10008, -10008, -10008);
+insert into FIELD_LABEL (ID, FIELD_ID, LABEL_ID) values (-10007, -10007, -20007);
+insert into FIELD_LABEL (ID, FIELD_ID, LABEL_ID) values (-10008, -10008, -20008);
 
 
 commit;
