@@ -48,7 +48,7 @@ create table CODE_PROCESSING_TYPE
 (
   CODE character varying(10) primary key,
   DESCRIPTION character varying(200) not null,
-  SORT_ORDER bigint not null,
+  SORT_ORDER bigint not null
 );
 
 -- use compared to CODE_PROCESSING_TYPE?
@@ -227,7 +227,7 @@ create table PAGE_PROCESSING_SOURCE
 (
   ID bigint primary key,
   PAGE_PROCESSING_ID bigint not null references PAGE_PROCESSING(ID),
-  SOURCE_ID bigint not null references SOURCE(ID)
+  SOURCE_ID bigint not null references SOURCE(ID),
   SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE)
 );
 
@@ -271,13 +271,6 @@ create table FIELD_SOURCE
   FLAG_DEFAULT_VALUE character varying(1)
 );
 
-create table FIELD_LABEL
-(
-  ID bigint primary key,
-  FIELD_ID bigint not null references FIELD(ID),
-  LABEL_ID bigint not null references LABEL(ID)
-);
-
 create table LABEL
 (
   ID bigint primary key,
@@ -286,6 +279,14 @@ create table LABEL
   TEXT character varying(4000),
   NOTES character varying(4000)
 );
+
+create table FIELD_LABEL
+(
+  ID bigint primary key,
+  FIELD_ID bigint not null references FIELD(ID),
+  LABEL_ID bigint not null references LABEL(ID)
+);
+
 
 -- Regions may be a report region, hence needing source.
 create table REGION
