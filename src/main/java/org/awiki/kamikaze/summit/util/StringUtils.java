@@ -31,6 +31,8 @@ public class StringUtils
     if(pageParams == null || pageParams.indexOf(PAGE_PARAM_KEYVALUE_SEPARATOR) < 1)
       return new LinkedMultiValueMap<String, String>(0);
     
+    // was
+    /*
     final String varsAndValues[] = pageParams.split(PAGE_PARAM_KEYVALUE_SEPARATOR);
     final String vars[] = varsAndValues[0].split(PAGE_PARAM_ITEM_SEPARATOR);
     final String values[] = varsAndValues[1].split(PAGE_PARAM_ITEM_SEPARATOR);
@@ -39,6 +41,13 @@ public class StringUtils
     
     for(int i = 0; i < vars.length; i++) {
       paramMap.put(vars[i], Arrays.asList(values[i])); // TODO handle multiple values in pageParams
+    }*/
+
+    final String varsAndValues[] = pageParams.split(PAGE_PARAM_ITEM_SEPARATOR);
+    MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>(varsAndValues.length);
+    for(int i = 0; i < varsAndValues.length; i++) {
+      final String[] kvp = varsAndValues[i].split(PAGE_PARAM_KEYVALUE_SEPARATOR);
+      paramMap.put(kvp[0], Arrays.asList(kvp[1])); // TODO handle multiple values in pageParams
     }
     
     return paramMap;

@@ -11,7 +11,7 @@
     <java-version>1.7</java-version>
     <org.springframework-version>4.3.24.RELEASE</org.springframework-version>
     <spring.version>${org.springframework-version}</spring.version>
-    <spring-jpa.version>1.11.22.RELEASE</spring-jpa.version>
+    <spring-jpa.version>1.11.23.RELEASE</spring-jpa.version>
     <!-- <spring-jpa.version>1.9.2.RELEASE</spring-jpa.version> -->
     <!--    <spring-security.version>3.2.4.RELEASE</spring-security.version> -->
     <spring-security.version>4.1.5.RELEASE</spring-security.version>
@@ -21,8 +21,8 @@
     <org.slf4j-version>1.7.2</org.slf4j-version>
     <tiles.version>3.0.5</tiles.version>
     <jadira.version>5.0.0.GA</jadira.version>
-    <jackson-databind.library>2.9.9.2</jackson-databind.library>
-    <jackson.library>2.8.11</jackson.library>
+    <jackson-databind.library>2.11.1</jackson-databind.library>
+      <!-- <jackson.library>2.11.1</jackson.library> no need for xml at this time -->
     <apache.commons.collections.version>4.1</apache.commons.collections.version>
     <apache.io.version>2.5</apache.io.version>
     <jsqlparser.version>1.1</jsqlparser.version>
@@ -345,10 +345,18 @@
       <version>${jackson-databind.library}</version>
     </dependency>
     <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson-databind.library}</version>
+    </dependency>
+
+    <!--
+    <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-xml</artifactId>
       <version>${jackson.library}</version>
     </dependency>
+    -->
 
     <!-- Test -->
     <dependency>
@@ -363,7 +371,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>20.0</version>
+      <version>[24.1.1,)</version>
     </dependency>
 
   </dependencies>
