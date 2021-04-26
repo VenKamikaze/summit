@@ -24,7 +24,7 @@
     <jackson-databind.library>2.11.1</jackson-databind.library>
       <!-- <jackson.library>2.11.1</jackson.library> no need for xml at this time -->
     <apache.commons.collections.version>4.1</apache.commons.collections.version>
-    <apache.io.version>2.5</apache.io.version>
+    <apache.io.version>2.7</apache.io.version>
     <jsqlparser.version>1.1</jsqlparser.version>
   </properties>
   <dependencies>
