@@ -16,7 +16,7 @@
     <!--    <spring-security.version>3.2.4.RELEASE</spring-security.version> -->
     <spring-security.version>4.1.5.RELEASE</spring-security.version>
     <!-- <hibernate-orm.version>4.3.5.Final</hibernate-orm.version> -->
-    <hibernate-orm.version>5.1.8.Final</hibernate-orm.version>
+    <hibernate-orm.version>5.4.24.Final</hibernate-orm.version>
     <org.aspectj-version>1.6.10</org.aspectj-version>
     <org.slf4j-version>1.7.2</org.slf4j-version>
     <tiles.version>3.0.5</tiles.version>
