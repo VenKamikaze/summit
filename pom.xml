@@ -9,7 +9,7 @@
   <version>0.0.2-SNAPSHOT</version>
   <properties>
     <java-version>1.8</java-version>
-    <org.springframework-version>4.3.24.RELEASE</org.springframework-version>
+    <org.springframework-version>5.2.20.RELEASE</org.springframework-version>
     <spring.version>${org.springframework-version}</spring.version>
     <spring-jpa.version>1.11.23.RELEASE</spring-jpa.version>
     <!-- <spring-jpa.version>1.9.2.RELEASE</spring-jpa.version> -->
