@@ -5,6 +5,7 @@
 let RUN_DEMO_SQL=1
 let DROP_FIRST=1
 DATABASE=postgres
+PGUSER=postgres
 # Must match the tablespace for summit defined in dba_ddl.sql
 # Must also be created by the root user before running this script.
 TABLESPACE_LOCATION=/var/lib/postgres/tablespaces/summit
@@ -35,7 +36,7 @@ runScript() {
   local FILE=${1:-}
   if [[ -n "${FILE}" ]]; then
     echo "Running ${FILE} on ${DATABASE}"
-    psql -d ${DATABASE} -f "${FILE}"
+    psql -d ${DATABASE} -U ${PGUSER} -f "${FILE}"
     RETVAL=$?
     [[ $? -ne 0 ]] && echo "Got back $RETVAL" >&2
   fi
@@ -49,6 +50,7 @@ fi
 runScript dba_ddl.sql
 if [[ $? -eq 0 ]]; then
   DATABASE=summit
+  PGUSER=summit
   runScript ddl.sql
   runScript setup-codetables.sql
   runScript setup-backend.sql
