@@ -8,6 +8,7 @@ import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMEN
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,8 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.google.common.collect.Lists;
 
 @Service
 public class FieldFormatterServiceImpl implements FieldFormatterService
@@ -107,7 +106,9 @@ public class FieldFormatterServiceImpl implements FieldFormatterService
       }
       
       if(fieldDto.hasChildPageItems()) {
-        for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(fieldDto.getChildPageItems())) ) {
+    	List<PageItem<String>> items = new ArrayList<>(fieldDto.getChildPageItems());
+    	Collections.reverse(items);
+        for(PageItem<String> innerItem : items ) {
           FormatterService<PageItem<?>> formatter = formatters.getFormatterService(innerItem.getClass().getCanonicalName());
           formatter.format(builder, innerItem, nextInsertAt, replacementVariableCache, pageFields);
         }

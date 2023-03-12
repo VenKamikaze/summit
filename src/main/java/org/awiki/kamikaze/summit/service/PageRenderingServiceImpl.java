@@ -187,7 +187,10 @@ public class PageRenderingServiceImpl implements PageRenderingService {
         
         // All fields turned into bind variables, with variable name coming from the field name.
         SourceProcessorResultTable resultTable = reportService.querySource(regionDto.getId(), regionDto.getSource().iterator().next(), bindVarService.convertFieldsToBindVars(regionItems));
-        resultTable.setTemplateDto(regionDto.getTemplateDto());
+        
+        // m2s: this is creating a double-up of SPRT templates and resulting in two requests per render
+        // resultTable.setTemplateDto(regionDto.getTemplateDto());
+        
         regionItems.add(resultTable);
       }
       else {

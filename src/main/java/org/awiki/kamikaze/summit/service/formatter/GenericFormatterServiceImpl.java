@@ -6,6 +6,7 @@ import static org.awiki.kamikaze.summit.service.formatter.FormatEnums.REPLACEMEN
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -23,8 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.google.common.collect.Lists;
 
 @Service
 public class GenericFormatterServiceImpl implements GenericFormatterService
@@ -81,9 +80,12 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
       int templateSourceReplaceLocation = templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString()) == -1 ? 0 : templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString());
       int nextInsertAt = templateSourceReplaceLocation + insertAt;
       builder.insert(insertAt, templateSource.replace(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString(), processedSource));
+      logger.trace("Builder (" + item.getClass().getCanonicalName() + "): " + builder.toString());
   
       if(item.hasChildPageItems()) {
-        for(PageItem<String> innerItem : Lists.reverse(new ArrayList<>(item.getChildPageItems())) ) {
+      	List<PageItem<String>> items = new ArrayList<>(new ArrayList<>(item.getChildPageItems()));
+      	Collections.reverse(items);
+        for(PageItem<String> innerItem : items ) {
           FormatterService<PageItem<?>> formatter = formatters.getFormatterService(innerItem.getClass().getCanonicalName());
           formatter.format(builder, innerItem, nextInsertAt, replacementVariableCache, pageFields);
         }
@@ -92,7 +94,7 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
     else {
       logger.debug("Got null template for item: " + item.getClass().getCanonicalName());
     }
-    
+
     return builder;
   }
   

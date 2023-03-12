@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 /**
  * When our source returns a table of information, this class is what is used to store the results.

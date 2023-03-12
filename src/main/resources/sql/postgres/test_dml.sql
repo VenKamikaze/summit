@@ -33,10 +33,10 @@ insert into page (select nextval('page_seq'), id, 'Test Report Page with Mustach
 insert into application_page (select nextval('spare_seq'), id, (select id from page where name = 'Test Report Page'), 1 from application where name = 'Test Application');
 insert into application_page select nextval('spare_seq'), 1, id, id from page where name like '%Mustache';
 
-insert into region  (select nextval('region_seq'), id, 'Test Report Region', 'body1', 'Report', 'dml_report' from template where class_name = 'org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable' and description not like '%Mustache%');
-insert into region  (select nextval('region_seq'), id, 'Test Report Region with Mustache', 'body1', 'Report', 'dml_report' from template where class_name = 'org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable' and description like '%Mustache%');
+insert into region  (select nextval('region_seq'), id, 'Test Report Region', 'body1', 'Report', 'dml_report' from template where class_name = 'org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable' and description like 'Static HTML for a table in a tabular report');
+insert into region  (select nextval('region_seq'), id, 'Test Report Region with Mustache', 'body1', 'Report', 'dml_report' from template where class_name = 'org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable' and description like 'HTML for a table in a tabular report with Mustache Templating');
 
-insert into page_region select nextval('spare_seq'), (select id from page where name like '%Mustache'), id, id from region where name like '%Mustache';
+insert into page_region select nextval('spare_seq'), (select id from page where name like 'Test Report Page with Mustache'), id, id from region where name like 'Test Report Region with Mustache';
 insert into page_region (select nextval('spare_seq'), (select id from page where name = 'Test Report Page'), id, 1 from region where name ='Test Report Region');
 
 insert into source values (1, 'select id, parent_id, description, class_name, source, mime_type from template');
