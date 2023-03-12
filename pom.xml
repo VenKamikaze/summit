@@ -17,7 +17,7 @@
     <spring-security.version>4.1.5.RELEASE</spring-security.version>
     <!-- <hibernate-orm.version>4.3.5.Final</hibernate-orm.version> -->
     <hibernate-orm.version>5.1.8.Final</hibernate-orm.version>
-    <org.slf4j-version>1.7.36</org.slf4j-version>
+    <log4j2.version>2.20.0</log4j2.version>
     <tiles.version>3.0.8</tiles.version>
     <jadira.version>5.0.0.GA</jadira.version>
     <jackson-databind.library>2.13.5</jackson-databind.library>
@@ -54,24 +54,21 @@
 
     <!-- Logging. COMMENT THIS OUT TO USE HIBERNATE GENERATION TOOLS IN ECLIPSE -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${org.slf4j-version}</version>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j2.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>${org.slf4j-version}</version>
-      <scope>runtime</scope>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
+      <version>${log4j2.version}</version>
     </dependency>
     <!-- Comment until here for eclipse hibernate generation tools -->
-
-    <!-- @Inject -->
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <version>1</version>
-    </dependency>
 
     <!-- Servlet -->
     <dependency>
@@ -155,12 +152,6 @@
       <classifier/>
     </dependency>
     <dependency>
-      <groupId>cglib</groupId>
-      <artifactId>cglib-nodep</artifactId>
-      <version>2.2</version>
-      <classifier/>
-    </dependency>
-    <dependency>
       <groupId>javax.transaction</groupId>
       <artifactId>jta</artifactId>
       <version>1.1</version>
@@ -177,6 +168,12 @@
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-jpa</artifactId>
       <version>${spring-jpa.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+	</exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Performs easy bean mapping -->
@@ -184,6 +181,12 @@
       <groupId>net.sf.dozer</groupId>
       <artifactId>dozer</artifactId>
       <version>5.5.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+	</exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -221,47 +224,6 @@
     </dependency>
 
     <dependency>
-      <groupId>commons-pool</groupId>
-      <artifactId>commons-pool</artifactId>
-      <version>1.5.4</version>
-      <classifier/>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
-      <version>1.3</version>
-      <classifier/>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-pool</groupId>
-          <artifactId>commons-pool</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>xerces</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>xercesImpl</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-collections4</artifactId>
       <version>${apache.commons.collections.version}</version>
@@ -270,6 +232,11 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>${apache.io.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>2.0.6</version>
     </dependency>
 
 
@@ -283,6 +250,12 @@
       <groupId>org.apache.tiles</groupId>
       <artifactId>tiles-core</artifactId>
       <version>${tiles.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+	</exclusion>
+      </exclusions>
     </dependency>
 
     <!-- JODA time, smart datetime package for Java -->
@@ -311,14 +284,6 @@
       <version>${jackson-databind.library}</version>
     </dependency>
 
-    <!--
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-xml</artifactId>
-      <version>${jackson.library}</version>
-    </dependency>
-    -->
-
     <!-- Test -->
     <dependency>
       <groupId>junit</groupId>
@@ -326,14 +291,6 @@
       <version>4.13.1</version>
       <scope>test</scope>
     </dependency>        
-
-    <!-- Google's Guava Library, used for helper methods for Collections -->
-    <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>[24.1.1,)</version>
-    </dependency>
 
   </dependencies>
   <build>

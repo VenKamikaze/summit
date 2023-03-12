@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="30" name="summit">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+
+    <File name="SummitAsync" fileName="${sys:logs.directory}/summit.log">
+      <PatternLayout>
+        <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+      </PatternLayout>
+    </File>
+
+    <Async name="Async">
+      <AppenderRef ref="SummitAsync"/>
+    </Async>
+  </Appenders>
+  <Loggers>
+    <Logger name="org.awiki.kamikaze" level="TRACE" additivity="false">
+      <AppenderRef ref="Async"/>
+    </Logger>
+    <Root level="INFO">
+      <AppenderRef ref="Async"/>
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+	
+</Configuration>
