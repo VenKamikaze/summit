@@ -24,7 +24,7 @@
     <apache.commons.collections.version>4.4</apache.commons.collections.version>
     <apache.io.version>2.11.0</apache.io.version>
     <jsqlparser.version>1.1</jsqlparser.version>
-    <postgresql.version>42.5.4</postgresql.version>
+    <postgresql.version>42.6.1</postgresql.version>
   </properties>
   <dependencies>
     <!-- Spring -->
