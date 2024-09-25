@@ -24,21 +24,7 @@
 		<beans:property name="order" value="1" />
 	</beans:bean>
 	
-	<!-- Tiles -->
-	<beans:bean class="org.springframework.web.servlet.view.UrlBasedViewResolver" id="tilesViewResolver">
-	  <beans:property name="viewClass" value="org.springframework.web.servlet.view.tiles3.TilesView" />
-	  <beans:property name="order" value="0" />
-	</beans:bean>
-	<beans:bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
-	    <beans:property name="definitions">
-	        <beans:list>
-				<beans:value>/WEB-INF/views/template/tiles.xml</beans:value>
-			<!--	<beans:value>/WEB-INF/layouts/layouts.xml</beans:value> -->
-	        </beans:list>
-	    </beans:property>
-	</beans:bean>
-	
-	<context:component-scan base-package="org.awiki.kamikaze.summit" use-default-filters="false">
+    <context:component-scan base-package="org.awiki.kamikaze.summit" use-default-filters="false">
     <context:include-filter expression="org.springframework.stereotype.Controller" type="annotation"/>
     <context:include-filter expression="org.springframework.stereotype.Component" type="annotation"/>
   </context:component-scan>
