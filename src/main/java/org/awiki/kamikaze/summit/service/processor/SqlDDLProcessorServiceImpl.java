@@ -20,8 +20,13 @@ public class SqlDDLProcessorServiceImpl implements SingularSourceProcessorServic
 
   private Logger log = LoggerFactory.getLogger(SqlDDLProcessorServiceImpl.class);
   
+  private JdbcTemplate jdbc;
+
   @Autowired
-  JdbcTemplate jdbc;
+  public void setJdbcTemplate(JdbcTemplate jdbc)
+  {
+    this.jdbc = jdbc;
+  }
 
   @Override
   public List<String> getResponsibilities()
@@ -37,7 +42,7 @@ public class SqlDDLProcessorServiceImpl implements SingularSourceProcessorServic
 
   @Override
   public SourceProcessorResult executeSource(final String ddl, final List<BindVar> bindVars) {
-    Assert.isTrue(bindVars == null || bindVars.isEmpty()); // execute immediate can support bind? consider..
+    Assert.isTrue(bindVars == null || bindVars.isEmpty(), "bind variables must be null or empty for this method to execute."); // execute immediate can support bind? consider..
     try {
       jdbc.execute(ddl);
     } 

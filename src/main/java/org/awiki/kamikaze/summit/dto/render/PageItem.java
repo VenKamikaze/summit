@@ -32,6 +32,7 @@ public interface PageItem<T> // Where T is the processed source type
   public boolean hasChildPageItems();
   
   /**
+   * FIXME: this should be Collection<PageItem<?>>
    * If this pageItem contains it's own page items, then this will return the list of those items.
    * Otherwise, should return an empty list.
    * @return

@@ -6,7 +6,6 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.awiki.kamikaze.summit.domain.codetable.CodeConditionalType;
 import org.awiki.kamikaze.summit.dto.render.ConditionalDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
-import org.awiki.kamikaze.summit.service.formatter.GenericFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SQLQuerySourceProcessorServiceImpl;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
@@ -24,12 +23,20 @@ public class ConditionalEvaluatorServiceImpl implements ConditionalEvaluatorServ
 {
   private static final Logger log = LoggerFactory.getLogger(ConditionalEvaluatorServiceImpl.class);
   
-  @Autowired
   private ProxySourceProcessorService sourceProcessors;
-  
-  @Autowired
   private BindVarService bindVarService;
   
+  @Autowired
+  public void setSourceProcessors(ProxySourceProcessorService sourceProcessors) {
+    this.sourceProcessors = sourceProcessors;
+  }
+
+  @Autowired
+  public void setBindVarService(BindVarService bindVarService) {
+    this.bindVarService = bindVarService;
+  }
+
+
   /* FIXME TODO: still relying on varchar only bind variables, allow other types */
   @Override
   public boolean evaluate(final ConditionalDto condition, final MultiValueMap<String, String> parameterMap) {

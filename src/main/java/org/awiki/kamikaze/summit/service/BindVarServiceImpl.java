@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
+import org.awiki.kamikaze.summit.mapper.BindVarMapper;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
-import org.awiki.kamikaze.summit.util.mapper.PageItemToBindVarMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.SqlParameterValue;
@@ -22,12 +22,16 @@ import org.springframework.util.MultiValueMap;
 @Service
 public class BindVarServiceImpl implements BindVarService
 {
-  @Autowired
-  private PageItemToBindVarMapper mapper;
+  private BindVarMapper mapper;
   
   //  https://stackoverflow.com/questions/2309970/named-parameters-in-jdbc for regex
   static Pattern bindParameters = Pattern.compile("(?!\\B'[^']*):(\\w+)(?![^']*'\\B)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  
+
+  @Autowired
+  public void setMapper(BindVarMapper mapper) {
+    this.mapper = mapper;
+  }
+
   @Override
   public List<BindVar> createBindVarsFromFields(String regionQuery, final Map<String, PageItem<String>> fields) {
     final Matcher m = bindParameters.matcher(regionQuery);
@@ -60,7 +64,8 @@ public class BindVarServiceImpl implements BindVarService
 
   @Override
   public List<BindVar> convertFieldsToBindVars(Collection<PageItem<String>> fields) {
-    return new ArrayList<>(CollectionUtils.collect(fields, mapper));
+    return fields.parallelStream().map(f -> mapper.map(f)).collect(Collectors.toList());
+    //return new ArrayList<>(CollectionUtils.collect(fields, mapper));
   }
   
   /**
@@ -72,7 +77,7 @@ public class BindVarServiceImpl implements BindVarService
   @SuppressWarnings("unchecked") // for empty map
   public Map<String, SqlParameter> convertBindVarsToSqlParameterMap(List<BindVar> bindVars) {
     if(bindVars == null)
-      return MapUtils.EMPTY_MAP;
+      return MapUtils.EMPTY_SORTED_MAP;
     
     final Map<String, SqlParameter> paramMap = new HashMap<>(bindVars.size()); // possibly this size or smaller.
     for (BindVar var : bindVars) {

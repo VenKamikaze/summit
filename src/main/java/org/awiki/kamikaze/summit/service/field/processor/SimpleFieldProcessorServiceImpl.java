@@ -13,34 +13,36 @@ import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.dto.render.SourceDto;
-import org.awiki.kamikaze.summit.repository.FieldRepository;
-import org.awiki.kamikaze.summit.service.field.FieldService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
-import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
 @Service
 public class SimpleFieldProcessorServiceImpl implements FieldProcessorService {
 
-  @Autowired
-  private FieldRepository repository;
-
-  @Autowired
-  private Mapper mapper;
-  
-  @Autowired
   private ProxySourceProcessorService sourceProcessors;
-  
-  @Autowired
   private ProxyFieldProcessorService fieldProcessors;
   
   public static final List<String> RESPONSIBILITIES = new ArrayList<String>(1);
   static {  RESPONSIBILITIES.add(FieldDto.class.getCanonicalName()); };
   // Since fields all extend (or are) the base impl of FieldDto, this will probably catch every field that doesn't have a specific processor.
+  
+  @Autowired 
+  public void setProxySourceProcessorService(@Lazy ProxySourceProcessorService sourceProcessors)
+  {
+    this.sourceProcessors = sourceProcessors;  
+  }
+
+  @Autowired
+  public void setProxyFieldProcessorService(@Lazy ProxyFieldProcessorService fieldProcessors)
+  {
+    this.fieldProcessors = fieldProcessors;  
+  }
+
   
   @Override
   public List<String> getResponsibilities()

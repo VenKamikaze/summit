@@ -31,11 +31,18 @@ public class SQLQuerySourceProcessorServiceImpl implements TabularQuerySourcePro
 
   private static final Logger logger = LoggerFactory.getLogger(SQLQuerySourceProcessorServiceImpl.class);
 
-  @Autowired
   private BindVarService bindVarService;
-  
-  @Autowired
   private NamedParameterJdbcTemplate jdbc;
+    
+  @Autowired
+  public void setBindVarService(BindVarService bindVarService) {
+    this.bindVarService = bindVarService;
+  }
+
+  @Autowired
+  public void setJdbc(NamedParameterJdbcTemplate jdbc) {
+    this.jdbc = jdbc;
+  }
 
   public static final List<String> RESPONSIBILITIES = new ArrayList<String>(2);
   static { RESPONSIBILITIES.add(BUILT_IN_SQL_DML_SELECT_ROW_TYPE);

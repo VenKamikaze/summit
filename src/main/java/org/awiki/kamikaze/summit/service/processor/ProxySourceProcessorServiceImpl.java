@@ -3,7 +3,7 @@ package org.awiki.kamikaze.summit.service.processor;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,16 +15,29 @@ public class ProxySourceProcessorServiceImpl implements ProxySourceProcessorServ
 
   private Logger log = LoggerFactory.getLogger(ProxySourceProcessorServiceImpl.class);
   
-  @Autowired
-  List<SingularSourceProcessorService> singularSourceServices; // TODO: review, may not make sense to split these
-
+  
+  private List<SingularSourceProcessorService> singularSourceServices; // TODO: review, may not make sense to split these
   // TODO review: is this required at all?
-  @Autowired
-  List<BatchSourceProcessorService> batchSourceServices; // TODO: review, may not make sense to split these
+  private List<BatchSourceProcessorService> batchSourceServices; // TODO: review, may not make sense to split these
+  private List<TabularQuerySourceProcessorService> tabularSourceServices; // TODO: review, may not make sense to split these
   
   @Autowired
-  List<TabularQuerySourceProcessorService> tabularSourceServices; // TODO: review, may not make sense to split these
-  
+  public void setSingularSourceServices(List<SingularSourceProcessorService> singularSourceServices) {
+    this.singularSourceServices = singularSourceServices;
+  }
+
+  @Autowired
+  public void setBatchSourceServices(List<BatchSourceProcessorService> batchSourceServices) {
+    this.batchSourceServices = batchSourceServices;
+  }
+
+  @Autowired
+  public void setTabularSourceServices(List<TabularQuerySourceProcessorService> tabularSourceServices) {
+    this.tabularSourceServices = tabularSourceServices;
+  }
+
+
+
   HashMap<String, SourceProcessorService> allSourceServiceCache;
   HashMap<String, SingularSourceProcessorService> singularSourceServiceCache;
   HashMap<String, TabularQuerySourceProcessorService> tabularSourceServiceCache;

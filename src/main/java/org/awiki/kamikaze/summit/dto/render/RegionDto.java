@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.persistence.OrderBy;
-import javax.persistence.Transient;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Transient;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.awiki.kamikaze.summit.service.field.FieldService;
 import org.awiki.kamikaze.summit.service.formatter.FormatEnums;
-import org.hibernate.validator.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 
 public class RegionDto implements PageItem<String> {

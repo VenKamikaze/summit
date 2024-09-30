@@ -4,7 +4,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,25 +19,25 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class ExceptionController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(ExceptionController.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExceptionController.class);
 
-	@RequestMapping(value = "/error/uncaughtException", method = RequestMethod.GET)
-	public String test(Locale locale, Model model) {
-		logger.info("Uncaught Exception!");
+  @RequestMapping(value = "/error/uncaughtException", method = RequestMethod.GET)
+  public String test(Locale locale, Model model) {
+    logger.info("Uncaught Exception!");
 		
-		return commonException(locale, model);
-	}
+    return commonException(locale, model);
+  }
 
   private String commonException(Locale locale, Model model)
   {
     Date date = new Date();
-		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+    DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
 		
-		String formattedDate = dateFormat.format(date);
+    String formattedDate = dateFormat.format(date);
 		
-		model.addAttribute("serverTime", formattedDate );
+    model.addAttribute("serverTime", formattedDate );
 		 
-		return "error/uncaughtException";  // tiles definition.
+    return "error/uncaughtException";  // tiles definition.
   }
 	
   @RequestMapping(value = "/error/resourceNotFound", method = RequestMethod.GET)

@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    name: ds-postgres
+    url: jdbc:postgresql://localhost:5432/summit
+    username: summit
+    password: summit_dev
+    driver-class: org.postgresql.Driver
+
+summit:
+  globals:
+    '[##__CONTEXTPATH__##]': ""
+    '[##__APIPATH__##]': /api
+

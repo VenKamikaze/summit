@@ -5,10 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
-import org.awiki.kamikaze.summit.service.BindVarService;
 import org.awiki.kamikaze.summit.util.DatabaseUtils;
 import org.awiki.kamikaze.summit.util.SQLUtils;
-import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +16,14 @@ import org.springframework.stereotype.Service;
 public class SQLReportQueryBuilderServiceImpl implements SQLReportQueryBuilderService
 {
   /** TODO REFACTOR A LOT OF THIS OUT INTO {@link SQLUtils} */
-  
-  @Autowired
-  private BindVarService bindVarService;
-  
-  @Autowired
+
   private DatabaseUtils databaseUtils;
+  
+  @Autowired
+  public void setDatabaseUtils(DatabaseUtils dbUtils)
+  {
+    this.databaseUtils = dbUtils;
+  }
   
   private static final Logger logger = LoggerFactory.getLogger(SQLReportQueryBuilderServiceImpl.class);
 
@@ -134,7 +134,7 @@ public class SQLReportQueryBuilderServiceImpl implements SQLReportQueryBuilderSe
       {
         String error = "Not yet supported. FIXME, TODO SQLServer: " + databaseUtils.getDetectedDBType();
         logger.error(error);
-        throw new NotYetImplementedException(error);
+        throw new RuntimeException(error);
       }
       
       default:

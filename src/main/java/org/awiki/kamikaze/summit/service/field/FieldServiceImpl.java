@@ -17,42 +17,56 @@ import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
+import org.awiki.kamikaze.summit.mapper.FieldMapper;
 import org.awiki.kamikaze.summit.repository.FieldRepository;
 import org.awiki.kamikaze.summit.service.field.processor.FieldProcessorService;
 import org.awiki.kamikaze.summit.service.field.processor.ProxyFieldProcessorService;
-import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
-import org.dozer.Mapper;
+import org.awiki.kamikaze.summit.util.component.CycleAvoidingMappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
 @Service
 public class FieldServiceImpl implements FieldService {
 
-  @Autowired
   private FieldRepository repository;
-
-  @Autowired
-  private Mapper mapper;
-  
-  @Autowired
-  private ProxySourceProcessorService sourceProcessors;
-  
-  @Autowired
+  private FieldMapper mapper;
+  //private ProxySourceProcessorService sourceProcessors;
   private ProxyFieldProcessorService fieldProcessors;
   
   public static final List<String> RESPONSIBILITIES = new ArrayList<String>(1);
   static {  RESPONSIBILITIES.add(FieldDto.class.getCanonicalName()); };
   // Since fields all extend (or are) the base impl of FieldDto, this will probably catch every field that doesn't have a specific processor.
   
+  @Autowired
+  public void setRepository(FieldRepository repository) {
+    this.repository = repository;
+  }
+
+  @Autowired
+  public void setMapper(@Lazy FieldMapper mapper) {
+    this.mapper = mapper;
+  }
+
+  //@Autowired
+  //public void setSourceProcessors(ProxySourceProcessorService sourceProcessors) {
+  //  this.sourceProcessors = sourceProcessors;
+  //}
+
+  @Autowired
+  public void setFieldProcessors(ProxyFieldProcessorService fieldProcessors) {
+    this.fieldProcessors = fieldProcessors;
+  }
+
   @Override
   public List<String> getResponsibilities()
   {
     return RESPONSIBILITIES;
   }
   
-  public HashSet<PageItem<String>> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final MultiValueMap<String, String> parameterMap) {
-    LinkedHashSet<PageItem<String>> fields = new LinkedHashSet<>();
+  public HashSet<FieldDto> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final MultiValueMap<String, String> parameterMap) {
+    LinkedHashSet<FieldDto> fields = new LinkedHashSet<>();
     
     for(RegionFieldDto regionFieldDto : regionFieldDtos) {
       final FieldDto fieldDto = regionFieldDto.getField();
@@ -111,7 +125,7 @@ public class FieldServiceImpl implements FieldService {
   @Override
   public FieldDto getUnprocessedFieldById(Long fieldId)
   {
-    return mapper.map(repository.findOne(fieldId), FieldDto.class);
+    return mapper.map(repository.findById(fieldId).get(), new CycleAvoidingMappingContext());
   }
 
 }

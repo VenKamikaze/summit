@@ -3,8 +3,8 @@ package org.awiki.kamikaze.summit.exception;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

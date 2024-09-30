@@ -1,8 +1,0 @@
-database.driverClassName=oracle.jdbc.OracleDriver
-database.url=jdbc:oracle:thin:@127.0.0.1:51521:ORACLE_SID
-#database.url=jdbc\:oracle\:thin\:@localhost\:1521\:XE
-database.username=summit
-database.password=summit_dev
-database.showSql=true
-
-date.format=dd/MM/yyyy

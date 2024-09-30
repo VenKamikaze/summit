@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.persistence.Transient;
+import jakarta.persistence.Transient;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.awiki.kamikaze.summit.service.PageProcessingService;

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
@@ -17,10 +16,15 @@ import org.springframework.stereotype.Service;
 public class BatchSqlDDLProcessorServiceImpl implements BatchSourceProcessorService {
 
   private Logger log = LoggerFactory.getLogger(BatchSqlDDLProcessorServiceImpl.class);
-  
-  @Autowired
-  JdbcTemplate jdbc;
 
+  private JdbcTemplate jdbc;
+
+  @Autowired
+  public void setJdbcTemplate(JdbcTemplate jdbc)
+  {
+    this.jdbc = jdbc;
+  }
+  
   @Override
   public SourceProcessorResult executeBatch(final List<String> ddls) {
     final SourceProcessorResult result = new SourceProcessorResult();

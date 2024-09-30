@@ -13,12 +13,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class TemplateFetchForKeyValuePairItemClosure implements Closure<KeyValuePairItem>
 {
-  @Autowired
   private TemplateService templateService;
   
   // Local Template cache for speed
   private Map<String, TemplateDto> templateCache = new HashMap<>();
-  
+    
+  @Autowired
+  public void setTemplateService(TemplateService templateService) {
+    this.templateService = templateService;
+  }
+
+
   @Override
   public void execute(final KeyValuePairItem input)
   {

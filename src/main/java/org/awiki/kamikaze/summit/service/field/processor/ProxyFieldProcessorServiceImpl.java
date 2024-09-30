@@ -3,7 +3,7 @@ package org.awiki.kamikaze.summit.service.field.processor;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +14,16 @@ import org.springframework.stereotype.Service;
 public class ProxyFieldProcessorServiceImpl implements ProxyFieldProcessorService
 {
   private Logger log = LoggerFactory.getLogger(ProxyFieldProcessorServiceImpl.class);
-  
-  @Autowired
+
   private List<FieldProcessorService> fieldProcessorServices;
   
   private HashMap<String, FieldProcessorService> allFieldServicesCache;
   
+  @Autowired
+  public void setFieldProcessorServices(List<FieldProcessorService> fieldProcessorServices) {
+    this.fieldProcessorServices = fieldProcessorServices;
+  }
+
   @PostConstruct
   private void initializeCache()
   {

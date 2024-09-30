@@ -4,24 +4,24 @@ import java.util.Collection;
 import java.util.List;
 
 import org.awiki.kamikaze.summit.domain.SourceMetadata;
-import org.awiki.kamikaze.summit.domain.SourceMetadataCols;
 import org.awiki.kamikaze.summit.dto.render.SourceDto;
 import org.awiki.kamikaze.summit.dto.render.SourceMetadataDto;
+import org.awiki.kamikaze.summit.mapper.SourceMetadataMapper;
+import org.awiki.kamikaze.summit.mapper.SourceProcessorResultTableColumnMapper;
 import org.awiki.kamikaze.summit.repository.SourceMetadataRepository;
 import org.awiki.kamikaze.summit.service.BindVarService;
-import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Column;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTableExtractor;
 import org.awiki.kamikaze.summit.util.SQLUtils;
-import org.dozer.Mapper;
+import org.awiki.kamikaze.summit.util.component.CycleAvoidingMappingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -31,20 +31,38 @@ public class SQLQuerySourceMetadataGatherer implements QuerySourceMetadataGather
 {
   private static final Logger logger = LoggerFactory.getLogger(SQLQuerySourceMetadataGatherer.class);
   
-  @Autowired
   private BindVarService bindVarService;
+  //private final ProxySourceProcessorService sourceProcessors;
+  private NamedParameterJdbcTemplate jdbc;
+  private SourceProcessorResultTableColumnMapper columnMapper;
+  private SourceMetadataMapper sourceMetadataMapper;
+  private SourceMetadataRepository repository;
+  
+  @Autowired
+  public void setBindVarService(BindVarService bindVarService) {
+    this.bindVarService = bindVarService;
+  }
 
   @Autowired
-  private ProxySourceProcessorService sourceProcessors;
-  
+  public void setJdbc(NamedParameterJdbcTemplate jdbc) {
+    this.jdbc = jdbc;
+  }
+
   @Autowired
-  private NamedParameterJdbcTemplate jdbc;
-  
+  public void setColumnMapper(@Lazy SourceProcessorResultTableColumnMapper columnMapper) {
+    this.columnMapper = columnMapper;
+  }
+
   @Autowired
-  private Mapper mapper;
-  
+  public void setSourceMetadataMapper(@Lazy SourceMetadataMapper sourceMetadataMapper) {
+    this.sourceMetadataMapper = sourceMetadataMapper;
+  }
+
   @Autowired
-  private SourceMetadataRepository repository;
+  public void setRepository(@Lazy SourceMetadataRepository repository) {
+    this.repository = repository;
+  }
+
   
   /*
   private Collection<String> getColumnNames(final SourceProcessorResultTable table)
@@ -60,11 +78,12 @@ public class SQLQuerySourceMetadataGatherer implements QuerySourceMetadataGather
   @Cacheable(value="reportColumnList")
   public Collection<String> getColumnList(long regionId, final List<BindVar> bindVars)
   {
-    RegionDto regionDto = regionMapper.map(regionRepo.findOne(regionId), RegionDto.class);
+    RegionDto regionDto = regionMapper.map(regionRepo.findById(regionId), RegionDto.class);
     final SourceProcessorResultTable table = getResults(regionDto.getSource().iterator().next(), bindVarService.convertBindVarsToSqlParameterMap(bindVars), String.valueOf(regionId));
     return getColumnNames(table);
   }
 */
+
 
   @Override
   @CachePut(value="sourceMetadata", key="sourceDto.id")
@@ -81,9 +100,9 @@ public class SQLQuerySourceMetadataGatherer implements QuerySourceMetadataGather
     
     SourceMetadata metadata = new SourceMetadata();
     for(Column c : res.getColumns()) {
-      metadata.getSourceMetadataCols().add(mapper.map(c, SourceMetadataCols.class));
+      metadata.getSourceMetadataCols().add(columnMapper.map(c, new CycleAvoidingMappingContext()));
     }
-    return mapper.map(repository.save(metadata), SourceMetadataDto.class);
+    return sourceMetadataMapper.map(repository.save(metadata), new CycleAvoidingMappingContext());
   }
 
   /*
@@ -92,7 +111,7 @@ public class SQLQuerySourceMetadataGatherer implements QuerySourceMetadataGather
   public SourceMetadataDto getSourceMetadata(SourceDto sourceDto, List<BindVar> bindVars)
   {
     logger.debug(SQLQuerySourceMetadataGatherer.class.getCanonicalName() + ": " + "getting sourceMetadata for source ID: " + sourceDto.getId());
-    repository.findOne(sourceDto.getSourceMetadata().getId())
+    repository.findById(sourceDto.getSourceMetadata().getId())
     return mapper.map(repository.save(metadata), SourceMetadataDto.class);
   }
   */

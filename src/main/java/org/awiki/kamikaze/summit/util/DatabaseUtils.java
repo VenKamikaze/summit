@@ -3,8 +3,7 @@ package org.awiki.kamikaze.summit.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,8 +12,8 @@ public class DatabaseUtils implements InitializingBean
   private static final Logger logger = LoggerFactory.getLogger(DatabaseUtils.class);
   private static DatabaseUtils instance;
   
-  @Autowired
-  private DriverManagerDataSource dataSource;
+  @Value("${spring.datasource.url}")
+  private String dbUrl;
   
   private DatabaseTypeEnum detectedDbType = null;
   
@@ -48,7 +47,7 @@ public class DatabaseUtils implements InitializingBean
   
   // TODO consider changing this to perform database specific queries to determine the DB type, e.g. select 1 from dual; for oracle.
   private void detectDbType() {
-    final String dbConnectionUrl = dataSource.getUrl() != null ? dataSource.getUrl().toLowerCase() : null;
+    final String dbConnectionUrl = dbUrl != null ? dbUrl.toLowerCase() : null;
     if(dbConnectionUrl != null) {
       if(dbConnectionUrl.contains("oracle")) {
         detectedDbType = DatabaseTypeEnum.ORACLE;

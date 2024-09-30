@@ -20,9 +20,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class BatchSqlDMLProcessorServiceImpl implements BatchSourceProcessorService {
   
-  @Autowired
   private JdbcTemplate jdbc;
 
+  @Autowired
+  public void setJdbcTemplate(JdbcTemplate jdbc)
+  {
+    this.jdbc = jdbc;
+  }
+
+  
   @Override
   public SourceProcessorResult executeBatch(final List<String> sqls) {
     SourceProcessorResult result = new SourceProcessorResult();

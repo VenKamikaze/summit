@@ -1,24 +1,24 @@
 package org.awiki.kamikaze.summit.dto.render;
 
-import org.hibernate.validator.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 
 
 
 public class ApplicationPageDto 
 {
-	private Long id;
+  private Long id;
 	
-	private PageDto page;
+  private PageDto page;
 	
 	//@Size(max = 200)
 	//@NotBlank(message = "Must not be empty.")
-	private ApplicationDto application;
+  private ApplicationDto application;
 	
 	//@NotBlank(message = "Must not be empty.")
 	//private Long applicationNum;
 
-	@NotBlank(message = "Must not be empty.")
+  @NotBlank(message = "Must not be empty.")
   private Long pageNum;
 
   public Long getId() {

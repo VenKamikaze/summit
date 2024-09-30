@@ -44,7 +44,7 @@ public interface FieldService {
    * @param parameterMap
    * @return Collection of FieldDtos
    */
-  public Set<PageItem<String>> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final MultiValueMap<String, String> parameterMap);
+  public Set<FieldDto> processFieldsForRender(final Collection<RegionFieldDto> regionFieldDtos, final Map<String, PageProcessingSourceSelectDto> fieldsToPopulate, final MultiValueMap<String, String> parameterMap);
   
   /**
    * Process a fields, plus any parameters passed in through the HttpServletRequest into a

@@ -22,6 +22,8 @@ import org.awiki.kamikaze.summit.util.component.VariableManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,13 +31,8 @@ public class FieldFormatterServiceImpl implements FieldFormatterService
 {
   private static final Logger logger = LoggerFactory.getLogger(GenericFormatterService.class);
   
-  @Autowired
-  private VariableManager variableManager;
-  
-  @Autowired
+  private VariableManager summitGlobalsVariableManager;
   private ProxyFormatterService formatters;
-  
-  @Autowired
   private ConditionalEvaluatorService conditionalService;
   
   public static final List<String> RESPONSIBILITIES = new ArrayList<String>(2);
@@ -44,6 +41,22 @@ public class FieldFormatterServiceImpl implements FieldFormatterService
             RESPONSIBILITIES.add(DropDownFieldDto.class.getCanonicalName());
          };
   
+  @Autowired
+  @Qualifier("summit-base")
+  public void setVariableManager(VariableManager variableManager) {
+    this.summitGlobalsVariableManager = variableManager;
+  }
+
+  @Autowired
+  public void setFormatters(@Lazy ProxyFormatterService formatters) {
+    this.formatters = formatters;
+  }
+
+  @Autowired
+  public void setConditionalService(ConditionalEvaluatorService conditionalService) {
+    this.conditionalService = conditionalService;
+  }
+
   @Override
   public List<String> getResponsibilities()
   {
@@ -73,9 +86,9 @@ public class FieldFormatterServiceImpl implements FieldFormatterService
     if(null != template) {
       logger.debug("Formatting field : " + fieldDto.getClass().getCanonicalName());
       String templateSource = replaceInternalVariables(template.getSource(), fieldDto, replacementVariableCache);
-      templateSource = replaceApplicationVariables(templateSource, variableManager.getReplacementVars());
+      templateSource = replaceApplicationVariables(templateSource, summitGlobalsVariableManager.getReplacementVars());
       String processedSource = fieldDto.getProcessedSource() == null ? StringUtils.EMPTY : replaceInternalVariables(fieldDto.getProcessedSource(), fieldDto, replacementVariableCache);
-      processedSource = replaceApplicationVariables(processedSource, variableManager.getReplacementVars());
+      processedSource = replaceApplicationVariables(processedSource, summitGlobalsVariableManager.getReplacementVars());
       
       
       
