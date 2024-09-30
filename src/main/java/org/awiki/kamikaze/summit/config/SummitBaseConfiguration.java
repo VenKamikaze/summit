@@ -29,7 +29,7 @@ public class SummitBaseConfiguration
   @Qualifier("summit-base")
   public VariableManager variableManager()
   {
-    globalVariables.getGlobals().entrySet().stream().forEach(k -> log.info("gvkey:"+k+", gvval:"+globalVariables.getGlobals().get(k))); 
+    globalVariables.getGlobals().entrySet().stream().forEach(k -> log.info("summit.globals.{}:",k)); 
     return new VariableManager(globalVariables.getGlobals());
   }
   
