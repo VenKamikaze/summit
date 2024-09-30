@@ -5,36 +5,51 @@ import java.util.Collection;
 import java.util.List;
 
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
+import org.awiki.kamikaze.summit.mapper.RegionMapper;
 import org.awiki.kamikaze.summit.repository.RegionRepository;
 import org.awiki.kamikaze.summit.service.BindVarService;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Column;
-import org.dozer.Mapper;
+import org.awiki.kamikaze.summit.util.component.CycleAvoidingMappingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 public abstract class ReportSourceProcessorService implements TabularQuerySourceProcessorService {
   
   static final Logger logger = LoggerFactory.getLogger(ReportSourceProcessorService.class);
   
-  @Autowired
   NamedParameterJdbcTemplate jdbc;
-  
-  @Autowired
   BindVarService bindVarService;
-  
-  @Autowired
-  Mapper regionMapper;
-  
-  @Autowired
+  RegionMapper regionMapper;
   RegionRepository regionRepo;
   
+  @Autowired
+  public void setJdbc(NamedParameterJdbcTemplate jdbc) {
+    this.jdbc = jdbc;
+  }
+
+  @Autowired
+  public void setBindVarService(BindVarService bindVarService) {
+    this.bindVarService = bindVarService;
+  }
+
+  @Autowired
+  public void setRegionMapper(@Lazy RegionMapper regionMapper) {
+    this.regionMapper = regionMapper;
+  }
+
+  @Autowired
+  public void setRegionRepo(RegionRepository regionRepo) {
+    this.regionRepo = regionRepo;
+  }
+
   /**
    * Cachable list of columns associated with a particular region.
    * @param regionId
@@ -42,7 +57,7 @@ public abstract class ReportSourceProcessorService implements TabularQuerySource
    */
   @Cacheable(value="reportColumnList")
   public Collection<String> getColumnList(long regionId, final List<BindVar> bindVars) {
-    RegionDto regionDto = regionMapper.map(regionRepo.findOne(regionId), RegionDto.class);
+    RegionDto regionDto = regionMapper.map(regionRepo.findById(regionId).get(), new CycleAvoidingMappingContext());
     final SourceProcessorResultTable table = executeQuery(regionDto.getSource().iterator().next(), bindVars);
     table.setId(String.valueOf(regionId));
     return getColumnNames(table);

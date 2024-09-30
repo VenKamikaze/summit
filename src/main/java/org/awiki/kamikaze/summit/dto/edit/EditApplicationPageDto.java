@@ -1,6 +1,6 @@
 package org.awiki.kamikaze.summit.dto.edit;
 
-import org.hibernate.validator.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class EditApplicationPageDto 
 {

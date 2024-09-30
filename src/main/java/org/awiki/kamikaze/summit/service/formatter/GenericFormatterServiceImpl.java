@@ -23,6 +23,8 @@ import org.awiki.kamikaze.summit.util.component.VariableManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,13 +32,8 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
 {
   private static final Logger logger = LoggerFactory.getLogger(GenericFormatterService.class);
   
-  @Autowired
-  private VariableManager variableManager;
-  
-  @Autowired
+  private VariableManager summitGlobalsVariableManager;
   private ProxyFormatterService formatters;
-  
-  @Autowired
   private ConditionalEvaluatorService conditionalService;
   
   public static final List<String> RESPONSIBILITIES = new ArrayList<String>(6);
@@ -50,6 +47,22 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
             RESPONSIBILITIES.add(SourceProcessorResultTable.Cell.class.getCanonicalName()); };
   
   
+  @Autowired
+  @Qualifier("summit-base")
+  public void setVariableManager(VariableManager variableManager) {
+    this.summitGlobalsVariableManager = variableManager;
+  }
+
+  @Autowired
+  public void setFormatters(@Lazy ProxyFormatterService formatters) {
+    this.formatters = formatters;
+  }
+
+  @Autowired
+  public void setConditionalService(ConditionalEvaluatorService conditionalService) {
+    this.conditionalService = conditionalService;
+  }
+
   @Override
   public List<String> getResponsibilities()
   {
@@ -74,9 +87,9 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
     if(null != template) {
       logger.debug("Formatting item : " + item.getClass().getCanonicalName());
       String templateSource = replaceInternalVariables(template.getSource(), item, replacementVariableCache);
-      templateSource = replaceApplicationVariables(templateSource, variableManager.getReplacementVars());
+      templateSource = replaceApplicationVariables(templateSource, summitGlobalsVariableManager.getReplacementVars());
       String processedSource = item.getProcessedSource() == null ? StringUtils.EMPTY : replaceInternalVariables(item.getProcessedSource(), item, replacementVariableCache);
-      processedSource = replaceApplicationVariables(processedSource, variableManager.getReplacementVars());
+      processedSource = replaceApplicationVariables(processedSource, summitGlobalsVariableManager.getReplacementVars());
       int templateSourceReplaceLocation = templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString()) == -1 ? 0 : templateSource.indexOf(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString());
       int nextInsertAt = templateSourceReplaceLocation + insertAt;
       builder.insert(insertAt, templateSource.replace(REPLACEMENT_DATA_AND_SUBREGION_VARIABLE.toString(), processedSource));

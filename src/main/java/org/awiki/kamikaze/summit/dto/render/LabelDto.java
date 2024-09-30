@@ -1,18 +1,17 @@
 package org.awiki.kamikaze.summit.dto.render;
 // Generated Oct 31, 2013 9:11:16 PM by Hibernate Tools 3.4.0.CR1
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.domain.codetable.CodeLabelType;
 import org.awiki.kamikaze.summit.service.formatter.FormatEnums;
-import org.hibernate.validator.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -147,7 +146,6 @@ public class LabelDto implements PageItem<String>
     return getTemplate();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Map<String, String> getCustomReplacementVariables()
   {

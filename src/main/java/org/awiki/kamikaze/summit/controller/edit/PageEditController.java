@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class PageEditController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(PageEditController.class);
+  private static final Logger logger = LoggerFactory.getLogger(PageEditController.class);
+	
+  private PageEditService pageEditService;
 
-	@Autowired
-	PageEditService pageEditService;
 	
 	/*
 	 * page
@@ -33,8 +33,15 @@ public class PageEditController {
 	
 	// TODO perhaps, for now, we should output a DTO and render a JSP page for the backend edit?
 	// later we can look at making this generic, when we have edit forms rendered on the front-end to end-users.
-	
-	 /**
+
+  @Autowired	
+	 public void setPageEditService(PageEditService pageEditService) {
+    this.pageEditService = pageEditService;
+  }
+
+
+
+  /**
    * This loads and renders the edit page for modifying basic pages
    */
   @RequestMapping(value = "/edit/{applicationId}/{pageId}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)

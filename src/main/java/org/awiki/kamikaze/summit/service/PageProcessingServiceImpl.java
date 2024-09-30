@@ -19,15 +19,25 @@ import org.springframework.util.MultiValueMap;
 @Service
 public class PageProcessingServiceImpl implements PageProcessingService
 {
-  @Autowired
   private ProxySourceProcessorService sourceProcessors;
-  
-  @Autowired
   private BindVarService bindVarService;
-  
-  @Autowired
   private ConditionalEvaluatorService conditionalService;
   
+  @Autowired
+  public void setSourceProcessors(ProxySourceProcessorService sourceProcessors) {
+    this.sourceProcessors = sourceProcessors;
+  }
+
+  @Autowired
+  public void setBindVarService(BindVarService bindVarService) {
+    this.bindVarService = bindVarService;
+  }
+
+  @Autowired
+  public void setConditionalService(ConditionalEvaluatorService conditionalService) {
+    this.conditionalService = conditionalService;
+  }
+
   /* FIXME TODO: still relying on varchar only bind variables, allow other types */
   @Override
   public Map<String, PageProcessingSourceSelectDto> processSource(PageProcessingSourceDto processSourceDto,

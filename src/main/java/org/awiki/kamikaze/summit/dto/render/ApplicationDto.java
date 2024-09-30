@@ -4,13 +4,13 @@ package org.awiki.kamikaze.summit.dto.render;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class ApplicationDto 
 {
-	private Long id;
+  private Long id;
 	 
   @NotBlank(message = "Must not be empty.")
   private Long applicationNum;

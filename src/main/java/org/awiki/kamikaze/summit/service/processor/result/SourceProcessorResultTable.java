@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.iterators.ArrayListIterator;
+import org.apache.commons.collections4.iterators.ArrayListIterator;
 import org.apache.commons.collections4.MapUtils;
 import org.awiki.kamikaze.summit.dto.render.ConditionalDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;

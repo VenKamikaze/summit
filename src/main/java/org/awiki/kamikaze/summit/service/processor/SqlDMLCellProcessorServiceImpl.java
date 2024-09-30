@@ -8,6 +8,7 @@ import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -27,8 +28,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class SqlDMLCellProcessorServiceImpl implements SingularSourceProcessorService {
   
-  @Autowired
   private NamedParameterJdbcTemplate jdbc;
+
+  @Autowired
+  public void setNamedParameterJdbcTemplate(NamedParameterJdbcTemplate jdbc)
+  {
+    this.jdbc = jdbc;
+  }
   
   @Override
   public List<String> getResponsibilities()

@@ -4,7 +4,7 @@ package org.awiki.kamikaze.summit.dto.render;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.validator.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class SourceDto implements java.io.Serializable
 {

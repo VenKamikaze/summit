@@ -13,14 +13,14 @@ import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.dto.render.SourceDto;
+import org.awiki.kamikaze.summit.mapper.PageMapper;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.DebugUtils;
-import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
-import org.dozer.Mapper;
+import org.awiki.kamikaze.summit.util.component.CycleAvoidingMappingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,19 +40,27 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements OldPag
   
   private static final String TEMPLATE_REPLACEMENT_VAR = "__#DATA#__";
   
-  @Autowired
   private ApplicationPageRepository appPageStore;
-  
-  @Autowired
   private ProxySourceProcessorService sourceProcessors;
+  private PageMapper pageMapper;
+
   
   @Autowired
-  private Mapper mapper;
-  
+  public void setAppPageStore(ApplicationPageRepository appPageStore) {
+    this.appPageStore = appPageStore;
+  }
+
   @Autowired
-  private PageToPageDtoMapper pageMapper;
-  
-  
+  public void setSourceProcessors(ProxySourceProcessorService sourceProcessors) {
+    this.sourceProcessors = sourceProcessors;
+  }
+
+  @Autowired
+  public void setPageMapper(PageMapper pageMapper) {
+    this.pageMapper = pageMapper;
+  }
+
+
   public PageDto renderPage(long applicationPageId) {
     // TODO Auto-generated method stub
     return null;
@@ -66,7 +74,7 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements OldPag
   public PageDto renderPage(long applicationId, long pageId) {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     //PageDto pageDto = mapper.map(appPage.getPage(), PageDto.class);
-    PageDto pageDto = pageMapper.map(appPage.getPage());
+    PageDto pageDto = pageMapper.map(appPage.getPage(), new CycleAvoidingMappingContext());
     
     DebugUtils.debugObjectGetters(pageDto);
     
@@ -87,7 +95,7 @@ public class OldPageRenderingServiceImplBeforeTemplateRefactor implements OldPag
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     if(appPage != null)
     {
-      PageDto pageDto = pageMapper.map(appPage.getPage());
+      PageDto pageDto = pageMapper.map(appPage.getPage(), new CycleAvoidingMappingContext());
       
       DebugUtils.debugObjectGetters(pageDto);
       return processTemplateForRender(pageDto);

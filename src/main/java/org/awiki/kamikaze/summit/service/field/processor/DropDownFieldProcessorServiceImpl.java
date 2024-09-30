@@ -6,8 +6,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.awiki.kamikaze.summit.dto.render.DropDownFieldDto;
@@ -17,14 +17,14 @@ import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
 import org.awiki.kamikaze.summit.dto.render.SourceDto;
+import org.awiki.kamikaze.summit.mapper.SourceProcessorResultTableRowMapper;
 import org.awiki.kamikaze.summit.repository.FieldRepository;
 import org.awiki.kamikaze.summit.service.field.TemplateFetchForKeyValuePairItemClosure;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.TabularQuerySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.bindvars.BindVar;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
-import org.awiki.kamikaze.summit.util.mapper.SourceProcessorResultTableRowToDropDownOptionItemMapper;
-import org.dozer.Mapper;
+import org.awiki.kamikaze.summit.util.component.CycleAvoidingMappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
@@ -32,27 +32,30 @@ import org.springframework.util.MultiValueMap;
 @Service
 public class DropDownFieldProcessorServiceImpl implements FieldProcessorService {
 
-  @Autowired
-  private FieldRepository repository;
-
-  @Autowired
-  private Mapper mapper;
-  
-  @Autowired
   private ProxySourceProcessorService sourceProcessors;
-  
-  @Autowired
-  private SourceProcessorResultTableRowToDropDownOptionItemMapper rowToOptionItemMapper;
-  
-  @Autowired
-  private TemplateService templateService;
-  
-  @Autowired
+  private SourceProcessorResultTableRowMapper rowToOptionItemMapper;
   private TemplateFetchForKeyValuePairItemClosure templateFetcher;
   
   public static final List<String> RESPONSIBILITIES = new ArrayList<String>(1);
   static {  RESPONSIBILITIES.add(DropDownFieldDto.class.getCanonicalName()); };
   
+  @Autowired
+  public void setSourceProcessors(ProxySourceProcessorService sourceProcessors) {
+    this.sourceProcessors = sourceProcessors;
+  }
+
+  @Autowired
+  public void setRowToOptionItemMapper(SourceProcessorResultTableRowMapper rowToOptionItemMapper) {
+    this.rowToOptionItemMapper = rowToOptionItemMapper;
+  }
+
+  @Autowired
+  public void setTemplateFetcher(TemplateFetchForKeyValuePairItemClosure templateFetcher) {
+    this.templateFetcher = templateFetcher;
+  }
+
+
+
   @Override
   public List<String> getResponsibilities()
   {
@@ -121,7 +124,7 @@ public class DropDownFieldProcessorServiceImpl implements FieldProcessorService 
         throw new UnsupportedOperationException("DropDownFields must provide only two columns, a key and a value, in that order.");
       }
       
-      items.addAll(CollectionUtils.collect(table.getBody(), rowToOptionItemMapper));
+      items.addAll(table.getBody().stream().map(b -> rowToOptionItemMapper.map(b)).collect(Collectors.toList()));
     }
 
     IteratorUtils.forEach(items.iterator(), templateFetcher);

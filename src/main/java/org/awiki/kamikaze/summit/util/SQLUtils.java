@@ -9,12 +9,8 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.awiki.kamikaze.summit.util.DatabaseTypeEnum.*;
-
 
 public class SQLUtils
 {
@@ -78,7 +74,7 @@ public class SQLUtils
       {
         String error = "Not yet supported. FIXME, TODO SQLServer: " + DatabaseUtils.get().getDetectedDBType();
         logger.error(error);
-        throw new NotYetImplementedException(error);
+        throw new RuntimeException(error);
       }
       
       default:

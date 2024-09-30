@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.OrderBy;
+import jakarta.persistence.OrderBy;
 
 public class SourceMetadataDto implements java.io.Serializable
 {

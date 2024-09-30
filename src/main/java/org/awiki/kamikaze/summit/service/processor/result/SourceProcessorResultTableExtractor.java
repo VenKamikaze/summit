@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.awiki.kamikaze.summit.service.processor.SQLQuerySourceProcessorServiceImpl;
-import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
-import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable.Column;
 
 /**
  * This class implements required methods to transform and populate a SourceProcessorResultTable from a

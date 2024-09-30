@@ -21,10 +21,10 @@ public class PageProcessingSourceSelectDto {
   public void setId(Long id) {
     this.id = id;
   }
-  public PageProcessingSourceDto getPageProcessing() {
+  public PageProcessingSourceDto getPageProcessingSource() {
     return pageProcessingSource;
   }
-  public void setPageProcessing(PageProcessingSourceDto pageProcessingSource) {
+  public void setPageProcessingSource(PageProcessingSourceDto pageProcessingSource) {
     this.pageProcessingSource = pageProcessingSource;
   }
   public long getFieldIndex() {

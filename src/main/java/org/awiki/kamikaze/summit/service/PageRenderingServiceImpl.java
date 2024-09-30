@@ -18,6 +18,7 @@ import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.dto.render.PageRegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.dto.render.RegionFieldDto;
+import org.awiki.kamikaze.summit.mapper.PageMapper;
 import org.awiki.kamikaze.summit.repository.ApplicationPageRepository;
 import org.awiki.kamikaze.summit.service.field.FieldService;
 import org.awiki.kamikaze.summit.service.formatter.FormatterService;
@@ -25,11 +26,11 @@ import org.awiki.kamikaze.summit.service.formatter.ProxyFormatterService;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.ReportSourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
-import org.awiki.kamikaze.summit.util.mapper.PageToPageDtoMapper;
-import org.dozer.Mapper;
+import org.awiki.kamikaze.summit.util.component.CycleAvoidingMappingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
@@ -45,30 +46,51 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   
   private static final Logger log = LoggerFactory.getLogger(PageRenderingServiceImpl.class);
   
-  @Autowired
   private ApplicationPageRepository appPageStore;
-  
-  @Autowired
   private ProxySourceProcessorService sourceProcessors;
-  
-  @Autowired
   private ProxyFormatterService sourceFormatters;
-  
-  @Autowired
-  private Mapper mapper;
-  
-  @Autowired
-  private PageToPageDtoMapper pageMapper;
-  
-  @Autowired
+  private PageMapper pageMapper;
   private BindVarService bindVarService;
-  
-  @Autowired
   private FieldService fieldService;
-  
-  @Autowired
   private PageProcessingService pageProcessingService;
   
+  
+  @Autowired
+  public void setAppPageStore(ApplicationPageRepository appPageStore) {
+    this.appPageStore = appPageStore;
+  }
+
+  @Autowired
+  public void setSourceProcessors(@Lazy ProxySourceProcessorService sourceProcessors) {
+    this.sourceProcessors = sourceProcessors;
+  }
+
+  @Autowired
+  public void setSourceFormatters(@Lazy ProxyFormatterService sourceFormatters) {
+    this.sourceFormatters = sourceFormatters;
+  }
+
+  @Autowired
+  public void setPageMapper(@Lazy PageMapper pageMapper) {
+    this.pageMapper = pageMapper;
+  }
+
+  @Autowired
+  public void setBindVarService(BindVarService bindVarService) {
+    this.bindVarService = bindVarService;
+  }
+
+  @Autowired
+  public void setFieldService(FieldService fieldService) {
+    this.fieldService = fieldService;
+  }
+
+  @Autowired
+  public void setPageProcessingService(PageProcessingService pageProcessingService) {
+    this.pageProcessingService = pageProcessingService;
+  }
+
+
   /**
    * Overarching method that handles the page rendering
    * This one renders the entire page and all it's contents to a String
@@ -84,7 +106,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     if(appPage != null)
     {
-      PageDto pageDto = pageMapper.map(appPage.getPage());
+      PageDto pageDto = pageMapper.map(appPage.getPage(), new CycleAvoidingMappingContext());
       return renderPageItems(pageDto, parameterMap);
     }
     return "Application " + applicationId + ", page " + pageId + "  does not exist.";
@@ -210,7 +232,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     if(appPage != null)
     {
-      PageDto pageDto = pageMapper.map(appPage.getPage());
+      PageDto pageDto = pageMapper.map(appPage.getPage(), new CycleAvoidingMappingContext());
       return processPageItemsOnSubmit(pageDto, submittedFormParams);
     }
     return "Application " + applicationId + ", page " + pageId + "  does not exist.";

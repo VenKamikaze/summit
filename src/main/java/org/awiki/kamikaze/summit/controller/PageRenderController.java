@@ -20,12 +20,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class PageRenderController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(PageRenderController.class);
-
-	@Autowired
-	PageRenderingService renderService;
+  private static final Logger logger = LoggerFactory.getLogger(PageRenderController.class);
 	
-	 /**
+  private PageRenderingService renderService;
+
+  @Autowired  
+  public void setRenderService(PageRenderingService renderService) {
+    this.renderService = renderService;
+  }
+
+  /**
    * This renders the application pages to a String
    */
   @RequestMapping(value = "/run/{applicationId}/{pageId}", method = RequestMethod.GET)
