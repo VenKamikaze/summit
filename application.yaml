@@ -6,6 +6,7 @@ spring:
     password: summit_dev
     driver-class: org.postgresql.Driver
 
+# csrf is auto-filled by spring
 summit:
   globals:
     '[##__CONTEXTPATH__##]': ""

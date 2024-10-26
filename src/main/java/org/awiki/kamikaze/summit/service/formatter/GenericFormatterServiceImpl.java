@@ -17,6 +17,7 @@ import org.awiki.kamikaze.summit.dto.render.PageDto;
 import org.awiki.kamikaze.summit.dto.render.PageItem;
 import org.awiki.kamikaze.summit.dto.render.RegionDto;
 import org.awiki.kamikaze.summit.dto.render.TemplateDto;
+import org.awiki.kamikaze.summit.security.CsrfTokenProvider;
 import org.awiki.kamikaze.summit.service.ConditionalEvaluatorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
 import org.awiki.kamikaze.summit.util.component.VariableManager;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +48,15 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
             RESPONSIBILITIES.add(SourceProcessorResultTable.Row.class.getCanonicalName()); 
             RESPONSIBILITIES.add(SourceProcessorResultTable.Cell.class.getCanonicalName()); };
   
+  @Value("${summit.csrf-key-name}")
+  private String csrfReplacementVariableKey;
+
+  private CsrfTokenProvider csrfTokenProvider;
+
+  @Autowired
+  private void setCsrfTokenProvider(CsrfTokenProvider provider) {
+    this.csrfTokenProvider = provider;
+  }
   
   @Autowired
   @Qualifier("summit-base")
@@ -131,6 +142,7 @@ public class GenericFormatterServiceImpl implements GenericFormatterService
     for(Map.Entry<String,String> me : replacementVariables.entrySet()) {
       processedString = StringUtils.replace(processedString, me.getKey(), me.getValue());
     }
+    processedString = StringUtils.replace(processedString, csrfReplacementVariableKey, csrfTokenProvider.getCsrfTokenValue() != null ? csrfTokenProvider.getCsrfTokenValue() : StringUtils.EMPTY);
     return processedString;
   }
 

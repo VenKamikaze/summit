@@ -1,0 +1,60 @@
+I'm working with a Java web application called 'Summit' (github.com/VenKamikaze/summit), which is a Rapid Application Development (RAD) framework built on Spring Boot 3.x. It follows a metadata-driven architecture similar to Oracle APEX, where web applications are defined through database structures rather than traditional code.
+
+Key architectural components:
+
+Database-Driven Page Definition:
+
+Applications are composed of hierarchical metadata stored in tables:
+
+APPLICATION: Top-level container
+APPLICATION_PAGE: Pages within an application
+PAGE: Contains regions and processing instructions
+PAGE_REGION: Defines content areas within pages
+REGION: Contains fields and display logic
+REGION_FIELD: Links regions to their fields
+FIELD: Define form inputs and display elements
+SOURCE: Contains SQL or other data source definitions
+TEMPLATE: HTML/output templates with substitution variables
+PAGE_PROCESSING: Defines request handling logic
+PAGE_PROCESSING_SOURCE: Contains processing instructions (e.g., SQL statements)
+CONDITIONAL: Contains logic for showing/hiding elements or controlling processing flow
+
+Template System:
+
+Uses HTML templates with substitution variables (e.g., ##VARIABLE##)
+Common variables include:
+
+##CONTEXTPATH##
+##APIPATH##
+##REGION-ID##
+##DATA##
+##PAGE-ID##
+##ID##
+##NAME##
+
+Templates can be hierarchical (parent/child relationships)
+Supports multiple output formats (HTML, CSV, etc.)
+
+Request Handling:
+
+GET requests:
+
+Retrieve application/page metadata
+Process template hierarchy
+Perform variable substitution
+Render final output using StringBuffer
+
+
+POST requests:
+
+Central controller handles requests via path pattern: /applicationId/pageId
+Actions (INSERT/UPDATE/DELETE) trigger associated PageProcessing
+Conditional objects determine when to apply processing
+Processing sources (typically SQL) execute with form fields as bind variables
+
+Security:
+
+Built on Spring Security
+CSRF protection being added.
+
+What I need help with is: [specific feature/enhancement/issue]"
