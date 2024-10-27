@@ -12,7 +12,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -37,6 +37,7 @@ public class WebSecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf((csrf) -> csrf
           .csrfTokenRepository(csrfTokenRepository())
+          .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
        ).authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
           .requestMatchers("/**").permitAll());
     return http.build();

@@ -9,8 +9,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class CsrfTokenProvider {
   
   private CsrfTokenRepository csrfTokenRepository;
@@ -30,6 +32,8 @@ public class CsrfTokenProvider {
     
     // Save the token for this request/response pair
     csrfTokenRepository.saveToken(token, request, response);
+    
+    log.trace("CSRF token saved. Name: {}, Value: {}", token.getParameterName(), token.getToken());
     
     return token;
   }

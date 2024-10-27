@@ -166,7 +166,9 @@ public class FieldFormatterServiceImpl implements FieldFormatterService
     for(Map.Entry<String,String> me : replacementVariables.entrySet()) {
       processedString = StringUtils.replace(processedString, me.getKey(), me.getValue());
     }
-    processedString = StringUtils.replace(processedString, csrfReplacementVariableKey, csrfTokenProvider.getCsrfTokenValue() != null ? csrfTokenProvider.getCsrfTokenValue() : StringUtils.EMPTY);
+    if(processedString.indexOf(csrfReplacementVariableKey) > 0) {
+      processedString = StringUtils.replace(processedString, csrfReplacementVariableKey, csrfTokenProvider.getCsrfTokenValue());
+    }
     return processedString;
   }
 
