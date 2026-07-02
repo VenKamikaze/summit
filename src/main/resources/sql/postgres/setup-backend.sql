@@ -23,7 +23,8 @@ insert into template select -50, null, 'Link table rows to URL - Hidden', 'org.a
 insert into template select -60, null, 'Input Item - Hidden', 'org.awiki.kamikaze.summit.dto.render.FieldDto', '<input type="hidden" name="##__NAME__##" id="##__ID__##" value="##__DATA__##" />';
 insert into template select -61, null, 'Input Item - Text', 'org.awiki.kamikaze.summit.dto.render.FieldDto', '<div class="field">##__LABEL-LEFT__##<input type="text" name="##__NAME__##" id="##__ID__##" value="##__DATA__##" />##__LABEL-RIGHT__##</div>';
 insert into template select -62, null, 'Input Item - Number', 'org.awiki.kamikaze.summit.dto.render.FieldDto', '<div class="field">##__LABEL-LEFT__##<input type="number" name="##__NAME__##" id="##__ID__##" value="##__DATA__##" />##__LABEL-RIGHT__##</div>'; -- HTML5 and IE10+ only.
-insert into template select -63, null, 'Input Item - DropDown', 'org.awiki.kamikaze.summit.dto.render.DropDownFieldDto', '<div class="field">##__LABEL-LEFT__##<select name="##__NAME__##" id="##__ID__##">##__DATA__##</select>##__LABEL-RIGHT__##</div>'; 
+insert into template select -63, null, 'Input Item - DropDown', 'org.awiki.kamikaze.summit.dto.render.DropDownFieldDto', '<div class="field">##__LABEL-LEFT__##<select name="##__NAME__##" id="##__ID__##">##__DATA__##</select>##__LABEL-RIGHT__##</div>';
+insert into template select -64, null, 'Input Item - TextArea', 'org.awiki.kamikaze.summit.dto.render.FieldDto', '<div class="field">##__LABEL-LEFT__##<textarea name="##__NAME__##" id="##__ID__##" rows="10" cols="80">##__DATA__##</textarea>##__LABEL-RIGHT__##</div>'; -- added 2026-07-02 for the IDE region form (multi-line SQL entry); existing DBs get it via summitdev-20260702-ide-p5-regions.sql
 
 -- Non-selectable template items belong in the -1000 range 
 insert into template select -1000, null, 'Label', 'org.awiki.kamikaze.summit.dto.render.LabelDto', '<label class="##__LABEL-CLASS__##" ##__LABEL-FOR__## id="##__ID__##">##__DATA__##</label>'; 

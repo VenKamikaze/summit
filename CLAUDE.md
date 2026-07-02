@@ -144,17 +144,32 @@ even though the search form says method="post".
 CSRF substitution work is merged into this branch's history. The active effort is
 the **Summit IDE** (app -20000) — see `doc/ide-plan.md` for the build order.
 Done + verified: applications list (-21000, t_020), application create/edit form
-(-21100, t_040), pages-in-application report (-20002, t_030; fixed-up
-summitdev-20241102.sql), plus t_010 locking in conditional-processing behaviour.
-Navigation: list rows → app form (`pageParams=id:<id>`), Create → app form
-(`id:0`), form's Pages button → pages report.
+(-21100, t_040), pages-in-application report (-20002, t_030), page create/edit
+form (-20102, t_050 — Save INSERTs PAGE + APPLICATION_PAGE via one Postgres
+data-modifying CTE in a dml_modify source), regions-on-page report (-23000) +
+region create/edit form (-23100, t_060 — 4-table Save CTE: REGION + PAGE_REGION
++ SOURCE + REGION_SOURCE; SQL source edited in new textarea template -64),
+fields-on-region report (-24000) + field create/edit form (-24100, t_070 —
+optional default source via a 'none' sentinel dropdown option +
+`NULLIF(:bind, 'none')`, conditional SOURCE/FIELD_SOURCE insert inside the
+CTE), plus t_010 locking in conditional-processing behaviour. Navigation:
+applications list rows → app form (`pageParams=id:<id>`), Create → app form
+(`id:0`), app form's Pages button → pages report, pages report rows → page
+form (`id:<pageId>`; child forms derive parent ids from the row id), page
+form's Regions button → regions report → region form, region form's Fields
+button → fields report → field form. The full APPLICATION → PAGE → REGION →
+FIELD chain is maintainable from the IDE.
 
-**Next: IDE page 4** — make the -20102 "Create New Page" stub a real page
-create/edit form. Needs: sequences for link tables (DDL delta), multi-table
-insert (preferred: Postgres data-modifying CTE `with new_page as (insert ...
-returning id) insert into application_page ...`), template dropdown sourced from
-TEMPLATE. Then regions report+form (needs a textarea field template), then
-fields report+form. Conditions/validations/processing maintenance is deliberately
-deferred. Known deferred items: post-POST branching, delete actions, Oracle
-pagination ordering, `dto/edit` + `PageEditController` are an older abandoned
-approach (`Old*` services too) — ignore them.
+Enabling changes landed with page 4: link/child-table sequences
+(`ddl-link-table-sequences-20260702.sql`, mirrored in ddl.sql) and a
+`FieldMapper` @ObjectFactory so DROPDOWN fields map to `DropDownFieldDto` —
+dropdowns had never worked on the render path before this (dispatch is by DTO
+class; plain FieldDto fell into SimpleFieldProcessor which can't run
+`dml_select`). Dropdown recipe + CTE/bind-scraper notes: `doc/ide-plan.md`.
+
+**Next: stop-and-reassess point reached** (doc/ide-plan.md): pages 1–6 are
+done; conditions/validations/processing maintenance was deliberately deferred
+and is the natural next scope discussion. Known deferred items: post-POST
+branching, delete actions, Oracle pagination ordering, `dto/edit` +
+`PageEditController` are an older abandoned approach (`Old*` services too) —
+ignore them.

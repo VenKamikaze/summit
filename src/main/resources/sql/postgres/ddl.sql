@@ -366,4 +366,16 @@ create sequence region_seq start 1;
 create sequence field_seq start 1;
 create sequence spare_seq start 1;
 
+-- Sequences for the link/child tables, so metadata rows can be created from
+-- SQL running inside the app (added 2026-07-02 for the Summit IDE; existing
+-- databases get these via ddl-link-table-sequences-20260702.sql).
+create sequence application_page_seq start 1;
+create sequence source_seq start 1;
+create sequence page_region_seq start 1;
+create sequence region_field_seq start 1;
+create sequence region_source_seq start 1;
+create sequence field_source_seq start 1;
+create sequence label_seq start 1;
+create sequence field_label_seq start 1;
+
 --GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO summit;

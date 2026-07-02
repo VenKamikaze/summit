@@ -20,18 +20,27 @@
 --    are always VARCHAR - those queries need CAST(col as VARCHAR) = :bind.
 --  * Re-runnable: deletes its own rows first (but never application -20000,
 --    which other IDE pages hang off).
+--
+-- Changed 2026-07-02 for IDE page 4 (see doc/ide-plan.md):
+--  * Page -20102 itself (the old empty stub) is now owned by
+--    summitdev-20260702-ide-p4-page-form.sql - this file no longer creates
+--    or deletes it, so both files stay independently re-runnable.
+--  * The Create button passes id:0 as well (create-mode convention: the
+--    form page's render processing requires an :id parameter).
+--  * Report rows link to the page form in edit mode (template -50 row link,
+--    pageParams=id:<clicked page id>).
 
 START TRANSACTION;
 
-delete from field_source where id in (-20102);
-delete from region_field where id in (-20002, -20103);
-delete from field where id in (-20002, -20102);
+delete from field_source where id in (-20102, -20103);
+delete from region_field where id in (-20002, -20103, -20104);
+delete from field where id in (-20002, -20102, -20103);
 delete from region_source where id in (-20000);
-delete from source where id in (-20002, -20102);
+delete from source where id in (-20002, -20102, -20103);
 delete from page_region where id in (-20000);
 delete from region where id in (-20000);
-delete from application_page where id in (-20002, -20102);
-delete from page where id in (-20002, -20102);
+delete from application_page where id in (-20002);
+delete from page where id in (-20002);
 
 -- The IDE application container. Other pages reference it, so only create it if missing.
 insert into application (id, application_num, name)
@@ -72,13 +81,24 @@ values (-20002, -60, 'applicationId', 'static', 'NUMBER', null);
 insert into region_field (id, region_id, field_id, field_num)
 values (-20002, -20000, -20002, 1);
 
--- New Page for Creating a Page (stub - becomes the page create/edit form, see doc/ide-plan.md)
-insert into page (id, template_id, "name")
-values (-20102, -100, 'Create New Page');
+-- Page -20102 (the page create/edit form this report links to) is created by
+-- summitdev-20260702-ide-p4-page-form.sql - load that file after this one.
 
--- Link page to internal application
-insert into application_page (id, application_id, page_id, page_num)
-values (-20102, -20000, -20102, 102);
+-- Row link (template -50): renders hidden input id="region--20000-sprt-link";
+-- the report JS appends the clicked row's id (the page id) to this URL prefix,
+-- opening the page form in edit mode. The form derives the applicationId from
+-- the page id itself, so only id: is needed here.
+insert into field (id, template_id, "name", source_type_code, field_type_code, default_source_type_code)
+values (-20103, -50, 'pages-sprt-link', 'static', 'TEXT', 'static');
+
+insert into region_field (id, region_id, field_id, field_num)
+values (-20104, -20000, -20103, 3);
+
+insert into source (id, "source")
+values (-20103, '##__CONTEXTPATH__##/run/-20000/-20102?pageParams=id:');
+
+insert into field_source (id, field_id, source_id, flag_default_value)
+values (-20103, -20103, -20103, 'Y');
 
 -- Create Button on Page -20002
 -- template -81 is 'Input Item - Javascript Button'
@@ -92,8 +112,10 @@ values (-20103, -20000, -20102, 2);
 -- Source for the Javascript Button to redirect
 -- We use location.href to navigate, passing the applicationId from the hidden field
 -- in pageParams format so the target page's parameter map picks it up.
+-- id:0 puts the form in create mode (id 0 never exists, and the form's render
+-- processing requires an :id parameter to be present).
 insert into source (id, "source")
-values (-20102, 'location.href=''##__CONTEXTPATH__##/run/-20000/-20102?pageParams=applicationId:'' + document.getElementById(''-20002'').value;');
+values (-20102, 'location.href=''##__CONTEXTPATH__##/run/-20000/-20102?pageParams=id:0,applicationId:'' + document.getElementById(''-20002'').value;');
 
 -- Link source to field
 insert into field_source (id, field_id, source_id, flag_default_value)

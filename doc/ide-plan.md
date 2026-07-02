@@ -52,30 +52,77 @@ and database state, and handle the CSRF cookie/token dance for POSTs.
    pageParams URL format, made re-runnable) and verified by
    `testing/verify/t_030_ide_pages_report.bash`. Reached from the application
    form's "Pages" button; its Create button targets the page-form stub -20102.
-4. **Page create/edit form** — name, page_num, template dropdown (from TEMPLATE).
-   First multi-table create (PAGE + APPLICATION_PAGE) — see gap list.
-5. **Regions-on-page report + region create/edit form** — name, region_num,
-   position/type/source-type dropdowns (from CODE_* tables), template dropdown,
-   SQL source (needs a textarea field template).
-6. **Fields-on-region report + field create/edit form** — name, field_num,
-   field-type/source-type/template dropdowns, optional default source.
+4. **Page create/edit form** — DONE (2026-07-02):
+   `summitdev/summitdev-20260702-ide-p4-page-form.sql` (page -20102, the old
+   stub, now owned by this file; new rows in -22000..-22099), verified by
+   `testing/verify/t_050_ide_page_form.bash`. Name, page_num, template
+   dropdown from TEMPLATE (class PageDto). Save INSERTs PAGE +
+   APPLICATION_PAGE in a single dml_modify source via a Postgres
+   data-modifying CTE; Update updates both tables the same way. Ids come from
+   page_seq + the new application_page_seq. The pages report (-20002) gained
+   a row link (edit mode, passes id: only — the form derives applicationId
+   from the page id) and its Create button now passes id:0 as well.
+   Required two enabling changes:
+   - DDL delta `sql/postgres/ddl-link-table-sequences-20260702.sql`
+     (sequences for the link/child tables; also added to ddl.sql).
+   - `FieldMapper` @ObjectFactory: DROPDOWN fields now map to DropDownFieldDto
+     (dropdowns had NEVER worked on the render path — see gotchas).
+5. **Regions-on-page report + region create/edit form** — DONE (2026-07-02):
+   `summitdev/summitdev-20260702-ide-p5-regions.sql` (report page -23000,
+   form page -23100), verified by `testing/verify/t_060_ide_regions.bash`
+   (including that an IDE-created report region renders on its page and
+   serves rows through the JSON API). Name, region_num, template dropdown
+   (explicit id list -200/-103 — region templates share no class_name),
+   position/type/source-type dropdowns from CODE_* tables, SQL source in the
+   new textarea template -64 (data only, added to setup-backend.sql and
+   insert-if-missing in the p5 file). Save creates REGION + PAGE_REGION +
+   SOURCE + REGION_SOURCE in one 4-table data-modifying CTE; Update updates
+   REGION, PAGE_REGION.region_num and the linked SOURCE in one CTE. Reached
+   from the page form's new Regions button (edit mode only). First-pass
+   limitations documented in the SQL file header (source row always created;
+   update only reaches a source linked via REGION_SOURCE; type/source-type
+   combinations unvalidated).
+6. **Fields-on-region report + field create/edit form** — DONE (2026-07-02):
+   `summitdev/summitdev-20260702-ide-p6-fields.sql` (report page -24000, form
+   page -24100), verified by `testing/verify/t_070_ide_fields.bash` (including
+   that an IDE-created field renders on its host page with its static default
+   value). Name, field_num, template dropdown (field templates = the two
+   render field DTO class_names), field-type/source-type dropdowns from CODE_*
+   tables, optional default source type + default value source textarea.
+   The optional default source type uses a **'none' sentinel option** +
+   `NULLIF(:bind, 'none')` in the DML ('' would hide the bind from the
+   scraper) and `coalesce(col, 'none')` on render. Save inserts FIELD +
+   REGION_FIELD always, and SOURCE + FIELD_SOURCE (flag 'Y') only when default
+   source text was entered (`where length(:default_source) > 0` inside the
+   CTE). Reached from the region form's new Fields button (edit mode only).
+   Limitations documented in the SQL file header (default text requires a
+   default type or the field won't render; update won't create a missing
+   default source; flag-'N' field_source rows not maintained).
 
-Stop and reassess after page 6 before adding conditions/validations/processing maintenance.
+Page 6 reached (2026-07-02) — **stop and reassess** before adding
+conditions/validations/processing maintenance, per the note below. The full
+APPLICATION → PAGE → REGION → FIELD chain is now maintainable from the IDE.
 
 ## Gaps to close as pages need them
 
-- **Sequences for child/link tables** (needed by page 4): none exist for `source`,
-  `application_page`, `page_region`, `region_field`, `region_source`, `field_source`,
-  `label` etc. Add a small DDL delta (or use `spare_seq` to start).
+- ~~**Sequences for child/link tables**~~ CLOSED (2026-07-02):
+  `ddl-link-table-sequences-20260702.sql` adds `application_page_seq`,
+  `source_seq`, `page_region_seq`, `region_field_seq`, `region_source_seq`,
+  `field_source_seq`, `label_seq`, `field_label_seq` (and setvals them past
+  existing rows); ddl.sql has the same creates for fresh databases.
 - ~~**VARCHAR binds**~~ understood and documented — see bind variable rules below.
 - ~~**Verify PAGE_PROCESSING conditionals**~~ VERIFIED WORKING (2026-07-02, see
   `testing/verify/t_010_page_processing_conditional.bash`) — notes.txt is out of date.
-- **Multi-table insert strategy** (page 4): either multiple PAGE_PROCESSING steps sharing
-  a conditional with `currval('page_seq')` in the later statements, or a single Postgres
-  data-modifying CTE (`with new_page as (insert ... returning id) insert into application_page ...`).
-  CTE is simpler; Postgres-only is acceptable for now.
-- **Textarea field template** (page 5): new TEMPLATE row for multi-line SQL entry —
-  data only, no Java expected.
+- ~~**Multi-table insert strategy**~~ CLOSED (2026-07-02): the Postgres
+  data-modifying CTE works as a single dml_modify source, verified end-to-end
+  by t_050. The bind scraper is a plain `:word` regex (no SQL parsing), so the
+  CTE syntax is invisible to it, and `NamedParameterJdbcTemplate.update()` runs
+  `WITH ... INSERT` fine. The quoted-literal trap still applies inside CTEs:
+  keep any literal that follows a bind starting with a word character
+  (sequence names like 'application_page_seq' are safe).
+- ~~**Textarea field template**~~ CLOSED (2026-07-02): TEMPLATE -64
+  'Input Item - TextArea' (class FieldDto, data only) in setup-backend.sql,
+  insert-if-missing in the p5 summitdev file for existing databases.
 - **Post-POST branching with parameters** (later): `processPageOnSubmit` branch target
   is TODO ("need attributes included") and `processPageBranch` is a commented-out stub.
   Mitigated 2026-07-02: `view()` accepts plain query params as page params, so the
@@ -103,7 +150,10 @@ Learned 2026-07-02 while building the application form:
   `pageParams=id:0` create-mode convention rather than a blank id.
 - The bind scraper regex skips a bind if a later quoted literal starts with a
   non-word character (e.g. `NULLIF(:x, '')` — the `''` hides `:x`). `:REQUEST = 'Save'`
-  is fine ('S is a word char). Avoid `''` literals after binds.
+  is fine ('S is a word char). Avoid `''` literals after binds. Literals
+  BEFORE all binds are harmless: `coalesce(s.source, '') ... where id = :id`
+  works (used by the region form's render query). When unsure, test the SQL
+  against the regex before loading it.
 - `StringUtils.toParameterMap` crashes on a key with an empty value (`id:`) —
   always pass a real value in pageParams.
 - Every bind in a render-processing source MUST be present in the parameter map
@@ -130,6 +180,26 @@ Learned 2026-07-02 while building the application form:
   and page -20102 rows from that file are NOT loaded (and the file itself has
   both gotchas above: `'BUTTON'` FK violation and missing default_source_type_code),
   so it needs fixing before it can be applied.
+- **Dropdown fields never worked on the render path** until 2026-07-02: field
+  processors/formatters dispatch on the DTO class canonical name, but
+  `FieldMapper` always produced a plain `FieldDto`, so DROPDOWN fields hit
+  `SimpleFieldProcessorServiceImpl`, which asks for a *singular* processor for
+  `dml_select` and dies with "No service found for sourceType=dml_select"
+  (page -10001 of the old test app 500s for exactly this reason on a stock
+  build). Fixed with an @ObjectFactory on FieldMapper keyed on
+  field_type_code = 'DROPDOWN'. The working dropdown recipe: field template
+  -63, source_type_code 'dml_select', field_type_code 'DROPDOWN', field_source
+  flag_default_value 'N', source returning exactly two columns (key, display
+  value). The selected option follows the RENDER_PG1 source_select value (or a
+  page parameter) matching the option key by string equality; dropdown option
+  sources get NO bind variables (runtime passes null), so they must be
+  bind-free SQL.
+- When one summitdev file's page links to another file's page (pages report ->
+  page form), give the *target* page's PAGE/APPLICATION_PAGE rows to the file
+  that builds the real page, and only ever reference the id from the linking
+  file — that keeps every file independently re-runnable (FK deletes don't
+  cross files). Done for -20102 (owned by the p4 file, referenced by
+  summitdev-20241102.sql).
 
 ## Standing limitations to design around (not fix)
 
