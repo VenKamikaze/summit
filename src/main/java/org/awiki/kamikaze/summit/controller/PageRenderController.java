@@ -35,9 +35,20 @@ public class PageRenderController {
   @RequestMapping(value = "/run/{applicationId}/{pageId}", method = RequestMethod.GET)
   @ResponseBody
   public String view(@PathVariable String applicationId, @PathVariable String pageId,
-          @RequestParam(required=false,name="pageParams") final String pageParams) {
+          @RequestParam(required=false,name="pageParams") final String pageParams,
+          @RequestParam final MultiValueMap<String, String> requestParams) {
     logger.info("Hit page /run/" + applicationId + "/" + pageId);
-    return renderService.renderPageToString(Long.parseLong(applicationId), Long.parseLong(pageId), StringUtils.toParameterMap(pageParams));
+    final MultiValueMap<String, String> parameterMap = StringUtils.toParameterMap(pageParams);
+    // Also accept plain query parameters as page parameters (pageParams format wins on
+    // duplicate keys). The redirect after a form POST carries the submitted form data as
+    // plain query parameters, so without this any page whose render processing uses bind
+    // variables fails after a submit.
+    requestParams.forEach((key, values) -> {
+      if(!"pageParams".equals(key) && !parameterMap.containsKey(key)) {
+        parameterMap.put(key, values);
+      }
+    });
+    return renderService.renderPageToString(Long.parseLong(applicationId), Long.parseLong(pageId), parameterMap);
   }
   
   /**
