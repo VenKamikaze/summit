@@ -96,6 +96,8 @@ http_post_form "${FORM}" \
   "default_source_type_code=static" "default_source=ZZ Verify Field Default" \
   "Save=Save"
 assert_eq "POST Save redirects" "302" "${RESPONSE_CODE}"
+assert_eq "Save branches to the fields report for the host region" \
+  "${SUMMIT_URL}/run/-20000/-24000?regionId=${HOST_REGION}" "${REDIRECT_URL}"
 assert_sql "field row created with codes intact (NULLIF kept 'static')" \
   "-61|TEXT|static|static" \
   "select template_id, field_type_code, source_type_code, default_source_type_code from field where name = '${TEST_NAME}'"
@@ -145,6 +147,8 @@ http_post_form "${FORM}" \
   "default_source_type_code=static" "default_source=ZZ Verify Field Default Renamed" \
   "Update=Update"
 assert_eq "POST Update redirects" "302" "${RESPONSE_CODE}"
+assert_eq "Update branches to the fields report for the host region" \
+  "${SUMMIT_URL}/run/-20000/-24000?regionId=${HOST_REGION}" "${REDIRECT_URL}"
 assert_sql "field row updated" "${TEST_NAME}renamed" \
   "select name from field where id = ${NEW_ID}"
 assert_sql "region_field row updated in the same statement" "3" \
@@ -153,5 +157,25 @@ assert_sql "default source updated in the same statement" "ZZ Verify Field Defau
   "select s.source from source s join field_source fs on fs.source_id = s.id where fs.field_id = ${NEW_ID}"
 assert_sql "still exactly two test fields (INSERT was skipped on Update)" "2" \
   "select count(*) from field where name like 'zzverifyfield%'"
+
+echo "Delete button shown in edit mode (fields are the leaf: no child gate)"
+http_get "${FORM}?pageParams=id:${NEW_ID}"
+assert_contains "Delete button shown for an existing field" 'name="Delete"'
+
+echo "POST Delete removes FIELD + REGION_FIELD + FIELD_SOURCE + SOURCE"
+http_post_form "${FORM}" \
+  "__SUMMIT_FORM_ID__=form--24100" \
+  "id=${NEW_ID}" "regionId=${HOST_REGION}" "name=${TEST_NAME}renamed" "field_num=3" \
+  "template_id=-61" "field_type_code=TEXT" "source_type_code=static" \
+  "default_source_type_code=static" "default_source=x" "Delete=Delete"
+assert_eq "POST Delete redirects" "302" "${RESPONSE_CODE}"
+assert_eq "Delete branches to the fields report for the host region" \
+  "${SUMMIT_URL}/run/-20000/-24000?regionId=${HOST_REGION}" "${REDIRECT_URL}"
+assert_sql "field row deleted" "0" \
+  "select count(*) from field where id = ${NEW_ID}"
+assert_sql "region_field row deleted in the same statement" "0" \
+  "select count(*) from region_field where field_id = ${NEW_ID}"
+assert_sql "default source deleted in the same statement" "0" \
+  "select count(*) from source where source like 'ZZ Verify Field Default%'"
 
 verify_summary

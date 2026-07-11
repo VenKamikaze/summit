@@ -63,6 +63,11 @@ insert into CODE_PROCESSING_TYPE
 insert into CODE_PROCESSING_TYPE
  values ('POST1', 'Page Process On Page POST', 2);
 
+-- Page POST branches. Evaluated after POST1 processing; the first one whose
+-- conditional passes redirects the browser to its target URL.
+insert into CODE_PROCESSING_TYPE
+ values ('BRANCH1', 'Page Branch After Page POST Processing', 3);
+
 -- Conditions that must evaluate to true for attached code to execute.
 insert into CODE_CONDITIONAL_TYPE
  values ('TEXT_TRUE', 'Source returns "true" as text', 1);
@@ -72,5 +77,19 @@ insert into CODE_CONDITIONAL_TYPE
 
 insert into CODE_CONDITIONAL_TYPE
  values ('NOTEXISTS', 'Source returns no records', 3);
+
+-- Validation types. NOT_NULL checks the submitted value; the others evaluate
+-- the validation's source like a conditional.
+insert into CODE_VALIDATION_TYPE
+ values ('NOT_NULL', 'Submitted field value must be present', 1);
+
+insert into CODE_VALIDATION_TYPE
+ values ('TEXT_TRUE', 'Source must return "true" as text', 2);
+
+insert into CODE_VALIDATION_TYPE
+ values ('EXISTS', 'Source must return some value or record', 3);
+
+insert into CODE_VALIDATION_TYPE
+ values ('NOTEXISTS', 'Source must return no records', 4);
 
 commit;

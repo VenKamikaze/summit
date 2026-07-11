@@ -40,19 +40,21 @@ START TRANSACTION;
 -- Deletes (children first), both pages
 ---------------------------------------------------------------------------
 
-delete from field_conditional where id in (-24100, -24101);
-delete from page_processing_conditional where id in (-24100, -24101);
-delete from conditional where id in (-24100, -24101, -24102, -24103);
+delete from field_conditional where id in (-24100, -24101, -24102);
+delete from page_processing_conditional where id in (-24100, -24101, -24102, -24103);
+delete from validation_conditional where id in (-24100, -24101);
+delete from validation where id in (-24100, -24101);
+delete from conditional where id in (-24100, -24101, -24102, -24103, -24104, -24105, -24106);
 delete from page_processing_source_select where id in (-24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108);
-delete from page_processing_source where id in (-24100, -24101, -24102);
-delete from page_processing where id in (-24100, -24101, -24102);
+delete from page_processing_source where id in (-24100, -24101, -24102, -24103, -24104);
+delete from page_processing where id in (-24100, -24101, -24102, -24103, -24104);
 delete from field_label where id in (-24100, -24101, -24102, -24103, -24104, -24105, -24106);
 delete from label where id in (-24100, -24101, -24102, -24103, -24104, -24105, -24106);
 delete from field_source where id in (-24001, -24002, -24101, -24102, -24103, -24104);
-delete from region_field where id in (-24000, -24001, -24002, -24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108, -24109, -24110);
-delete from field where id in (-24000, -24001, -24002, -24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108, -24109, -24110);
+delete from region_field where id in (-24000, -24001, -24002, -24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108, -24109, -24110, -24111);
+delete from field where id in (-24000, -24001, -24002, -24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108, -24109, -24110, -24111);
 delete from region_source where id in (-24000);
-delete from source where id in (-24000, -24001, -24002, -24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108, -24109);
+delete from source where id in (-24000, -24001, -24002, -24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108, -24109, -24110, -24111, -24112, -24113, -24114);
 delete from page_region where id in (-24000, -24100);
 delete from region where id in (-24000, -24100);
 delete from application_page where id in (-24000, -24100);
@@ -172,7 +174,8 @@ insert into field (id, template_id, "name", source_type_code, field_type_code, d
   (-24107, -63, 'default_source_type_code', 'dml_select', 'DROPDOWN', null),
   (-24108, -64, 'default_source',           'static',     'TEXT',     null),
   (-24109, -80, 'Save',                     'static',     'SUBMIT',   null),
-  (-24110, -80, 'Update',                   'static',     'SUBMIT',   null);
+  (-24110, -80, 'Update',                   'static',     'SUBMIT',   null),
+  (-24111, -80, 'Delete',                   'static',     'SUBMIT',   null);
 
 insert into region_field (id, region_id, field_id, field_num) values
   (-24100, -24100, -24100, 1),
@@ -185,7 +188,8 @@ insert into region_field (id, region_id, field_id, field_num) values
   (-24107, -24100, -24107, 8),
   (-24108, -24100, -24108, 9),
   (-24109, -24100, -24109, 10),
-  (-24110, -24100, -24110, 11);
+  (-24110, -24100, -24110, 11),
+  (-24111, -24100, -24111, 12);
 
 -- Labels
 insert into label (id, template_id, label_type_code, text, notes) values
@@ -228,9 +232,9 @@ insert into source (id, "source") values
   (-24105, 'with new_field as (insert into field (id, template_id, name, source_type_code, field_type_code, default_source_type_code) select nextval(''field_seq''), CAST(:template_id as NUMERIC), :name, :source_type_code, :field_type_code, NULLIF(:default_source_type_code, ''none'') returning id), new_rf as (insert into region_field (id, region_id, field_id, field_num) select nextval(''region_field_seq''), CAST(:regionId as NUMERIC), nf.id, CAST(:field_num as NUMERIC) from new_field nf returning id), new_source as (insert into source (id, source) select nextval(''source_seq''), :default_source where length(:default_source) > 0 returning id) insert into field_source (id, field_id, source_id, flag_default_value) select nextval(''field_source_seq''), nf.id, ns.id, ''Y'' from new_field nf, new_source ns'),
   (-24106, 'with upd_field as (update field set template_id = CAST(:template_id as NUMERIC), name = :name, source_type_code = :source_type_code, field_type_code = :field_type_code, default_source_type_code = NULLIF(:default_source_type_code, ''none'') where CAST(id as VARCHAR) = :id returning id), upd_rf as (update region_field set field_num = CAST(:field_num as NUMERIC) where field_id in (select id from upd_field) returning id) update source set source = :default_source where id in (select fs.source_id from field_source fs join upd_field uf on fs.field_id = uf.id where fs.flag_default_value = ''Y'')');
 
-insert into page_processing (id, page_id, processing_type_code, processing_num) values
-  (-24101, -24100, 'POST1', 1),
-  (-24102, -24100, 'POST1', 2);
+insert into page_processing (id, page_id, processing_type_code, processing_num, success_message) values
+  (-24101, -24100, 'POST1', 1, 'Field created.'),
+  (-24102, -24100, 'POST1', 2, 'Field updated.');
 
 insert into page_processing_source (id, page_processing_id, source_id, source_type_code) values
   (-24101, -24101, -24105, 'dml_modify'),
@@ -248,6 +252,74 @@ insert into page_processing_conditional (id, page_processing_id, conditional_id)
   (-24100, -24101, -24100),
   (-24101, -24102, -24101);
 
+---------------------------------------------------------------------------
+-- Delete: fields are the leaf of the hierarchy, so this cascades the field's
+-- own child rows in one CTE: FIELD_SOURCE (+ its SOURCE rows), FIELD_LABEL
+-- (+ its LABEL rows), FIELD_CONDITIONAL, REGION_FIELD, then FIELD.
+---------------------------------------------------------------------------
+
+insert into source (id, "source") values
+  (-24112, 'with del_fs as (delete from field_source where CAST(field_id as VARCHAR) = :id returning source_id), del_src as (delete from source where id in (select source_id from del_fs) returning id), del_fl as (delete from field_label where CAST(field_id as VARCHAR) = :id returning label_id), del_lbl as (delete from label where id in (select label_id from del_fl) returning id), del_fc as (delete from field_conditional where CAST(field_id as VARCHAR) = :id returning id), del_rf as (delete from region_field where CAST(field_id as VARCHAR) = :id returning id) delete from field where CAST(id as VARCHAR) = :id'),
+  (-24113, 'select ''true'' where :REQUEST = ''Delete''');
+
+insert into page_processing (id, page_id, processing_type_code, processing_num, success_message)
+values (-24104, -24100, 'POST1', 3, 'Field deleted.');
+
+insert into page_processing_source (id, page_processing_id, source_id, source_type_code)
+values (-24104, -24104, -24112, 'dml_modify');
+
+insert into conditional (id, source_id, source_type_code, conditional_type_code)
+values (-24105, -24113, 'dml_selcel', 'TEXT_TRUE');
+
+insert into page_processing_conditional (id, page_processing_id, conditional_id)
+values (-24103, -24104, -24105);
+
+---------------------------------------------------------------------------
+-- Validations: run on POST before any processing, gated to Save/Update.
+-- Field name is validated even though its label is optional: it is the bind
+-- variable / submitted parameter name, so it is functionally required.
+---------------------------------------------------------------------------
+
+insert into source (id, "source")
+values (-24114, 'select ''true'' where :REQUEST in (''Save'', ''Update'')');
+
+insert into conditional (id, source_id, source_type_code, conditional_type_code)
+values (-24106, -24114, 'dml_selcel', 'TEXT_TRUE');
+
+insert into validation (id, page_id, "name", validation_num, validation_type_code, field_name, error_message) values
+  (-24100, -24100, 'name not null',      1, 'NOT_NULL', 'name',      'Field Name is required.'),
+  (-24101, -24100, 'field_num not null', 2, 'NOT_NULL', 'field_num', 'Field Number is required.');
+
+insert into validation_conditional (id, validation_id, conditional_id) values
+  (-24100, -24100, -24106),
+  (-24101, -24101, -24106);
+
+---------------------------------------------------------------------------
+-- Branch: after a Save, Update or Delete, land back on the Fields-on-Region
+-- report for this region. The :regionId in the static URL template
+-- substitutes from the submitted form (the hidden regionId field).
+---------------------------------------------------------------------------
+
+insert into code_processing_type
+select 'BRANCH1', 'Page Branch After Page POST Processing', 3
+where not exists (select 1 from code_processing_type where code = 'BRANCH1');
+
+insert into source (id, "source") values
+  (-24110, 'select ''true'' where :REQUEST in (''Save'', ''Update'', ''Delete'')'),
+  (-24111, '/run/-20000/-24000?regionId=:regionId');
+
+insert into page_processing (id, page_id, processing_type_code, processing_num)
+values (-24103, -24100, 'BRANCH1', 4);
+
+insert into page_processing_source (id, page_processing_id, source_id, source_type_code)
+values (-24103, -24103, -24111, 'static');
+
+insert into conditional (id, source_id, source_type_code, conditional_type_code)
+values (-24104, -24110, 'dml_selcel', 'TEXT_TRUE');
+
+insert into page_processing_conditional (id, page_processing_id, conditional_id)
+values (-24102, -24103, -24104);
+
 -- Conditional button display: Save when creating, Update when editing.
 insert into source (id, "source")
 values (-24109, 'select 1 from field where id = :id');
@@ -258,6 +330,7 @@ insert into conditional (id, source_id, source_type_code, conditional_type_code)
 
 insert into field_conditional (id, field_id, conditional_id) values
   (-24100, -24109, -24102),  -- Save   : shown when the field does not exist
-  (-24101, -24110, -24103);  -- Update : shown when the field exists
+  (-24101, -24110, -24103),  -- Update : shown when the field exists
+  (-24102, -24111, -24103);  -- Delete : shown when the field exists (leaf, no gate needed)
 
 COMMIT;

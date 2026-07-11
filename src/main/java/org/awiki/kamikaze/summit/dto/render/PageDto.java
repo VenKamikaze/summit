@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -19,6 +20,7 @@ public class PageDto implements PageItem<String> {
   private Long                    id;
   private Set<PageRegionDto>      pageRegions      = new LinkedHashSet<>(0);
   private Set<PageProcessingDto>  pageProcessings  = new LinkedHashSet<>(0);
+  private List<ValidationDto>     validations      = new ArrayList<>(0);
   private Set<ApplicationPageDto> applicationPages = new HashSet<>(0);
 
   //changed definition
@@ -57,6 +59,12 @@ public class PageDto implements PageItem<String> {
   }
   public void setPageProcessings(Set<PageProcessingDto> pageProcessings) {
     this.pageProcessings = pageProcessings;
+  }
+  public List<ValidationDto> getValidations() {
+    return validations;
+  }
+  public void setValidations(List<ValidationDto> validations) {
+    this.validations = validations;
   }
 
   /**

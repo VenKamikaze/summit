@@ -77,6 +77,19 @@ public interface PageProcessingService {
    * @param submitAction - the button that posted the form
    * @return Map of fieldName(String) to PageProcessingSourceSelectDto including populated values
    */
-  public Map<String, PageProcessingSourceSelectDto> processSource(final PageProcessingSourceDto processSourceDto, 
+  public Map<String, PageProcessingSourceSelectDto> processSource(final PageProcessingSourceDto processSourceDto,
+          final MultiValueMap<String, String> parameterMap);
+
+  /**
+   * Process a BRANCH1 PageProcessingSourceDto into a branch target URL (context-relative path).
+   * Honours the processing's PAGE_PROCESSING_CONDITIONAL the same way processSource does.
+   * Source types: 'static' treats the source as a URL template whose :name variables are
+   * substituted (URL-encoded) from the parameter map; 'dml_selcel' executes the source as a
+   * query whose single-cell result is the target URL.
+   * @param PageProcessingSourceDto
+   * @param parameterMap
+   * @return the branch target, or null if the conditional failed or the source produced no target
+   */
+  public String processBranchSource(final PageProcessingSourceDto processSourceDto,
           final MultiValueMap<String, String> parameterMap);
 }

@@ -123,12 +123,67 @@ APPLICATION → PAGE → REGION → FIELD chain is now maintainable from the IDE
 - ~~**Textarea field template**~~ CLOSED (2026-07-02): TEMPLATE -64
   'Input Item - TextArea' (class FieldDto, data only) in setup-backend.sql,
   insert-if-missing in the p5 summitdev file for existing databases.
-- **Post-POST branching with parameters** (later): `processPageOnSubmit` branch target
-  is TODO ("need attributes included") and `processPageBranch` is a commented-out stub.
-  Mitigated 2026-07-02: `view()` accepts plain query params as page params, so the
-  default redirect-back-to-self after a POST now renders instead of 500ing.
-  Real branch support (e.g. land on the new row's edit page) is still future work.
-- **Delete actions** (later): explicitly out of scope for the first pass.
+- ~~**Post-POST branching with parameters**~~ CLOSED (2026-07-11): BRANCH1
+  page processings are now implemented (`PageProcessingServiceImpl.processBranchSource`).
+  A branch is a PAGE_PROCESSING row of type BRANCH1 (+ PAGE_PROCESSING_SOURCE,
+  gated by PAGE_PROCESSING_CONDITIONAL, typically on :REQUEST); branches evaluate
+  in processing_num order after all POST1 processing and the FIRST one whose
+  conditional passes wins (APEX semantics). Source types: 'static' = a
+  context-relative URL template whose :name variables substitute (URL-encoded)
+  from the submitted form params — a missing param substitutes empty with a
+  warning; 'dml_selcel' = a query (VARCHAR binds) returning the target URL.
+  The four IDE forms now branch back to their report page after Save/Update
+  (asserted in t_040/t_050/t_060/t_070). CODE_PROCESSING_TYPE 'BRANCH1' is in
+  setup-codetables.sql and insert-if-missing in each form's summitdev file.
+  Landing on a NEW row's edit page is still future work (needs the INSERT's
+  generated id fed back into the parameter map, APEX "returning into item").
+- ~~**Delete actions**~~ CLOSED (2026-07-11): every IDE form has a Delete button
+  (template -80, :REQUEST = 'Delete' POST1 dml_modify, branch back to the report).
+  Deletes are **bottom-up** (no cascade): the button is gated by a field
+  conditional so it only shows when the row has no children — app with no
+  pages, page with no regions AND no page_processings, region with no fields;
+  fields are the leaf so their delete CTE cascades the field's own child rows
+  (FIELD_SOURCE + SOURCE, FIELD_LABEL + LABEL, FIELD_CONDITIONAL, REGION_FIELD).
+  Caveats: the server does NOT re-check the visibility conditional on POST (a
+  hand-crafted Delete POST against a row with children FK-500s), there is no
+  JS confirm dialog yet (template -80 has no onclick hook — an APEX-style
+  confirm needs a new button template), and orphaned CONDITIONAL/SOURCE rows
+  from deleted field_conditionals are left behind (harmless).
+- ~~**Validations + success/error messages**~~ CLOSED (2026-07-11), APEX-3.2
+  style — dedicated validation metadata, inline error re-render, flashed
+  success messages:
+  - Schema (`ddl-validations-20260711.sql` delta; mirrored in ddl.sql and
+    setup-codetables.sql for fresh databases): VALIDATION (page_id, name,
+    validation_num, validation_type_code, field_name, error_message, optional
+    source_id/source_type_code), VALIDATION_CONDITIONAL, CODE_VALIDATION_TYPE
+    (NOT_NULL / TEXT_TRUE / EXISTS / NOTEXISTS), a SUCCESS_MESSAGE column on
+    PAGE_PROCESSING, and validation_seq / validation_conditional_seq.
+  - Runtime: on POST, validations run after the submitted button is determined
+    and BEFORE any POST1 processing (`ValidationServiceImpl` — NOT_NULL checks
+    the submitted param; the source-backed types delegate to
+    ConditionalEvaluatorService with VARCHAR parameter-map binds). Each
+    validation is gated by VALIDATION_CONDITIONAL (the IDE ones fire only on
+    :REQUEST = 'Save'/'Update'). Any failure aborts processing and the
+    controller re-renders the page as HTTP 200 with the submitted form as the
+    parameter map — submitted values win over RENDER_PG1 DB values, so the
+    user's input is preserved. Errors render (HTML-escaped, class
+    `summit-error`) into the page template's new `##__NOTIFICATION__##`
+    placeholder; template -100 gained a
+    `<div class="notification" id="summit-notification">` for it.
+  - Success messages: each POST1 processing whose conditional passed
+    contributes its SUCCESS_MESSAGE; the controller flashes them across the
+    post-submit redirect (flash attribute `summitSuccessMessages`, consumed by
+    the next GET, rendered class `summit-success`). TEST GOTCHA: Spring
+    consumes only ONE matching FlashMap per request — a script that POSTs
+    twice without GETting the redirect target in between will see the FIRST
+    (stale) flash on its next GET (burned in t_040's delete assertion).
+  - Enabler: `BindVarMapper` now binds a NUMBER field populated with a blank
+    value as SQL NULL instead of crashing in `new BigDecimal("")` — required
+    for the inline re-render of a failed submit.
+  - IDE metadata: NOT_NULL validations on all four forms (p2 application_num,
+    p4 page_num, p5 region_num, p6 name + field_num) and success messages
+    ('X created./updated./deleted.') on every POST1 processing; asserted in
+    t_040–t_070.
 
 ## Bind variable rules (which type binds where)
 

@@ -23,6 +23,8 @@ public class PageProcessingDto {
   @NotBlank(message = "Must not be empty.")
   private Long                  processingNum;
   
+  private String                successMessage; // APEX "process success message", shown after the post-POST redirect
+
   private List<PageProcessingSourceDto> pageProcessingSourceDtos = new ArrayList<>();
 
   private ConditionalDto conditionalDto = null; // the default.
@@ -50,6 +52,12 @@ public class PageProcessingDto {
   }
   public void setProcessingNum(Long processingNum) {
     this.processingNum = processingNum;
+  }
+  public String getSuccessMessage() {
+    return successMessage;
+  }
+  public void setSuccessMessage(String successMessage) {
+    this.successMessage = successMessage;
   }
   public List<PageProcessingSourceDto> getPageProcessingSource() {
     return pageProcessingSourceDtos;

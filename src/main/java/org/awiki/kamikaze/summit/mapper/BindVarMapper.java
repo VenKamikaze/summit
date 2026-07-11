@@ -17,9 +17,15 @@ public interface BindVarMapper
   default BindVar mapFieldDto(@NonNull FieldDto f) {
     if(f.getProcessedSource() != null)
 	{
-      return (FieldConstants.TYPE_NUMBER.equals(f.getCodeFieldType())) ? 
-         new BindVar(new BigDecimal(f.getProcessedSource().toString()), java.sql.Types.NUMERIC, f.getName()) :
-         new BindVar(f.getProcessedSource(), java.sql.Types.VARCHAR, f.getName());
+      if(FieldConstants.TYPE_NUMBER.equals(f.getCodeFieldType())) {
+        // A NUMBER field populated with a blank value (e.g. a form re-rendered
+        // after a failed validation) binds as SQL NULL, same as an unpopulated
+        // field - new BigDecimal("") can only ever throw.
+        return f.getProcessedSource().toString().trim().isEmpty()
+           ? mapOther(f)
+           : new BindVar(new BigDecimal(f.getProcessedSource().toString()), java.sql.Types.NUMERIC, f.getName());
+      }
+      return new BindVar(f.getProcessedSource(), java.sql.Types.VARCHAR, f.getName());
 	}
     return mapOther(f);
   }

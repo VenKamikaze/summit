@@ -77,3 +77,20 @@ a:visited {
   font-size: 9pt;
   font-weight: bold;
 }
+
+/* Notification area (validation errors / process success messages). */
+.summit-error {
+  color: #7a1f1f;
+  background-color: #fbeaea;
+  border: 1px solid #d9534f;
+  padding: 0.4em 0.8em;
+  margin: 0.4em 0;
+}
+
+.summit-success {
+  color: #1f5c1f;
+  background-color: #e8f5e8;
+  border: 1px solid #4cae4c;
+  padding: 0.4em 0.8em;
+  margin: 0.4em 0;
+}

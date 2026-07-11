@@ -10,7 +10,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring", uses = {PageRegionMapper.class, TemplateMapper.class, PageProcessingMapper.class, ApplicationPageMapper.class}, 
+@Mapper(componentModel = "spring", uses = {PageRegionMapper.class, TemplateMapper.class, PageProcessingMapper.class, ValidationMapper.class, ApplicationPageMapper.class},
   injectionStrategy = InjectionStrategy.SETTER )
 public interface PageMapper 
 {

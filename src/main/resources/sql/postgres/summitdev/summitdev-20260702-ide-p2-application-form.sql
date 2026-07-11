@@ -24,18 +24,20 @@
 
 START TRANSACTION;
 
-delete from field_conditional where id in (-21100, -21101, -21102);
-delete from page_processing_conditional where id in (-21100, -21101);
-delete from conditional where id in (-21100, -21101, -21102, -21103);
+delete from field_conditional where id in (-21100, -21101, -21102, -21103);
+delete from page_processing_conditional where id in (-21100, -21101, -21102, -21103);
+delete from validation_conditional where id in (-21100);
+delete from validation where id in (-21100);
+delete from conditional where id in (-21100, -21101, -21102, -21103, -21104, -21105, -21106, -21107);
 delete from page_processing_source_select where id in (-21100, -21101, -21102);
-delete from page_processing_source where id in (-21100, -21101, -21102);
-delete from page_processing where id in (-21100, -21101, -21102);
+delete from page_processing_source where id in (-21100, -21101, -21102, -21103, -21104);
+delete from page_processing where id in (-21100, -21101, -21102, -21103, -21104);
 delete from field_label where id in (-21100, -21101);
 delete from label where id in (-21100, -21101);
 delete from field_source where id in (-21105);
-delete from region_field where id in (-21100, -21101, -21102, -21103, -21104, -21105);
-delete from field where id in (-21100, -21101, -21102, -21103, -21104, -21105);
-delete from source where id in (-21100, -21105, -21106, -21107, -21108, -21109, -21110);
+delete from region_field where id in (-21100, -21101, -21102, -21103, -21104, -21105, -21106);
+delete from field where id in (-21100, -21101, -21102, -21103, -21104, -21105, -21106);
+delete from source where id in (-21100, -21105, -21106, -21107, -21108, -21109, -21110, -21111, -21112, -21113, -21114, -21115, -21116);
 delete from page_region where id = -21100;
 delete from region where id = -21100;
 delete from application_page where id = -21100;
@@ -89,7 +91,8 @@ insert into field (id, template_id, "name", source_type_code, field_type_code, d
   (-21102, -61, 'name',            'static', 'TEXT',   null),
   (-21103, -80, 'Save',            'static', 'SUBMIT', null),
   (-21104, -80, 'Update',          'static', 'SUBMIT', null),
-  (-21105, -81, 'Pages',           'static', 'SUBMIT', 'static');
+  (-21105, -81, 'Pages',           'static', 'SUBMIT', 'static'),
+  (-21106, -80, 'Delete',          'static', 'SUBMIT', null);
 
 insert into region_field (id, region_id, field_id, field_num) values
   (-21100, -21100, -21100, 1),
@@ -97,7 +100,8 @@ insert into region_field (id, region_id, field_id, field_num) values
   (-21102, -21100, -21102, 3),
   (-21103, -21100, -21103, 4),
   (-21104, -21100, -21104, 5),
-  (-21105, -21100, -21105, 6);
+  (-21105, -21100, -21105, 6),
+  (-21106, -21100, -21106, 7);
 
 -- Labels for the editable fields
 insert into label (id, template_id, label_type_code, text, notes) values
@@ -124,9 +128,9 @@ insert into source (id, "source") values
   (-21106, 'insert into application (id, application_num, name) values (nextval(''application_seq''), CAST(:application_num as NUMERIC), :name)'),
   (-21107, 'update application set application_num = CAST(:application_num as NUMERIC), name = :name where CAST(id as VARCHAR) = :id');
 
-insert into page_processing (id, page_id, processing_type_code, processing_num) values
-  (-21101, -21100, 'POST1', 1),
-  (-21102, -21100, 'POST1', 2);
+insert into page_processing (id, page_id, processing_type_code, processing_num, success_message) values
+  (-21101, -21100, 'POST1', 1, 'Application created.'),
+  (-21102, -21100, 'POST1', 2, 'Application updated.');
 
 insert into page_processing_source (id, page_processing_id, source_id, source_type_code) values
   (-21101, -21101, -21106, 'dml_modify'),
@@ -146,6 +150,73 @@ insert into page_processing_conditional (id, page_processing_id, conditional_id)
   (-21101, -21102, -21101);
 
 ---------------------------------------------------------------------------
+-- Delete: remove the application. The button only shows when the app has no
+-- pages (see field conditional below) - deletes are bottom-up for now, so no
+-- child rows need cascading here.
+---------------------------------------------------------------------------
+
+insert into source (id, "source") values
+  (-21113, 'delete from application where CAST(id as VARCHAR) = :id'),
+  (-21114, 'select ''true'' where :REQUEST = ''Delete''');
+
+insert into page_processing (id, page_id, processing_type_code, processing_num, success_message)
+values (-21104, -21100, 'POST1', 3, 'Application deleted.');
+
+insert into page_processing_source (id, page_processing_id, source_id, source_type_code)
+values (-21104, -21104, -21113, 'dml_modify');
+
+insert into conditional (id, source_id, source_type_code, conditional_type_code)
+values (-21105, -21114, 'dml_selcel', 'TEXT_TRUE');
+
+insert into page_processing_conditional (id, page_processing_id, conditional_id)
+values (-21103, -21104, -21105);
+
+---------------------------------------------------------------------------
+-- Validations: run on POST before any processing; failure re-renders the
+-- form with the error in the notification area. Gated to Save/Update.
+---------------------------------------------------------------------------
+
+insert into source (id, "source")
+values (-21116, 'select ''true'' where :REQUEST in (''Save'', ''Update'')');
+
+insert into conditional (id, source_id, source_type_code, conditional_type_code)
+values (-21107, -21116, 'dml_selcel', 'TEXT_TRUE');
+
+insert into validation (id, page_id, "name", validation_num, validation_type_code, field_name, error_message)
+values (-21100, -21100, 'application_num not null', 1, 'NOT_NULL', 'application_num', 'Application Number is required.');
+
+insert into validation_conditional (id, validation_id, conditional_id)
+values (-21100, -21100, -21107);
+
+---------------------------------------------------------------------------
+-- Branch: after a Save, Update or Delete, land back on the Applications list.
+-- BRANCH1 processings run after all POST1 processing; a 'static' source is a
+-- URL template whose :name variables substitute from the submitted form.
+---------------------------------------------------------------------------
+
+-- Existing databases predate the BRANCH1 processing type (setup-codetables.sql
+-- has it for fresh ones).
+insert into code_processing_type
+select 'BRANCH1', 'Page Branch After Page POST Processing', 3
+where not exists (select 1 from code_processing_type where code = 'BRANCH1');
+
+insert into source (id, "source") values
+  (-21111, 'select ''true'' where :REQUEST in (''Save'', ''Update'', ''Delete'')'),
+  (-21112, '/run/-20000/-21000');
+
+insert into page_processing (id, page_id, processing_type_code, processing_num)
+values (-21103, -21100, 'BRANCH1', 4);
+
+insert into page_processing_source (id, page_processing_id, source_id, source_type_code)
+values (-21103, -21103, -21112, 'static');
+
+insert into conditional (id, source_id, source_type_code, conditional_type_code)
+values (-21104, -21111, 'dml_selcel', 'TEXT_TRUE');
+
+insert into page_processing_conditional (id, page_processing_id, conditional_id)
+values (-21102, -21103, -21104);
+
+---------------------------------------------------------------------------
 -- Conditional button display: Save when creating, Update + Pages when editing
 ---------------------------------------------------------------------------
 
@@ -158,9 +229,18 @@ insert into conditional (id, source_id, source_type_code, conditional_type_code)
   (-21102, -21110, 'dml_selcel', 'NOTEXISTS'),
   (-21103, -21110, 'dml_selcel', 'EXISTS');
 
+-- Delete only shows when the app exists AND has no pages: deletes are
+-- bottom-up (no cascade), so an app with pages cannot be deleted yet.
+insert into source (id, "source")
+values (-21115, 'select 1 from application a where a.id = :id and not exists (select 1 from application_page ap where ap.application_id = a.id)');
+
+insert into conditional (id, source_id, source_type_code, conditional_type_code)
+values (-21106, -21115, 'dml_selcel', 'EXISTS');
+
 insert into field_conditional (id, field_id, conditional_id) values
   (-21100, -21103, -21102),  -- Save     : shown when the app does not exist
   (-21101, -21104, -21103),  -- Update   : shown when the app exists
-  (-21102, -21105, -21103);  -- Pages    : shown when the app exists
+  (-21102, -21105, -21103),  -- Pages    : shown when the app exists
+  (-21103, -21106, -21106);  -- Delete   : shown when the app exists and has no pages
 
 COMMIT;

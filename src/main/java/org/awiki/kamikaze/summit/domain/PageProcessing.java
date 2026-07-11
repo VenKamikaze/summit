@@ -36,6 +36,7 @@ public class PageProcessing implements java.io.Serializable
   private Page                       page;
   private CodeProcessingType         codeProcessingType;    // e.g. clear session state, DML, redirect to another page
   private long                       processingNum;         // in which order this processing occurs.
+  private String                     successMessage;        // APEX "process success message", shown after the post-POST redirect
   private List<PageProcessingSource> pageProcessingSource = new ArrayList<>();
   
   private Conditional                conditional = null;
@@ -109,6 +110,17 @@ public class PageProcessing implements java.io.Serializable
   public void setProcessingNum(long processingNum)
   {
     this.processingNum = processingNum;
+  }
+
+  @Column(name = "SUCCESS_MESSAGE")
+  public String getSuccessMessage()
+  {
+    return this.successMessage;
+  }
+
+  public void setSuccessMessage(String successMessage)
+  {
+    this.successMessage = successMessage;
   }
 
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "pageProcessing")

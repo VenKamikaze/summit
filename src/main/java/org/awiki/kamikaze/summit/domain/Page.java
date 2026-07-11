@@ -29,6 +29,7 @@ public class Page implements java.io.Serializable
   private long                  id;
   private Set<PageRegion>       pageRegions      = new LinkedHashSet<PageRegion>(0);
   private List<PageProcessing>  pageProcessings  = new ArrayList<PageProcessing>(0);
+  private List<Validation>      validations      = new ArrayList<Validation>(0);
   private Set<ApplicationPage>  applicationPages = new HashSet<ApplicationPage>(0);
 
   //changed definition
@@ -88,6 +89,18 @@ public class Page implements java.io.Serializable
   public void setPageProcessings(List<PageProcessing> pageProcessings)
   {
     this.pageProcessings = pageProcessings;
+  }
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "page")
+  @OrderBy(value="validationNum")
+  public List<Validation> getValidations()
+  {
+    return this.validations;
+  }
+
+  public void setValidations(List<Validation> validations)
+  {
+    this.validations = validations;
   }
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "page")

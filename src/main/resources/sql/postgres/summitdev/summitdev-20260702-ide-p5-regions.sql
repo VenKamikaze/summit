@@ -42,19 +42,21 @@ select -64, null, 'Input Item - TextArea', 'org.awiki.kamikaze.summit.dto.render
 -- Deletes (children first), both pages
 ---------------------------------------------------------------------------
 
-delete from field_conditional where id in (-23100, -23101, -23102);
-delete from page_processing_conditional where id in (-23100, -23101);
-delete from conditional where id in (-23100, -23101, -23102, -23103);
+delete from field_conditional where id in (-23100, -23101, -23102, -23103);
+delete from page_processing_conditional where id in (-23100, -23101, -23102, -23103);
+delete from validation_conditional where id in (-23100);
+delete from validation where id in (-23100);
+delete from conditional where id in (-23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107);
 delete from page_processing_source_select where id in (-23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108);
-delete from page_processing_source where id in (-23100, -23101, -23102);
-delete from page_processing where id in (-23100, -23101, -23102);
+delete from page_processing_source where id in (-23100, -23101, -23102, -23103, -23104);
+delete from page_processing where id in (-23100, -23101, -23102, -23103, -23104);
 delete from field_label where id in (-23100, -23101, -23102, -23103, -23104, -23105, -23106);
 delete from label where id in (-23100, -23101, -23102, -23103, -23104, -23105, -23106);
 delete from field_source where id in (-23001, -23002, -23101, -23102, -23103, -23104, -23105);
-delete from region_field where id in (-23000, -23001, -23002, -23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108, -23109, -23110, -23111);
-delete from field where id in (-23000, -23001, -23002, -23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108, -23109, -23110, -23111);
+delete from region_field where id in (-23000, -23001, -23002, -23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108, -23109, -23110, -23111, -23112);
+delete from field where id in (-23000, -23001, -23002, -23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108, -23109, -23110, -23111, -23112);
 delete from region_source where id in (-23000);
-delete from source where id in (-23000, -23001, -23002, -23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108, -23109, -23110);
+delete from source where id in (-23000, -23001, -23002, -23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108, -23109, -23110, -23112, -23113, -23114, -23115, -23116, -23117);
 delete from page_region where id in (-23000, -23100);
 delete from region where id in (-23000, -23100);
 delete from application_page where id in (-23000, -23100);
@@ -179,7 +181,8 @@ insert into field (id, template_id, "name", source_type_code, field_type_code, d
   (-23108, -64, 'source',               'static',     'TEXT',     null),
   (-23109, -80, 'Save',                 'static',     'SUBMIT',   null),
   (-23110, -80, 'Update',               'static',     'SUBMIT',   null),
-  (-23111, -81, 'Fields',               'static',     'SUBMIT',   'static');
+  (-23111, -81, 'Fields',               'static',     'SUBMIT',   'static'),
+  (-23112, -80, 'Delete',               'static',     'SUBMIT',   null);
 
 insert into region_field (id, region_id, field_id, field_num) values
   (-23100, -23100, -23100, 1),
@@ -193,7 +196,8 @@ insert into region_field (id, region_id, field_id, field_num) values
   (-23108, -23100, -23108, 9),
   (-23109, -23100, -23109, 10),
   (-23110, -23100, -23110, 11),
-  (-23111, -23100, -23111, 12);
+  (-23111, -23100, -23111, 12),
+  (-23112, -23100, -23112, 13);
 
 -- Labels
 insert into label (id, template_id, label_type_code, text, notes) values
@@ -244,9 +248,9 @@ insert into source (id, "source") values
   (-23105, 'with new_source as (insert into source (id, source) select nextval(''source_seq''), :source returning id), new_region as (insert into region (id, template_id, name, code_region_position, code_region_type, source_type_code) select nextval(''region_seq''), CAST(:template_id as NUMERIC), :name, :code_region_position, :code_region_type, :source_type_code returning id), new_pr as (insert into page_region (id, page_id, region_id, region_num) select nextval(''page_region_seq''), CAST(:pageId as NUMERIC), nr.id, CAST(:region_num as NUMERIC) from new_region nr returning id) insert into region_source (id, region_id, source_id) select nextval(''region_source_seq''), nr.id, ns.id from new_region nr, new_source ns'),
   (-23106, 'with upd_region as (update region set template_id = CAST(:template_id as NUMERIC), name = :name, code_region_position = :code_region_position, code_region_type = :code_region_type, source_type_code = :source_type_code where CAST(id as VARCHAR) = :id returning id), upd_pr as (update page_region set region_num = CAST(:region_num as NUMERIC) where region_id in (select id from upd_region) returning id) update source set source = :source where id in (select rs.source_id from region_source rs join upd_region ur on rs.region_id = ur.id)');
 
-insert into page_processing (id, page_id, processing_type_code, processing_num) values
-  (-23101, -23100, 'POST1', 1),
-  (-23102, -23100, 'POST1', 2);
+insert into page_processing (id, page_id, processing_type_code, processing_num, success_message) values
+  (-23101, -23100, 'POST1', 1, 'Region created.'),
+  (-23102, -23100, 'POST1', 2, 'Region updated.');
 
 insert into page_processing_source (id, page_processing_id, source_id, source_type_code) values
   (-23101, -23101, -23105, 'dml_modify'),
@@ -264,6 +268,69 @@ insert into page_processing_conditional (id, page_processing_id, conditional_id)
   (-23100, -23101, -23100),
   (-23101, -23102, -23101);
 
+---------------------------------------------------------------------------
+-- Delete: remove REGION + PAGE_REGION + REGION_SOURCE (+ its SOURCE rows) in
+-- one CTE. The button only shows when the region has no fields (bottom-up).
+---------------------------------------------------------------------------
+
+insert into source (id, "source") values
+  (-23114, 'with del_rs as (delete from region_source where CAST(region_id as VARCHAR) = :id returning source_id), del_src as (delete from source where id in (select source_id from del_rs) returning id), del_pr as (delete from page_region where CAST(region_id as VARCHAR) = :id returning id) delete from region where CAST(id as VARCHAR) = :id'),
+  (-23115, 'select ''true'' where :REQUEST = ''Delete''');
+
+insert into page_processing (id, page_id, processing_type_code, processing_num, success_message)
+values (-23104, -23100, 'POST1', 3, 'Region deleted.');
+
+insert into page_processing_source (id, page_processing_id, source_id, source_type_code)
+values (-23104, -23104, -23114, 'dml_modify');
+
+insert into conditional (id, source_id, source_type_code, conditional_type_code)
+values (-23105, -23115, 'dml_selcel', 'TEXT_TRUE');
+
+insert into page_processing_conditional (id, page_processing_id, conditional_id)
+values (-23103, -23104, -23105);
+
+---------------------------------------------------------------------------
+-- Validations: run on POST before any processing, gated to Save/Update.
+---------------------------------------------------------------------------
+
+insert into source (id, "source")
+values (-23117, 'select ''true'' where :REQUEST in (''Save'', ''Update'')');
+
+insert into conditional (id, source_id, source_type_code, conditional_type_code)
+values (-23107, -23117, 'dml_selcel', 'TEXT_TRUE');
+
+insert into validation (id, page_id, "name", validation_num, validation_type_code, field_name, error_message)
+values (-23100, -23100, 'region_num not null', 1, 'NOT_NULL', 'region_num', 'Region Number is required.');
+
+insert into validation_conditional (id, validation_id, conditional_id)
+values (-23100, -23100, -23107);
+
+---------------------------------------------------------------------------
+-- Branch: after a Save, Update or Delete, land back on the Regions-on-Page
+-- report for this page. The :pageId in the static URL template substitutes
+-- from the submitted form (the hidden pageId field).
+---------------------------------------------------------------------------
+
+insert into code_processing_type
+select 'BRANCH1', 'Page Branch After Page POST Processing', 3
+where not exists (select 1 from code_processing_type where code = 'BRANCH1');
+
+insert into source (id, "source") values
+  (-23112, 'select ''true'' where :REQUEST in (''Save'', ''Update'', ''Delete'')'),
+  (-23113, '/run/-20000/-23000?pageId=:pageId');
+
+insert into page_processing (id, page_id, processing_type_code, processing_num)
+values (-23103, -23100, 'BRANCH1', 4);
+
+insert into page_processing_source (id, page_processing_id, source_id, source_type_code)
+values (-23103, -23103, -23113, 'static');
+
+insert into conditional (id, source_id, source_type_code, conditional_type_code)
+values (-23104, -23112, 'dml_selcel', 'TEXT_TRUE');
+
+insert into page_processing_conditional (id, page_processing_id, conditional_id)
+values (-23102, -23103, -23104);
+
 -- Conditional button display: Save when creating, Update + Fields when editing.
 insert into source (id, "source")
 values (-23109, 'select 1 from region where id = :id');
@@ -272,9 +339,18 @@ insert into conditional (id, source_id, source_type_code, conditional_type_code)
   (-23102, -23109, 'dml_selcel', 'NOTEXISTS'),
   (-23103, -23109, 'dml_selcel', 'EXISTS');
 
+-- Delete only shows when the region exists AND has no fields: deletes are
+-- bottom-up (no cascade to fields) for now.
+insert into source (id, "source")
+values (-23116, 'select 1 from region r where r.id = :id and not exists (select 1 from region_field rf where rf.region_id = r.id)');
+
+insert into conditional (id, source_id, source_type_code, conditional_type_code)
+values (-23106, -23116, 'dml_selcel', 'EXISTS');
+
 insert into field_conditional (id, field_id, conditional_id) values
   (-23100, -23109, -23102),  -- Save   : shown when the region does not exist
   (-23101, -23110, -23103),  -- Update : shown when the region exists
-  (-23102, -23111, -23103);  -- Fields : shown when the region exists
+  (-23102, -23111, -23103),  -- Fields : shown when the region exists
+  (-23103, -23112, -23106);  -- Delete : shown when the region exists and has no fields
 
 COMMIT;

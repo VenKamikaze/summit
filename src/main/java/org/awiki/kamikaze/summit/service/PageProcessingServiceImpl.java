@@ -1,9 +1,13 @@
 package org.awiki.kamikaze.summit.service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceDto;
 import org.awiki.kamikaze.summit.dto.render.PageProcessingSourceSelectDto;
 import org.awiki.kamikaze.summit.service.processor.ProxySourceProcessorService;
@@ -12,6 +16,8 @@ import org.awiki.kamikaze.summit.service.processor.SingularSourceProcessorServic
 import org.awiki.kamikaze.summit.service.processor.TabularQuerySourceProcessorService;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResult;
 import org.awiki.kamikaze.summit.service.processor.result.SourceProcessorResultTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
@@ -19,6 +25,8 @@ import org.springframework.util.MultiValueMap;
 @Service
 public class PageProcessingServiceImpl implements PageProcessingService
 {
+  private static final Logger log = LoggerFactory.getLogger(PageProcessingServiceImpl.class);
+
   private ProxySourceProcessorService sourceProcessors;
   private BindVarService bindVarService;
   private ConditionalEvaluatorService conditionalService;
@@ -82,6 +90,56 @@ public class PageProcessingServiceImpl implements PageProcessingService
     }
 
     return results;
+  }
+
+  @Override
+  public String processBranchSource(PageProcessingSourceDto processSourceDto,
+          MultiValueMap<String, String> parameterMap)
+  {
+    // Branches are gated by PAGE_PROCESSING_CONDITIONAL just like POST1 processings,
+    // typically on :REQUEST matching the submitted button.
+    if(processSourceDto.getPageProcessing().getConditional() != null) {
+      if (! conditionalService.evaluate(processSourceDto.getPageProcessing().getConditional(), parameterMap)) {
+        return null;
+      }
+    }
+
+    final String target;
+    if(SingularSourceProcessorService.BUILT_IN_STATIC_TEXT_TYPE.equals(processSourceDto.getCodeSourceType())) {
+      target = substituteUrlParameters(processSourceDto.getSource(), parameterMap);
+    }
+    else if(SingularSourceProcessorService.BUILT_IN_SQL_DML_SELECT_CELL_TYPE.equals(processSourceDto.getCodeSourceType())) {
+      final SingularSourceProcessorService processor = sourceProcessors.getSingularSourceProcessorService(processSourceDto.getCodeSourceType());
+      final SourceProcessorResult result = processor.processSource(processSourceDto.getSource(), processSourceDto.getCodeSourceType(),
+              bindVarService.createVarcharBindVarsFromParameterMap(processSourceDto.getSource(), parameterMap));
+      target = result != null ? result.getResultValue() : null;
+    }
+    else {
+      throw new NotImplementedException("Unsupported source type for a branch processing: " + processSourceDto.getCodeSourceType());
+    }
+
+    return StringUtils.isBlank(target) ? null : target.trim();
+  }
+
+  /**
+   * Substitute :name variables in a static branch URL template with the (URL-encoded) first
+   * value of the matching parameter. Uses the same bind-variable pattern as SQL sources so
+   * templates follow the documented bind scraping rules. A :name with no matching parameter
+   * substitutes as an empty string (logged), keeping the URL well-formed.
+   */
+  private String substituteUrlParameters(final String template, final MultiValueMap<String, String> parameterMap) {
+    final Matcher m = BindVarServiceImpl.bindParameters.matcher(template);
+    final StringBuffer sb = new StringBuffer();
+    while(m.find()) {
+      final String name = m.group(1);
+      final String value = parameterMap.containsKey(name) ? parameterMap.getFirst(name) : null;
+      if(value == null) {
+        log.warn("Branch URL template references :" + name + " but no such parameter was submitted; substituting empty. Template: " + template);
+      }
+      m.appendReplacement(sb, Matcher.quoteReplacement(URLEncoder.encode(StringUtils.defaultString(value), StandardCharsets.UTF_8)));
+    }
+    m.appendTail(sb);
+    return sb.toString();
   }
 
 }

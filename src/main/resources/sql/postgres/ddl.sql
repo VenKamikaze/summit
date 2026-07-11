@@ -16,6 +16,15 @@ create table CODE_CONDITIONAL_TYPE
   SORT_ORDER bigint not null
 );
 
+-- Validation types: NOT_NULL checks the submitted field value directly;
+-- TEXT_TRUE/EXISTS/NOTEXISTS evaluate the validation source like a conditional.
+create table CODE_VALIDATION_TYPE
+(
+  CODE character varying(10) primary key,
+  DESCRIPTION character varying(200) not null,
+  SORT_ORDER bigint not null
+);
+
 /*
 -- appears unused as of July 2017
 create table CODE_FIELD_SOURCE_TYPE
@@ -220,7 +229,8 @@ create table PAGE_PROCESSING
   ID bigint primary key,
   PAGE_ID bigint not null references PAGE(ID),
   PROCESSING_TYPE_CODE character varying(10) not null references CODE_PROCESSING_TYPE(CODE),
-  PROCESSING_NUM bigint not null
+  PROCESSING_NUM bigint not null,
+  SUCCESS_MESSAGE character varying(4000) -- APEX "process success message", shown after the post-POST redirect
 );
 
 create table PAGE_PROCESSING_SOURCE
@@ -360,6 +370,29 @@ create table LABEL_CONDITIONAL
   CONDITIONAL_ID bigint not null references CONDITIONAL(ID)
 );
 
+-- APEX-style page validations: run on POST before any POST1 processing; a
+-- failure re-renders the page with the error message(s) in the notification
+-- area. Added 2026-07-11 (existing databases: ddl-validations-20260711.sql).
+create table VALIDATION
+(
+  ID bigint primary key,
+  PAGE_ID bigint not null references PAGE(ID),
+  NAME character varying(200) not null,
+  VALIDATION_NUM bigint not null,
+  VALIDATION_TYPE_CODE character varying(10) not null references CODE_VALIDATION_TYPE(CODE),
+  FIELD_NAME character varying(200),
+  ERROR_MESSAGE character varying(4000) not null,
+  SOURCE_ID bigint references SOURCE(ID),
+  SOURCE_TYPE_CODE character varying(10) references CODE_SOURCE_TYPE(CODE)
+);
+
+create table VALIDATION_CONDITIONAL
+(
+  ID bigint primary key,
+  VALIDATION_ID bigint not null references VALIDATION(ID),
+  CONDITIONAL_ID bigint not null references CONDITIONAL(ID)
+);
+
 create sequence application_seq start 1;
 create sequence page_seq start 1;
 create sequence region_seq start 1;
@@ -377,5 +410,9 @@ create sequence region_source_seq start 1;
 create sequence field_source_seq start 1;
 create sequence label_seq start 1;
 create sequence field_label_seq start 1;
+
+-- Validation sequences (added 2026-07-11).
+create sequence validation_seq start 1;
+create sequence validation_conditional_seq start 1;
 
 --GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO summit;

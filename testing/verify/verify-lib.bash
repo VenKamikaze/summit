@@ -91,6 +91,25 @@ http_post_form() {
   RESPONSE_BODY=""
 }
 
+# POST form data and capture the response body - used for validation-failure
+# re-renders, which answer 200 with the page inline instead of a 302.
+# Sets RESPONSE_BODY and RESPONSE_CODE.
+http_post_form_body() {
+  local path="$1"; shift
+  local args=()
+  local kv
+  for kv in "$@"; do
+    args+=(--data-urlencode "${kv}")
+  done
+  RESPONSE_BODY="$(curl -s -w '\n%{http_code}' \
+      -b "${_COOKIE_JAR}" -c "${_COOKIE_JAR}" \
+      --data-urlencode "_csrf=$(csrf_token)" "${args[@]}" \
+      "${SUMMIT_URL}${path}")"
+  RESPONSE_CODE="${RESPONSE_BODY##*$'\n'}"
+  RESPONSE_BODY="${RESPONSE_BODY%$'\n'*}"
+  REDIRECT_URL=""
+}
+
 # GET the report region JSON API. Sets RESPONSE_BODY (JSON) and RESPONSE_CODE.
 # Usage: http_get_region_json <regionId> [pageParams e.g. "applicationId:-20000"]
 http_get_region_json() {

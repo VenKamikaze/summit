@@ -96,6 +96,8 @@ http_post_form "${FORM}" \
   "source_type_code=dml_report" \
   "source=select 42 as id, 'ZZ Verify' as \"Verify Column\"" "Save=Save"
 assert_eq "POST Save redirects" "302" "${RESPONSE_CODE}"
+assert_eq "Save branches to the regions report for the host page" \
+  "${SUMMIT_URL}/run/-20000/-23000?pageId=${HOST_ID}" "${REDIRECT_URL}"
 assert_sql "region row created" "-200|body1|Report|dml_report" \
   "select template_id, code_region_position, code_region_type, source_type_code from region where name = '${TEST_NAME}'"
 assert_sql "region id came from region_seq (positive)" "t" \
@@ -108,7 +110,7 @@ assert_sql "source + region_source rows created in the same statement" \
 
 echo "The redirect after Save renders"
 http_get "${REDIRECT_URL#${SUMMIT_URL}}"
-assert_http_ok "GET post-submit redirect target"
+assert_http_ok "GET post-submit redirect target (regions report)"
 
 NEW_ID="$(sql "select id from region where name = '${TEST_NAME}'")"
 
@@ -134,6 +136,8 @@ http_post_form "${FORM}" \
   "source_type_code=dml_report" \
   "source=select 42 as id, 'ZZ Verify Renamed' as \"Verify Column\"" "Update=Update"
 assert_eq "POST Update redirects" "302" "${RESPONSE_CODE}"
+assert_eq "Update branches to the regions report for the host page" \
+  "${SUMMIT_URL}/run/-20000/-23000?pageId=${HOST_ID}" "${REDIRECT_URL}"
 assert_sql "region row updated" "${TEST_NAME} Renamed" \
   "select name from region where id = ${NEW_ID}"
 assert_sql "page_region row updated in the same statement" "2" \
@@ -143,5 +147,28 @@ assert_sql "source row updated in the same statement" \
   "select s.source from source s join region_source rs on rs.source_id = s.id where rs.region_id = ${NEW_ID}"
 assert_sql "still exactly one test region (INSERT was skipped on Update)" "1" \
   "select count(*) from region where name like 'ZZ Verify Region%'"
+
+echo "Delete button gating (deletes are bottom-up: no fields allowed)"
+http_get "${FORM}?pageParams=id:${NEW_ID}"
+assert_contains "Delete button shown for a region with no fields" 'name="Delete"'
+http_get "${FORM}?pageParams=id:-21000"
+assert_not_contains "Delete button hidden for a region with fields" 'name="Delete"'
+
+echo "POST Delete removes REGION + PAGE_REGION + SOURCE and branches to the report"
+http_get "${FORM}?pageParams=id:${NEW_ID}"   # refresh CSRF token
+http_post_form "${FORM}" \
+  "__SUMMIT_FORM_ID__=form--23100" \
+  "id=${NEW_ID}" "pageId=${HOST_ID}" "name=${TEST_NAME} Renamed" "region_num=2" \
+  "template_id=-200" "code_region_position=body1" "code_region_type=Report" \
+  "source_type_code=dml_report" "source=x" "Delete=Delete"
+assert_eq "POST Delete redirects" "302" "${RESPONSE_CODE}"
+assert_eq "Delete branches to the regions report for the host page" \
+  "${SUMMIT_URL}/run/-20000/-23000?pageId=${HOST_ID}" "${REDIRECT_URL}"
+assert_sql "region row deleted" "0" \
+  "select count(*) from region where id = ${NEW_ID}"
+assert_sql "page_region row deleted in the same statement" "0" \
+  "select count(*) from page_region where region_id = ${NEW_ID}"
+assert_sql "region's source deleted in the same statement" "0" \
+  "select count(*) from source where source like 'select 42 as id, %ZZ Verify%'"
 
 verify_summary

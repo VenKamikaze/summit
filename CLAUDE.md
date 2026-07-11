@@ -16,7 +16,7 @@ Companion docs:
 ## Build / run / verify
 
 ```bash
-mvn clean package                    # build (tests use H2, do not need postgres)
+mvn clean package                    # build; NOTE: tests hit the REAL local postgres (not H2) — apply DDL deltas first or SummitApplicationTests fails
 java -jar target/summit-sb-*.jar     # run; expects postgres summit/summit_dev@localhost:5432/summit
 ./testing/verify/run-verify.bash     # end-to-end verification suite (needs running app + DB)
 ```
@@ -37,9 +37,12 @@ APPLICATION → APPLICATION_PAGE → PAGE → PAGE_REGION → REGION → REGION_
 with SOURCE (SQL/static text, linked via REGION_SOURCE / FIELD_SOURCE /
 PAGE_PROCESSING_SOURCE), TEMPLATE (HTML with `##__VAR__##` substitution variables,
 hierarchical via parent_id), LABEL + FIELD_LABEL, PAGE_PROCESSING (+_SOURCE,
-+_SOURCE_SELECT, +_CONDITIONAL), CONDITIONAL, FIELD_CONDITIONAL, and CODE_* lookup
-tables. Sequences exist for application/page/region/field (+ spare_seq) — NOT yet
-for link/child tables (source, application_page, page_region, region_field, ...).
++_SOURCE_SELECT, +_CONDITIONAL, and a SUCCESS_MESSAGE column since 2026-07-11),
+CONDITIONAL, FIELD_CONDITIONAL, VALIDATION + VALIDATION_CONDITIONAL (since
+2026-07-11), and CODE_* lookup tables. Sequences exist for
+application/page/region/field (+ spare_seq), for the link/child tables (source,
+application_page, page_region, region_field, ... — added 2026-07-02), and for
+the validation tables.
 
 Conventions (`.junie/guidelines.md`): hand-authored metadata IDs live in
 -40000..-20000 (IDE app itself is -20000; its pages use blocks: -21000 list,
@@ -62,12 +65,26 @@ report row-link -50.
   `GET/POST /api/filter/json/{regionId}` (`PageRestController`) and mustache-renders
   the JSON into `#mustacheReportRegion-<regionId>`. Filtering/pagination are built
   on JSQLParser query rewriting (`service/report/`).
-- `POST /run/{applicationId}/{pageId}` → `processPageOnSubmit`: the submitted
-  button name (validated against the region's buttons via `__SUMMIT_FORM_ID__`)
-  becomes the reserved `:REQUEST` bind; POST1 processings run in processing_num
-  order, each gated by PAGE_PROCESSING_CONDITIONAL; then redirect back to the
-  same page with the form data as query params. Branching (`processPageBranch`)
-  is a stub — you cannot yet redirect elsewhere after a POST.
+- `POST /run/{applicationId}/{pageId}` → `processPageOnSubmit` (returns a
+  `PageSubmitResult`): the submitted button name (validated against the
+  region's buttons via `__SUMMIT_FORM_ID__`) becomes the reserved `:REQUEST`
+  bind; page VALIDATIONs run next (since 2026-07-11, each gated by
+  VALIDATION_CONDITIONAL; NOT_NULL checks the submitted param, source-backed
+  types go through ConditionalEvaluatorService) — any failure skips all
+  processing and the controller re-renders the page inline (HTTP 200) with the
+  submitted values preserved and the errors in the page template's
+  `##__NOTIFICATION__##` div; otherwise POST1 processings run in
+  processing_num order, each gated by PAGE_PROCESSING_CONDITIONAL, and each
+  passing processing's SUCCESS_MESSAGE is collected and flashed across the
+  redirect (flash attribute `summitSuccessMessages`, rendered into
+  `##__NOTIFICATION__##` by the next GET, consumed once); then redirect back
+  to the same page with the form data as query params — unless a BRANCH1
+  processing fires (since 2026-07-11): branches evaluate after POST1 in
+  processing_num order, gated by PAGE_PROCESSING_CONDITIONAL, first passing
+  branch wins; a 'static' source is a URL template with URL-encoded :param
+  substitution from the submitted form, a 'dml_selcel' source is a query
+  returning the target URL. The IDE forms branch back to their report page on
+  Save/Update/Delete.
 
 ## Processor / formatter dispatch
 
@@ -167,9 +184,22 @@ dropdowns had never worked on the render path before this (dispatch is by DTO
 class; plain FieldDto fell into SimpleFieldProcessor which can't run
 `dml_select`). Dropdown recipe + CTE/bind-scraper notes: `doc/ide-plan.md`.
 
-**Next: stop-and-reassess point reached** (doc/ide-plan.md): pages 1–6 are
-done; conditions/validations/processing maintenance was deliberately deferred
-and is the natural next scope discussion. Known deferred items: post-POST
-branching, delete actions, Oracle pagination ordering, `dto/edit` +
-`PageEditController` are an older abandoned approach (`Old*` services too) —
-ignore them.
+**2026-07-11**: post-POST branching implemented (BRANCH1, see Request flow
+above) and all four IDE forms branch back to their report page on
+Save/Update/Delete. Delete actions added to all four forms — bottom-up only
+(Delete button hidden while children exist via field conditionals; field
+deletes cascade the field's own child rows in one CTE). Validations +
+success/error messages implemented, APEX-3.2 style (see Request flow above and
+the CLOSED entry in `doc/ide-plan.md`): VALIDATION / VALIDATION_CONDITIONAL /
+CODE_VALIDATION_TYPE tables + PAGE_PROCESSING.SUCCESS_MESSAGE
+(`ddl-validations-20260711.sql`, mirrored in ddl.sql/setup-codetables.sql),
+`ValidationService`, `PageSubmitResult`, `##__NOTIFICATION__##` in page
+template -100 (summit-error/summit-success styles in main.css), NOT_NULL
+validations gated to Save/Update + success messages on all four IDE forms,
+and a `BindVarMapper` fix so a blank NUMBER field binds as SQL NULL instead
+of crashing. All verified (t_040–t_070; suite green). Next agreed scope: none
+yet — candidates are the deferred items: landing on a NEW row's edit page
+after Save (needs generated-id write-back), JS confirm on Delete, IDE
+maintenance pages for processing/branch/validation/conditional metadata,
+Oracle pagination ordering; `dto/edit` + `PageEditController` are an older
+abandoned approach (`Old*` services too) — ignore them.

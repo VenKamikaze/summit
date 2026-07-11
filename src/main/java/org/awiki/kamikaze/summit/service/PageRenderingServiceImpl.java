@@ -4,10 +4,12 @@ import static org.awiki.kamikaze.summit.domain.Region.REGION_TYPE_REPORT;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.awiki.kamikaze.summit.domain.ApplicationPage;
 import org.awiki.kamikaze.summit.dto.render.PageDto;
@@ -43,9 +45,11 @@ import org.springframework.util.MultiValueMap;
 public class PageRenderingServiceImpl implements PageRenderingService {
   
   public static final String REQUEST = "REQUEST"; // reserved bind variable for referencing submit actions in a POST.
-  
+
+  public static final String NOTIFICATION_VAR = "##__NOTIFICATION__##"; // page-template placeholder for validation errors / success messages
+
   private static final Logger log = LoggerFactory.getLogger(PageRenderingServiceImpl.class);
-  
+
   private ApplicationPageRepository appPageStore;
   private ProxySourceProcessorService sourceProcessors;
   private ProxyFormatterService sourceFormatters;
@@ -53,7 +57,9 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   private BindVarService bindVarService;
   private FieldService fieldService;
   private PageProcessingService pageProcessingService;
-  
+  private ValidationService validationService;
+  private ConditionalEvaluatorService conditionalService;
+
   
   @Autowired
   public void setAppPageStore(ApplicationPageRepository appPageStore) {
@@ -90,6 +96,16 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     this.pageProcessingService = pageProcessingService;
   }
 
+  @Autowired
+  public void setValidationService(ValidationService validationService) {
+    this.validationService = validationService;
+  }
+
+  @Autowired
+  public void setConditionalService(ConditionalEvaluatorService conditionalService) {
+    this.conditionalService = conditionalService;
+  }
+
 
   /**
    * Overarching method that handles the page rendering
@@ -103,13 +119,37 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    *                 appending content at the start of each format call.
    */
   public String renderPageToString(long applicationId, long pageId, final MultiValueMap<String, String> parameterMap) {
+    return renderPageToString(applicationId, pageId, parameterMap, Collections.emptyList(), false);
+  }
+
+  @Override
+  public String renderPageToString(long applicationId, long pageId, final MultiValueMap<String, String> parameterMap,
+          final List<String> notificationMessages, final boolean isError) {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     if(appPage != null)
     {
       PageDto pageDto = pageMapper.map(appPage.getPage(), new CycleAvoidingMappingContext());
-      return renderPageItems(pageDto, parameterMap);
+      return substituteNotification(renderPageItems(pageDto, parameterMap), notificationMessages, isError);
     }
     return "Application " + applicationId + ", page " + pageId + "  does not exist.";
+  }
+
+  /**
+   * Replace the page template's ##__NOTIFICATION__## placeholder with the
+   * given messages (HTML-escaped). Pages whose template has no placeholder
+   * simply show no notifications.
+   */
+  private String substituteNotification(final String renderedPage, final List<String> messages, final boolean isError) {
+    if(!renderedPage.contains(NOTIFICATION_VAR)) {
+      return renderedPage;
+    }
+    final StringBuilder html = new StringBuilder();
+    final String cssClass = isError ? "summit-error" : "summit-success";
+    for(final String message : messages) {
+      html.append("<div class=\"").append(cssClass).append("\">")
+          .append(StringEscapeUtils.escapeHtml4(message)).append("</div>");
+    }
+    return renderedPage.replace(NOTIFICATION_VAR, html.toString());
   }
   
 
@@ -227,7 +267,7 @@ public class PageRenderingServiceImpl implements PageRenderingService {
 
   // TODO this should be moved to a different service as it's distinct from just rendering a page.
   @Override
-  public String processPageOnSubmit(long applicationId, long pageId, final MultiValueMap<String, String> submittedFormParams)
+  public PageSubmitResult processPageOnSubmit(long applicationId, long pageId, final MultiValueMap<String, String> submittedFormParams)
   {
     ApplicationPage appPage = appPageStore.findByApplicationIdAndPageId(applicationId, pageId);
     if(appPage != null)
@@ -235,7 +275,8 @@ public class PageRenderingServiceImpl implements PageRenderingService {
       PageDto pageDto = pageMapper.map(appPage.getPage(), new CycleAvoidingMappingContext());
       return processPageItemsOnSubmit(pageDto, submittedFormParams);
     }
-    return "Application " + applicationId + ", page " + pageId + "  does not exist.";
+    log.error("POST to non-existent page: application " + applicationId + ", page " + pageId);
+    return new PageSubmitResult(); // no branch target; the controller redirects back to the requested page, which renders the does-not-exist message.
   }
   
   /**
@@ -243,18 +284,21 @@ public class PageRenderingServiceImpl implements PageRenderingService {
    *   if they should branch to another target page.
    * This method processes the branching code, and returns the branchTarget (if any) that the client browser
    *   should be redirected into.
-   * If more than one branch target is processed, the final one is returned only. 
+   * Branches evaluate in processing_num order and the first one whose conditional passes and
+   *   produces a target wins (matching APEX branch semantics).
    * @return String branchTarget or null
    */
   private String processPageBranch(final Collection<PageProcessingDto> pageProcesses, final MultiValueMap<String, String> parameterMap,
           final String submitAction) {
-    String branchTarget = null;
     for(PageProcessingDto process : pageProcesses) {
-      for(PageProcessingSourceDto sourceDto : process.getPageProcessingSource()) { 
-        //branchTarget = pageProcessingService.processSource(sourceDto, parameterMap); // FIXME TODO
+      for(PageProcessingSourceDto sourceDto : process.getPageProcessingSource()) {
+        final String branchTarget = pageProcessingService.processBranchSource(sourceDto, parameterMap);
+        if(branchTarget != null) {
+          return branchTarget;
+        }
       }
     }
-    return branchTarget;
+    return null;
   }
   
   /**
@@ -292,31 +336,49 @@ public class PageRenderingServiceImpl implements PageRenderingService {
   }
   
   /**
-   * 
-   *  
+   * Runs the POST lifecycle: determine the submitted button, run validations
+   * (a failure aborts here), run POST1 processing (collecting the success
+   * messages of the processings that ran), then evaluate branches.
    * @param pageDto, Map<String,String> (submittedFormParams)
-   * @return String identifying target page to branch to.
+   * @return PageSubmitResult with either validation errors or branch target + success messages.
    */
-  private String processPageItemsOnSubmit(final PageDto pageDto, final MultiValueMap<String, String> submittedFormParams) {
+  private PageSubmitResult processPageItemsOnSubmit(final PageDto pageDto, final MultiValueMap<String, String> submittedFormParams) {
+    final PageSubmitResult result = new PageSubmitResult();
+
     long start = System.nanoTime();
     final String submitAction = determineSubmittedButton(pageDto, submittedFormParams);
     long end = System.nanoTime();
-    
+
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": determineSubmittedButton took: " + (end - start) / 1000000 + "ms");
     submittedFormParams.add(REQUEST, submitAction); // add it even if it's empty, so we don't get null pointers if :REQUEST is used in a source statement.
-    
+
+    result.getValidationErrors().addAll(validationService.validate(pageDto.getValidations(), submittedFormParams));
+    if(result.hasValidationErrors()) {
+      return result; // no processing, no branch: the controller re-renders the page with the errors.
+    }
+
     start = System.nanoTime();
     processPageProcessingSource(pageDto.getPagePostProcessings(), submittedFormParams);
     end = System.nanoTime();
-    
+
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processPageRenderSource took: " + (end - start) / 1000000 + "ms");
 
+    // Collect the success messages of the POST1 processings that ran. This
+    // re-evaluates each processing's conditional (processSource evaluates it
+    // internally too); conditionals are cheap single-cell queries.
+    for(final PageProcessingDto processing : pageDto.getPagePostProcessings()) {
+      if(StringUtils.isNotBlank(processing.getSuccessMessage())
+              && (processing.getConditional() == null || conditionalService.evaluate(processing.getConditional(), submittedFormParams))) {
+        result.getSuccessMessages().add(processing.getSuccessMessage());
+      }
+    }
+
     start = System.nanoTime();
-    String branchTarget = processPageBranch(pageDto.getPagePostProcessingBranches(), submittedFormParams, submitAction); // FIXME TODO
+    result.setBranchTarget(processPageBranch(pageDto.getPagePostProcessingBranches(), submittedFormParams, submitAction));
     end = System.nanoTime();
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processPageBranch took: " + (end - start) / 1000000 + "ms");
 
-    return branchTarget;
-  }  
-  
+    return result;
+  }
+
 }

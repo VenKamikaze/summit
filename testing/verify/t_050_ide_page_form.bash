@@ -58,6 +58,8 @@ http_post_form "${PAGE}" \
   "id=0" "applicationId=-20000" "name=${TEST_NAME}" "page_num=${TEST_NUM}" \
   "template_id=-100" "Save=Save"
 assert_eq "POST Save redirects" "302" "${RESPONSE_CODE}"
+assert_eq "Save branches to the pages report for this application" \
+  "${SUMMIT_URL}/run/-20000/-20002?applicationId=-20000" "${REDIRECT_URL}"
 assert_sql "page row created with the chosen template" "${TEST_NAME}|-100" \
   "select name, template_id from page where name = '${TEST_NAME}'"
 assert_sql "page id came from page_seq (positive, not hand-picked)" "t" \
@@ -67,9 +69,9 @@ assert_sql "application_page row created in the same statement" "-20000|${TEST_N
 assert_sql "application_page id came from application_page_seq" "t" \
   "select ap.id > 0 from application_page ap join page p on ap.page_id = p.id where p.name = '${TEST_NAME}'"
 
-echo "The redirect after Save renders (query params accepted as page params)"
+echo "The redirect after Save renders"
 http_get "${REDIRECT_URL#${SUMMIT_URL}}"
-assert_http_ok "GET post-submit redirect target"
+assert_http_ok "GET post-submit redirect target (pages report)"
 
 NEW_ID="$(sql "select id from page where name = '${TEST_NAME}'")"
 
@@ -94,11 +96,33 @@ http_post_form "${PAGE}" \
   "id=${NEW_ID}" "applicationId=-20000" "name=${TEST_NAME} Renamed" \
   "page_num=999002" "template_id=-100" "Update=Update"
 assert_eq "POST Update redirects" "302" "${RESPONSE_CODE}"
+assert_eq "Update branches to the pages report for this application" \
+  "${SUMMIT_URL}/run/-20000/-20002?applicationId=-20000" "${REDIRECT_URL}"
 assert_sql "page row updated" "${TEST_NAME} Renamed" \
   "select name from page where id = ${NEW_ID}"
 assert_sql "application_page row updated in the same statement" "999002" \
   "select page_num from application_page where page_id = ${NEW_ID}"
 assert_sql "still exactly one test page (INSERT was skipped on Update)" "1" \
   "select count(*) from page where name like 'ZZ Verify Page%'"
+
+echo "Delete button gating (deletes are bottom-up: no regions/processings allowed)"
+http_get "${PAGE}?pageParams=id:${NEW_ID}"
+assert_contains "Delete button shown for a page with no regions/processings" 'name="Delete"'
+http_get "${PAGE}?pageParams=id:-21000"
+assert_not_contains "Delete button hidden for a page with regions" 'name="Delete"'
+
+echo "POST Delete removes PAGE + APPLICATION_PAGE and branches to the report"
+http_get "${PAGE}?pageParams=id:${NEW_ID}"   # refresh CSRF token
+http_post_form "${PAGE}" \
+  "__SUMMIT_FORM_ID__=form--22000" \
+  "id=${NEW_ID}" "applicationId=-20000" "name=${TEST_NAME} Renamed" \
+  "page_num=999002" "template_id=-100" "Delete=Delete"
+assert_eq "POST Delete redirects" "302" "${RESPONSE_CODE}"
+assert_eq "Delete branches to the pages report for this application" \
+  "${SUMMIT_URL}/run/-20000/-20002?applicationId=-20000" "${REDIRECT_URL}"
+assert_sql "page row deleted" "0" \
+  "select count(*) from page where id = ${NEW_ID}"
+assert_sql "application_page row deleted in the same statement" "0" \
+  "select count(*) from application_page where page_id = ${NEW_ID}"
 
 verify_summary
