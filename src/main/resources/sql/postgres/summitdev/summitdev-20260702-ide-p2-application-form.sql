@@ -25,19 +25,19 @@
 START TRANSACTION;
 
 delete from field_conditional where id in (-21100, -21101, -21102, -21103);
-delete from page_processing_conditional where id in (-21100, -21101, -21102, -21103);
+delete from page_processing_conditional where id in (-21100, -21101, -21102, -21103, -21104);
 delete from validation_conditional where id in (-21100);
 delete from validation where id in (-21100);
-delete from conditional where id in (-21100, -21101, -21102, -21103, -21104, -21105, -21106, -21107);
-delete from page_processing_source_select where id in (-21100, -21101, -21102);
-delete from page_processing_source where id in (-21100, -21101, -21102, -21103, -21104);
-delete from page_processing where id in (-21100, -21101, -21102, -21103, -21104);
+delete from conditional where id in (-21100, -21101, -21102, -21103, -21104, -21105, -21106, -21107, -21108);
+delete from page_processing_source_select where id in (-21100, -21101, -21102, -21103);
+delete from page_processing_source where id in (-21100, -21101, -21102, -21103, -21104, -21105);
+delete from page_processing where id in (-21100, -21101, -21102, -21103, -21104, -21105);
 delete from field_label where id in (-21100, -21101);
 delete from label where id in (-21100, -21101);
 delete from field_source where id in (-21105);
 delete from region_field where id in (-21100, -21101, -21102, -21103, -21104, -21105, -21106);
 delete from field where id in (-21100, -21101, -21102, -21103, -21104, -21105, -21106);
-delete from source where id in (-21100, -21105, -21106, -21107, -21108, -21109, -21110, -21111, -21112, -21113, -21114, -21115, -21116);
+delete from source where id in (-21100, -21105, -21106, -21107, -21108, -21109, -21110, -21111, -21112, -21113, -21114, -21115, -21116, -21117);
 delete from page_region where id = -21100;
 delete from region where id = -21100;
 delete from application_page where id = -21100;
@@ -121,11 +121,14 @@ insert into field_source (id, field_id, source_id, flag_default_value)
 values (-21105, -21105, -21105, 'Y');
 
 ---------------------------------------------------------------------------
--- POST: Save = INSERT (id from application_seq), Update = UPDATE
+-- POST: Save = INSERT (id from application_seq), Update = UPDATE.
+-- The Save source is a data-modifying CTE run as dml_selcel so the generated
+-- id is selected back; the source_select row below writes it into the :id
+-- parameter (APEX "returning into item") for the Save branch to use.
 ---------------------------------------------------------------------------
 
 insert into source (id, "source") values
-  (-21106, 'insert into application (id, application_num, name) values (nextval(''application_seq''), CAST(:application_num as NUMERIC), :name)'),
+  (-21106, 'with new_app as (insert into application (id, application_num, name) values (nextval(''application_seq''), CAST(:application_num as NUMERIC), :name) returning id) select id from new_app'),
   (-21107, 'update application set application_num = CAST(:application_num as NUMERIC), name = :name where CAST(id as VARCHAR) = :id');
 
 insert into page_processing (id, page_id, processing_type_code, processing_num, success_message) values
@@ -133,8 +136,11 @@ insert into page_processing (id, page_id, processing_type_code, processing_num, 
   (-21102, -21100, 'POST1', 2, 'Application updated.');
 
 insert into page_processing_source (id, page_processing_id, source_id, source_type_code) values
-  (-21101, -21101, -21106, 'dml_modify'),
+  (-21101, -21101, -21106, 'dml_selcel'),
   (-21102, -21102, -21107, 'dml_modify');
+
+insert into page_processing_source_select (id, page_processing_source_id, field_index, field_name)
+values (-21103, -21101, 0, 'id');
 
 -- Run the INSERT only for Save, the UPDATE only for Update.
 insert into source (id, "source") values
@@ -189,9 +195,12 @@ insert into validation_conditional (id, validation_id, conditional_id)
 values (-21100, -21100, -21107);
 
 ---------------------------------------------------------------------------
--- Branch: after a Save, Update or Delete, land back on the Applications list.
--- BRANCH1 processings run after all POST1 processing; a 'static' source is a
--- URL template whose :name variables substitute from the submitted form.
+-- Branches: after a Save, land on the NEW application's edit page (the POST1
+-- write-back above replaced :id with the generated id); after an Update or
+-- Delete, land back on the Applications list. BRANCH1 processings run after
+-- all POST1 processing in processing_num order, first passing branch wins;
+-- a 'static' source is a URL template whose :name variables substitute from
+-- the (post-write-back) submitted form.
 ---------------------------------------------------------------------------
 
 -- Existing databases predate the BRANCH1 processing type (setup-codetables.sql
@@ -201,20 +210,26 @@ select 'BRANCH1', 'Page Branch After Page POST Processing', 3
 where not exists (select 1 from code_processing_type where code = 'BRANCH1');
 
 insert into source (id, "source") values
-  (-21111, 'select ''true'' where :REQUEST in (''Save'', ''Update'', ''Delete'')'),
-  (-21112, '/run/-20000/-21000');
+  (-21111, 'select ''true'' where :REQUEST in (''Update'', ''Delete'')'),
+  (-21112, '/run/-20000/-21000'),
+  (-21117, '/run/-20000/-21100?id=:id');
 
-insert into page_processing (id, page_id, processing_type_code, processing_num)
-values (-21103, -21100, 'BRANCH1', 4);
+insert into page_processing (id, page_id, processing_type_code, processing_num) values
+  (-21105, -21100, 'BRANCH1', 4),
+  (-21103, -21100, 'BRANCH1', 5);
 
-insert into page_processing_source (id, page_processing_id, source_id, source_type_code)
-values (-21103, -21103, -21112, 'static');
+insert into page_processing_source (id, page_processing_id, source_id, source_type_code) values
+  (-21105, -21105, -21117, 'static'),
+  (-21103, -21103, -21112, 'static');
 
-insert into conditional (id, source_id, source_type_code, conditional_type_code)
-values (-21104, -21111, 'dml_selcel', 'TEXT_TRUE');
+-- The Save branch reuses the :REQUEST = 'Save' conditional source (-21108).
+insert into conditional (id, source_id, source_type_code, conditional_type_code) values
+  (-21108, -21108, 'dml_selcel', 'TEXT_TRUE'),
+  (-21104, -21111, 'dml_selcel', 'TEXT_TRUE');
 
-insert into page_processing_conditional (id, page_processing_id, conditional_id)
-values (-21102, -21103, -21104);
+insert into page_processing_conditional (id, page_processing_id, conditional_id) values
+  (-21104, -21105, -21108),
+  (-21102, -21103, -21104);
 
 ---------------------------------------------------------------------------
 -- Conditional button display: Save when creating, Update + Pages when editing

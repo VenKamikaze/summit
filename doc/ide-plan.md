@@ -1,3 +1,4 @@
+
 # Summit IDE — rough build plan
 
 Goal: an internal Summit-built application (like Oracle APEX app 4550) for creating and
@@ -132,11 +133,11 @@ APPLICATION → PAGE → REGION → FIELD chain is now maintainable from the IDE
   context-relative URL template whose :name variables substitute (URL-encoded)
   from the submitted form params — a missing param substitutes empty with a
   warning; 'dml_selcel' = a query (VARCHAR binds) returning the target URL.
-  The four IDE forms now branch back to their report page after Save/Update
+  The four IDE forms branch back to their report page after Update/Delete
   (asserted in t_040/t_050/t_060/t_070). CODE_PROCESSING_TYPE 'BRANCH1' is in
   setup-codetables.sql and insert-if-missing in each form's summitdev file.
-  Landing on a NEW row's edit page is still future work (needs the INSERT's
-  generated id fed back into the parameter map, APEX "returning into item").
+  Save branches to the new row's edit page — see the generated-id write-back
+  entry below.
 - ~~**Delete actions**~~ CLOSED (2026-07-11): every IDE form has a Delete button
   (template -80, :REQUEST = 'Delete' POST1 dml_modify, branch back to the report).
   Deletes are **bottom-up** (no cascade): the button is gated by a field
@@ -184,6 +185,30 @@ APPLICATION → PAGE → REGION → FIELD chain is now maintainable from the IDE
     p4 page_num, p5 region_num, p6 name + field_num) and success messages
     ('X created./updated./deleted.') on every POST1 processing; asserted in
     t_040–t_070.
+- ~~**Landing on a NEW row's edit page after Save**~~ CLOSED (2026-07-12),
+  APEX "returning into item" style — generated-id write-back:
+  - Runtime: after the POST1 processings run, any values they selected into
+    their PAGE_PROCESSING_SOURCE_SELECT rows are written back into the
+    parameter map, REPLACING the submitted parameter of the same name
+    (`processPageItemsOnSubmit` in PageRenderingServiceImpl). Branches (and
+    the no-branch redirect, which echoes the parameter map) therefore see the
+    written-back values. No schema change: PAGE_PROCESSING_SOURCE_SELECT
+    already existed for RENDER_PG1's dml_selrow column→field mapping.
+  - To capture a generated key, the Save source must RETURN it, and
+    `dml_modify` runs via `jdbc.update()` which cannot return values — so the
+    IDE Save sources became **dml_selcel** data-modifying CTEs whose final
+    statement is `select id from <insert-cte>` (Postgres runs every
+    data-modifying CTE exactly once whether or not the final SELECT reads
+    it). Each Save processing gained one source_select row (field_index 0,
+    field_name 'id') mapping the returned id onto :id.
+  - Each IDE form now has TWO branches: processing_num 4 gated on
+    :REQUEST = 'Save' targeting its own form page with `?id=:id` (the
+    written-back generated id), and the old report-page branch renumbered to
+    5 and re-gated to Update/Delete. First passing branch wins, so the order
+    only documents intent (the conditionals are disjoint).
+  - Asserted in t_040–t_070: the Save redirect URL is the form page with the
+    freshly generated id, and that GET renders the row in edit mode (Update
+    shown, Save hidden) with the 'created' flash.
 
 ## Bind variable rules (which type binds where)
 

@@ -96,8 +96,6 @@ http_post_form "${FORM}" \
   "default_source_type_code=static" "default_source=ZZ Verify Field Default" \
   "Save=Save"
 assert_eq "POST Save redirects" "302" "${RESPONSE_CODE}"
-assert_eq "Save branches to the fields report for the host region" \
-  "${SUMMIT_URL}/run/-20000/-24000?regionId=${HOST_REGION}" "${REDIRECT_URL}"
 assert_sql "field row created with codes intact (NULLIF kept 'static')" \
   "-61|TEXT|static|static" \
   "select template_id, field_type_code, source_type_code, default_source_type_code from field where name = '${TEST_NAME}'"
@@ -108,6 +106,19 @@ assert_sql "region_field row created in the same statement" "${HOST_REGION}|1" \
 assert_sql "default source + field_source (flag Y) created in the same statement" \
   "ZZ Verify Field Default|Y" \
   "select s.source, fs.flag_default_value from source s join field_source fs on fs.source_id = s.id join field f on f.id = fs.field_id where f.name = '${TEST_NAME}'"
+NEW_ID="$(sql "select id from field where name = '${TEST_NAME}'")"
+assert_eq "Save branches to the new field's edit page (generated-id write-back)" \
+  "${SUMMIT_URL}${FORM}?id=${NEW_ID}" "${REDIRECT_URL}"
+
+echo "The redirect after Save renders the new row in edit mode"
+http_get "${REDIRECT_URL#${SUMMIT_URL}}"
+assert_http_ok "GET post-submit redirect target (edit form for the new field)"
+assert_contains "success message flashed across the redirect" \
+  '<div class="summit-success">Field created.</div>'
+assert_contains "form populated with new field name" "value=\"${TEST_NAME}\""
+assert_contains "default source shown" '>ZZ Verify Field Default</textarea>'
+assert_contains "Update button shown for new field" 'name="Update"'
+assert_not_contains "Save button hidden for new field" 'name="Save"'
 
 echo "POST Save with (none) + empty default source inserts FIELD + REGION_FIELD only"
 http_get "${FORM}?pageParams=id:0,regionId:${HOST_REGION}"
@@ -118,6 +129,10 @@ http_post_form "${FORM}" \
   "default_source_type_code=none" "default_source=" \
   "Save=Save"
 assert_eq "POST Save redirects" "302" "${RESPONSE_CODE}"
+NEW_ID2="$(sql "select id from field where name = '${TEST_NAME}2'")"
+assert_eq "second Save also lands on its new edit page" \
+  "${SUMMIT_URL}${FORM}?id=${NEW_ID2}" "${REDIRECT_URL}"
+http_get "${REDIRECT_URL#${SUMMIT_URL}}"   # consume this POST's flash before the next one
 assert_sql "field row created with NULL default source type ('none' sentinel)" "t" \
   "select default_source_type_code is null from field where name = '${TEST_NAME}2'"
 assert_sql "no field_source row was created" "0" \
@@ -129,15 +144,6 @@ assert_http_ok "GET the host page with the new fields"
 assert_contains "text field renders with its static default value" \
   "name=\"${TEST_NAME}\""
 assert_contains "default value rendered" 'ZZ Verify Field Default'
-
-NEW_ID="$(sql "select id from field where name = '${TEST_NAME}'")"
-
-echo "Edit mode for the new field"
-http_get "${FORM}?pageParams=id:${NEW_ID}"
-assert_http_ok "GET form for new field"
-assert_contains "form populated with new field name" "value=\"${TEST_NAME}\""
-assert_contains "default source shown" '>ZZ Verify Field Default</textarea>'
-assert_contains "Update button shown for new field" 'name="Update"'
 
 echo "POST Update modifies FIELD, REGION_FIELD and the default SOURCE via one CTE"
 http_post_form "${FORM}" \

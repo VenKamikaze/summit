@@ -96,8 +96,6 @@ http_post_form "${FORM}" \
   "source_type_code=dml_report" \
   "source=select 42 as id, 'ZZ Verify' as \"Verify Column\"" "Save=Save"
 assert_eq "POST Save redirects" "302" "${RESPONSE_CODE}"
-assert_eq "Save branches to the regions report for the host page" \
-  "${SUMMIT_URL}/run/-20000/-23000?pageId=${HOST_ID}" "${REDIRECT_URL}"
 assert_sql "region row created" "-200|body1|Report|dml_report" \
   "select template_id, code_region_position, code_region_type, source_type_code from region where name = '${TEST_NAME}'"
 assert_sql "region id came from region_seq (positive)" "t" \
@@ -107,12 +105,18 @@ assert_sql "page_region row created in the same statement" "${HOST_ID}|1" \
 assert_sql "source + region_source rows created in the same statement" \
   "select 42 as id, 'ZZ Verify' as \"Verify Column\"" \
   "select s.source from source s join region_source rs on rs.source_id = s.id join region r on r.id = rs.region_id where r.name = '${TEST_NAME}'"
-
-echo "The redirect after Save renders"
-http_get "${REDIRECT_URL#${SUMMIT_URL}}"
-assert_http_ok "GET post-submit redirect target (regions report)"
-
 NEW_ID="$(sql "select id from region where name = '${TEST_NAME}'")"
+assert_eq "Save branches to the new region's edit page (generated-id write-back)" \
+  "${SUMMIT_URL}${FORM}?id=${NEW_ID}" "${REDIRECT_URL}"
+
+echo "The redirect after Save renders the new row in edit mode"
+http_get "${REDIRECT_URL#${SUMMIT_URL}}"
+assert_http_ok "GET post-submit redirect target (edit form for the new region)"
+assert_contains "success message flashed across the redirect" \
+  '<div class="summit-success">Region created.</div>'
+assert_contains "form populated with new region name" "value=\"${TEST_NAME}\""
+assert_contains "Update button shown for new region" 'name="Update"'
+assert_not_contains "Save button hidden for new region" 'name="Save"'
 
 echo "The region the IDE just created actually works"
 http_get "/run/-20000/${HOST_ID}"
@@ -121,12 +125,6 @@ assert_contains "new report region scaffolding renders" "mustacheReportRegion-${
 http_get_region_json "${NEW_ID}"
 assert_http_ok "GET the new region's JSON API"
 assert_json "new region serves its query" '.body[0].cells[1].value' "ZZ Verify"
-
-echo "Edit mode for the new region"
-http_get "${FORM}?pageParams=id:${NEW_ID}"
-assert_http_ok "GET form for new region"
-assert_contains "form populated with new region name" "value=\"${TEST_NAME}\""
-assert_contains "Update button shown for new region" 'name="Update"'
 
 echo "POST Update modifies REGION, PAGE_REGION and SOURCE via one CTE"
 http_post_form "${FORM}" \

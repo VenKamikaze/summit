@@ -41,20 +41,20 @@ START TRANSACTION;
 ---------------------------------------------------------------------------
 
 delete from field_conditional where id in (-24100, -24101, -24102);
-delete from page_processing_conditional where id in (-24100, -24101, -24102, -24103);
+delete from page_processing_conditional where id in (-24100, -24101, -24102, -24103, -24104);
 delete from validation_conditional where id in (-24100, -24101);
 delete from validation where id in (-24100, -24101);
-delete from conditional where id in (-24100, -24101, -24102, -24103, -24104, -24105, -24106);
-delete from page_processing_source_select where id in (-24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108);
-delete from page_processing_source where id in (-24100, -24101, -24102, -24103, -24104);
-delete from page_processing where id in (-24100, -24101, -24102, -24103, -24104);
+delete from conditional where id in (-24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107);
+delete from page_processing_source_select where id in (-24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108, -24109);
+delete from page_processing_source where id in (-24100, -24101, -24102, -24103, -24104, -24105);
+delete from page_processing where id in (-24100, -24101, -24102, -24103, -24104, -24105);
 delete from field_label where id in (-24100, -24101, -24102, -24103, -24104, -24105, -24106);
 delete from label where id in (-24100, -24101, -24102, -24103, -24104, -24105, -24106);
 delete from field_source where id in (-24001, -24002, -24101, -24102, -24103, -24104);
 delete from region_field where id in (-24000, -24001, -24002, -24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108, -24109, -24110, -24111);
 delete from field where id in (-24000, -24001, -24002, -24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108, -24109, -24110, -24111);
 delete from region_source where id in (-24000);
-delete from source where id in (-24000, -24001, -24002, -24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108, -24109, -24110, -24111, -24112, -24113, -24114);
+delete from source where id in (-24000, -24001, -24002, -24100, -24101, -24102, -24103, -24104, -24105, -24106, -24107, -24108, -24109, -24110, -24111, -24112, -24113, -24114, -24115);
 delete from page_region where id in (-24000, -24100);
 delete from region where id in (-24000, -24100);
 delete from application_page where id in (-24000, -24100);
@@ -228,8 +228,10 @@ insert into field_source (id, field_id, source_id, flag_default_value) values
 -- POST: Save = one CTE inserting FIELD + REGION_FIELD (+ SOURCE + FIELD_SOURCE
 --       when default source text was entered), Update = one CTE updating
 --       FIELD, REGION_FIELD.field_num and the default SOURCE.
+-- The Save CTE is run as dml_selcel so the generated field id is selected
+-- back; the source_select row writes it into :id for the Save branch.
 insert into source (id, "source") values
-  (-24105, 'with new_field as (insert into field (id, template_id, name, source_type_code, field_type_code, default_source_type_code) select nextval(''field_seq''), CAST(:template_id as NUMERIC), :name, :source_type_code, :field_type_code, NULLIF(:default_source_type_code, ''none'') returning id), new_rf as (insert into region_field (id, region_id, field_id, field_num) select nextval(''region_field_seq''), CAST(:regionId as NUMERIC), nf.id, CAST(:field_num as NUMERIC) from new_field nf returning id), new_source as (insert into source (id, source) select nextval(''source_seq''), :default_source where length(:default_source) > 0 returning id) insert into field_source (id, field_id, source_id, flag_default_value) select nextval(''field_source_seq''), nf.id, ns.id, ''Y'' from new_field nf, new_source ns'),
+  (-24105, 'with new_field as (insert into field (id, template_id, name, source_type_code, field_type_code, default_source_type_code) select nextval(''field_seq''), CAST(:template_id as NUMERIC), :name, :source_type_code, :field_type_code, NULLIF(:default_source_type_code, ''none'') returning id), new_rf as (insert into region_field (id, region_id, field_id, field_num) select nextval(''region_field_seq''), CAST(:regionId as NUMERIC), nf.id, CAST(:field_num as NUMERIC) from new_field nf returning id), new_source as (insert into source (id, source) select nextval(''source_seq''), :default_source where length(:default_source) > 0 returning id), new_fs as (insert into field_source (id, field_id, source_id, flag_default_value) select nextval(''field_source_seq''), nf.id, ns.id, ''Y'' from new_field nf, new_source ns returning id) select id from new_field'),
   (-24106, 'with upd_field as (update field set template_id = CAST(:template_id as NUMERIC), name = :name, source_type_code = :source_type_code, field_type_code = :field_type_code, default_source_type_code = NULLIF(:default_source_type_code, ''none'') where CAST(id as VARCHAR) = :id returning id), upd_rf as (update region_field set field_num = CAST(:field_num as NUMERIC) where field_id in (select id from upd_field) returning id) update source set source = :default_source where id in (select fs.source_id from field_source fs join upd_field uf on fs.field_id = uf.id where fs.flag_default_value = ''Y'')');
 
 insert into page_processing (id, page_id, processing_type_code, processing_num, success_message) values
@@ -237,8 +239,11 @@ insert into page_processing (id, page_id, processing_type_code, processing_num, 
   (-24102, -24100, 'POST1', 2, 'Field updated.');
 
 insert into page_processing_source (id, page_processing_id, source_id, source_type_code) values
-  (-24101, -24101, -24105, 'dml_modify'),
+  (-24101, -24101, -24105, 'dml_selcel'),
   (-24102, -24102, -24106, 'dml_modify');
+
+insert into page_processing_source_select (id, page_processing_source_id, field_index, field_name)
+values (-24109, -24101, 0, 'id');
 
 insert into source (id, "source") values
   (-24107, 'select ''true'' where :REQUEST = ''Save'''),
@@ -295,9 +300,10 @@ insert into validation_conditional (id, validation_id, conditional_id) values
   (-24101, -24101, -24106);
 
 ---------------------------------------------------------------------------
--- Branch: after a Save, Update or Delete, land back on the Fields-on-Region
--- report for this region. The :regionId in the static URL template
--- substitutes from the submitted form (the hidden regionId field).
+-- Branches: after a Save, land on the NEW field's edit page (the POST1
+-- write-back replaced :id with the generated id); after an Update or Delete,
+-- land back on the Fields-on-Region report. The :name variables in the
+-- static URL templates substitute from the (post-write-back) submitted form.
 ---------------------------------------------------------------------------
 
 insert into code_processing_type
@@ -305,20 +311,26 @@ select 'BRANCH1', 'Page Branch After Page POST Processing', 3
 where not exists (select 1 from code_processing_type where code = 'BRANCH1');
 
 insert into source (id, "source") values
-  (-24110, 'select ''true'' where :REQUEST in (''Save'', ''Update'', ''Delete'')'),
-  (-24111, '/run/-20000/-24000?regionId=:regionId');
+  (-24110, 'select ''true'' where :REQUEST in (''Update'', ''Delete'')'),
+  (-24111, '/run/-20000/-24000?regionId=:regionId'),
+  (-24115, '/run/-20000/-24100?id=:id');
 
-insert into page_processing (id, page_id, processing_type_code, processing_num)
-values (-24103, -24100, 'BRANCH1', 4);
+insert into page_processing (id, page_id, processing_type_code, processing_num) values
+  (-24105, -24100, 'BRANCH1', 4),
+  (-24103, -24100, 'BRANCH1', 5);
 
-insert into page_processing_source (id, page_processing_id, source_id, source_type_code)
-values (-24103, -24103, -24111, 'static');
+insert into page_processing_source (id, page_processing_id, source_id, source_type_code) values
+  (-24105, -24105, -24115, 'static'),
+  (-24103, -24103, -24111, 'static');
 
-insert into conditional (id, source_id, source_type_code, conditional_type_code)
-values (-24104, -24110, 'dml_selcel', 'TEXT_TRUE');
+-- The Save branch reuses the :REQUEST = 'Save' conditional source (-24107).
+insert into conditional (id, source_id, source_type_code, conditional_type_code) values
+  (-24107, -24107, 'dml_selcel', 'TEXT_TRUE'),
+  (-24104, -24110, 'dml_selcel', 'TEXT_TRUE');
 
-insert into page_processing_conditional (id, page_processing_id, conditional_id)
-values (-24102, -24103, -24104);
+insert into page_processing_conditional (id, page_processing_id, conditional_id) values
+  (-24104, -24105, -24107),
+  (-24102, -24103, -24104);
 
 -- Conditional button display: Save when creating, Update when editing.
 insert into source (id, "source")

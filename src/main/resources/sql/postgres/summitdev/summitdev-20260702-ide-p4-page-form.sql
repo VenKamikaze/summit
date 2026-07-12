@@ -30,19 +30,19 @@
 START TRANSACTION;
 
 delete from field_conditional where id in (-22000, -22001, -22002, -22003);
-delete from page_processing_conditional where id in (-22000, -22001, -22002, -22003);
+delete from page_processing_conditional where id in (-22000, -22001, -22002, -22003, -22004);
 delete from validation_conditional where id in (-22000);
 delete from validation where id in (-22000);
-delete from conditional where id in (-22000, -22001, -22002, -22003, -22004, -22005, -22006, -22007);
-delete from page_processing_source_select where id in (-22000, -22001, -22002, -22003, -22004);
-delete from page_processing_source where id in (-22000, -22001, -22002, -22003, -22004);
-delete from page_processing where id in (-22000, -22001, -22002, -22003, -22004);
+delete from conditional where id in (-22000, -22001, -22002, -22003, -22004, -22005, -22006, -22007, -22008);
+delete from page_processing_source_select where id in (-22000, -22001, -22002, -22003, -22004, -22005);
+delete from page_processing_source where id in (-22000, -22001, -22002, -22003, -22004, -22005);
+delete from page_processing where id in (-22000, -22001, -22002, -22003, -22004, -22005);
 delete from field_label where id in (-22000, -22001, -22002);
 delete from label where id in (-22000, -22001, -22002);
 delete from field_source where id in (-22001, -22007);
 delete from region_field where id in (-22000, -22001, -22002, -22003, -22004, -22005, -22006, -22007, -22008);
 delete from field where id in (-22000, -22001, -22002, -22003, -22004, -22005, -22006, -22007, -22008);
-delete from source where id in (-22000, -22001, -22002, -22003, -22004, -22005, -22006, -22007, -22008, -22009, -22010, -22011, -22012, -22013);
+delete from source where id in (-22000, -22001, -22002, -22003, -22004, -22005, -22006, -22007, -22008, -22009, -22010, -22011, -22012, -22013, -22014);
 delete from page_region where id = -22000;
 delete from region where id = -22000;
 delete from application_page where id = -20102;
@@ -145,11 +145,13 @@ insert into field_source (id, field_id, source_id, flag_default_value)
 values (-22007, -22007, -22007, 'Y');
 
 ---------------------------------------------------------------------------
--- POST: Save = INSERT into PAGE + APPLICATION_PAGE (one CTE), Update = both
+-- POST: Save = INSERT into PAGE + APPLICATION_PAGE (one CTE), Update = both.
+-- The Save CTE is run as dml_selcel so the generated page id is selected
+-- back; the source_select row writes it into :id for the Save branch.
 ---------------------------------------------------------------------------
 
 insert into source (id, "source") values
-  (-22002, 'with new_page as (insert into page (id, template_id, name) select nextval(''page_seq''), CAST(:template_id as NUMERIC), :name returning id) insert into application_page (id, application_id, page_id, page_num) select nextval(''application_page_seq''), CAST(:applicationId as NUMERIC), id, CAST(:page_num as NUMERIC) from new_page'),
+  (-22002, 'with new_page as (insert into page (id, template_id, name) select nextval(''page_seq''), CAST(:template_id as NUMERIC), :name returning id), new_ap as (insert into application_page (id, application_id, page_id, page_num) select nextval(''application_page_seq''), CAST(:applicationId as NUMERIC), id, CAST(:page_num as NUMERIC) from new_page returning id) select id from new_page'),
   (-22003, 'with upd as (update page set template_id = CAST(:template_id as NUMERIC), name = :name where CAST(id as VARCHAR) = :id returning id) update application_page set page_num = CAST(:page_num as NUMERIC) where page_id in (select id from upd)');
 
 insert into page_processing (id, page_id, processing_type_code, processing_num, success_message) values
@@ -157,8 +159,11 @@ insert into page_processing (id, page_id, processing_type_code, processing_num, 
   (-22002, -20102, 'POST1', 2, 'Page updated.');
 
 insert into page_processing_source (id, page_processing_id, source_id, source_type_code) values
-  (-22001, -22001, -22002, 'dml_modify'),
+  (-22001, -22001, -22002, 'dml_selcel'),
   (-22002, -22002, -22003, 'dml_modify');
+
+insert into page_processing_source_select (id, page_processing_source_id, field_index, field_name)
+values (-22005, -22001, 0, 'id');
 
 -- Run the INSERT only for Save, the UPDATE only for Update.
 insert into source (id, "source") values
@@ -211,9 +216,10 @@ insert into validation_conditional (id, validation_id, conditional_id)
 values (-22000, -22000, -22007);
 
 ---------------------------------------------------------------------------
--- Branch: after a Save, Update or Delete, land back on the
--- Pages-in-Application report for this application. The :applicationId in the
--- static URL template substitutes from the submitted form (hidden field).
+-- Branches: after a Save, land on the NEW page's edit page (the POST1
+-- write-back replaced :id with the generated id); after an Update or Delete,
+-- land back on the Pages-in-Application report. The :name variables in the
+-- static URL templates substitute from the (post-write-back) submitted form.
 ---------------------------------------------------------------------------
 
 insert into code_processing_type
@@ -221,20 +227,26 @@ select 'BRANCH1', 'Page Branch After Page POST Processing', 3
 where not exists (select 1 from code_processing_type where code = 'BRANCH1');
 
 insert into source (id, "source") values
-  (-22008, 'select ''true'' where :REQUEST in (''Save'', ''Update'', ''Delete'')'),
-  (-22009, '/run/-20000/-20002?applicationId=:applicationId');
+  (-22008, 'select ''true'' where :REQUEST in (''Update'', ''Delete'')'),
+  (-22009, '/run/-20000/-20002?applicationId=:applicationId'),
+  (-22014, '/run/-20000/-20102?id=:id');
 
-insert into page_processing (id, page_id, processing_type_code, processing_num)
-values (-22003, -20102, 'BRANCH1', 4);
+insert into page_processing (id, page_id, processing_type_code, processing_num) values
+  (-22005, -20102, 'BRANCH1', 4),
+  (-22003, -20102, 'BRANCH1', 5);
 
-insert into page_processing_source (id, page_processing_id, source_id, source_type_code)
-values (-22003, -22003, -22009, 'static');
+insert into page_processing_source (id, page_processing_id, source_id, source_type_code) values
+  (-22005, -22005, -22014, 'static'),
+  (-22003, -22003, -22009, 'static');
 
-insert into conditional (id, source_id, source_type_code, conditional_type_code)
-values (-22004, -22008, 'dml_selcel', 'TEXT_TRUE');
+-- The Save branch reuses the :REQUEST = 'Save' conditional source (-22004).
+insert into conditional (id, source_id, source_type_code, conditional_type_code) values
+  (-22008, -22004, 'dml_selcel', 'TEXT_TRUE'),
+  (-22004, -22008, 'dml_selcel', 'TEXT_TRUE');
 
-insert into page_processing_conditional (id, page_processing_id, conditional_id)
-values (-22002, -22003, -22004);
+insert into page_processing_conditional (id, page_processing_id, conditional_id) values
+  (-22004, -22005, -22008),
+  (-22002, -22003, -22004);
 
 ---------------------------------------------------------------------------
 -- Conditional button display: Save when creating, Update + Regions when editing

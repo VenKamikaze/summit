@@ -54,29 +54,25 @@ http_post_form "${PAGE}" \
   "__SUMMIT_FORM_ID__=form--21100" \
   "id=0" "application_num=${TEST_NUM}" "name=${TEST_NAME}" "Save=Save"
 assert_eq "POST Save redirects" "302" "${RESPONSE_CODE}"
-assert_eq "Save branches to the applications list" \
-  "${SUMMIT_URL}/run/-20000/-21000" "${REDIRECT_URL}"
 assert_sql "application row created" "${TEST_NAME}" \
   "select name from application where application_num = ${TEST_NUM}"
 assert_sql "id came from application_seq (positive, not hand-picked)" "t" \
   "select id > 0 from application where application_num = ${TEST_NUM}"
+NEW_ID="$(sql "select id from application where application_num = ${TEST_NUM}")"
+assert_eq "Save branches to the new application's edit page (generated-id write-back)" \
+  "${SUMMIT_URL}${PAGE}?id=${NEW_ID}" "${REDIRECT_URL}"
 
-echo "The redirect after Save renders with the process success message"
+echo "The redirect after Save renders the new row in edit mode with the success message"
 http_get "${REDIRECT_URL#${SUMMIT_URL}}"
-assert_http_ok "GET post-submit redirect target (applications list)"
+assert_http_ok "GET post-submit redirect target (edit form for the new app)"
 assert_contains "success message flashed across the redirect" \
   '<div class="summit-success">Application created.</div>'
+assert_contains "form populated with new app name" "value=\"${TEST_NAME}\""
+assert_contains "Update button shown for new app" 'name="Update"'
+assert_not_contains "Save button hidden for new app" 'name="Save"'
 http_get "${REDIRECT_URL#${SUMMIT_URL}}"
 assert_not_contains "success message shown only once (flash consumed)" \
   '<div class="summit-success">Application created.</div>'
-
-NEW_ID="$(sql "select id from application where application_num = ${TEST_NUM}")"
-
-echo "Edit mode for the new application"
-http_get "${PAGE}?pageParams=id:${NEW_ID}"
-assert_http_ok "GET form for new app"
-assert_contains "form populated with new app name" "value=\"${TEST_NAME}\""
-assert_contains "Update button shown for new app" 'name="Update"'
 
 echo "POST Update modifies the application"
 http_post_form "${PAGE}" \

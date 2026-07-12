@@ -358,10 +358,20 @@ public class PageRenderingServiceImpl implements PageRenderingService {
     }
 
     start = System.nanoTime();
-    processPageProcessingSource(pageDto.getPagePostProcessings(), submittedFormParams);
+    final Map<String, PageProcessingSourceSelectDto> processedValues = processPageProcessingSource(pageDto.getPagePostProcessings(), submittedFormParams);
     end = System.nanoTime();
 
     log.info(Thread.currentThread().getStackTrace()[1].getMethodName().toString() + ": processPageRenderSource took: " + (end - start) / 1000000 + "ms");
+
+    // APEX "returning into item": values a POST1 processing selected into its
+    // PAGE_PROCESSING_SOURCE_SELECT rows replace the submitted parameter of the
+    // same name, so branches (and the no-branch redirect) see them - e.g. the
+    // generated id of a Save INSERT, letting the branch land on the new row.
+    for(final PageProcessingSourceSelectDto selected : processedValues.values()) {
+      if(selected.getFieldValue() != null && selected.getFieldValue().getResultValue() != null) {
+        submittedFormParams.set(selected.getFieldName(), selected.getFieldValue().getResultValue());
+      }
+    }
 
     // Collect the success messages of the POST1 processings that ran. This
     // re-evaluates each processing's conditional (processSource evaluates it

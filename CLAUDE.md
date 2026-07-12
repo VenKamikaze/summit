@@ -26,10 +26,18 @@ java -jar target/summit-sb-*.jar     # run; expects postgres summit/summit_dev@l
   `ddl.sql`, `setup-codetables.sql`, `setup-backend.sql` (templates), then
   `summitdev/*.sql` (IDE app) and optionally `test_dml.sql` / `test_form_dml.sql`.
 - All summitdev SQL files are re-runnable (delete-their-own-rows-then-insert).
+- Reload a metadata file into the running DB: `PGPASSWORD=summit_dev psql -h localhost -U summit -d summit -v ON_ERROR_STOP=1 -q -f <file.sql>`.
+- Restart dance: `pkill -f "summit-sb-.*jar"` (exit 144 is normal), wait for
+  8080 to free, then start the new jar — if the old JVM still holds 8080 the
+  new one dies at startup and requests silently hit the OLD jar.
 - The verification harness (`testing/verify/verify-lib.bash`) asserts on rendered
   HTML, the report JSON API, and DB state, and handles the CSRF cookie/token dance
   for POSTs. Every IDE page gets a `t_*.bash` script. Env overrides: SUMMIT_URL,
   SUMMIT_DB_HOST/PORT/USER/NAME.
+- Verify-script gotcha: Spring consumes only ONE FlashMap per request, and flash
+  maps match on target path AND query params — GET each POST's redirect target
+  before the next POST, or a stale same-target flash shadows the next one (bit
+  t_040; flashes for different `?id=` targets don't collide, see t_070).
 
 ## Data model (metadata tables)
 
@@ -77,14 +85,19 @@ report row-link -50.
   processing_num order, each gated by PAGE_PROCESSING_CONDITIONAL, and each
   passing processing's SUCCESS_MESSAGE is collected and flashed across the
   redirect (flash attribute `summitSuccessMessages`, rendered into
-  `##__NOTIFICATION__##` by the next GET, consumed once); then redirect back
-  to the same page with the form data as query params — unless a BRANCH1
-  processing fires (since 2026-07-11): branches evaluate after POST1 in
-  processing_num order, gated by PAGE_PROCESSING_CONDITIONAL, first passing
-  branch wins; a 'static' source is a URL template with URL-encoded :param
-  substitution from the submitted form, a 'dml_selcel' source is a query
-  returning the target URL. The IDE forms branch back to their report page on
-  Save/Update/Delete.
+  `##__NOTIFICATION__##` by the next GET, consumed once); values a POST1
+  processing selects into PAGE_PROCESSING_SOURCE_SELECT rows are written back
+  into the parameter map replacing same-named submitted params (since
+  2026-07-12, APEX "returning into item" — a dml_selcel Save CTE ending in
+  `select id from <insert-cte>` feeds the generated id into :id); then
+  redirect back to the same page with the form data as query params — unless
+  a BRANCH1 processing fires (since 2026-07-11): branches evaluate after
+  POST1 in processing_num order, gated by PAGE_PROCESSING_CONDITIONAL, first
+  passing branch wins; a 'static' source is a URL template with URL-encoded
+  :param substitution from the (post-write-back) submitted form, a
+  'dml_selcel' source is a query returning the target URL. The IDE forms
+  branch to the new row's edit page (`?id=:id`) on Save, and back to their
+  report page on Update/Delete.
 
 ## Processor / formatter dispatch
 
@@ -93,6 +106,10 @@ report row-link -50.
   SQLQuerySourceProcessor; `dml_selcel` SqlDMLCellProcessor; `dml_modify`
   SqlDML batch processors; `dml_report` SQLQueryReportRegionSourceProcessor;
   `ddl_exec` DDL processors.
+- `dml_modify` executes via `jdbc.update()` and CANNOT return values; to capture
+  RETURNING output (e.g. a generated id), run the data-modifying CTE as
+  `dml_selcel` with a final `SELECT` — Postgres executes every data-modifying
+  CTE exactly once even if the final SELECT doesn't reference it.
 - DTO class canonical name → formatter (`ProxyFormatterService`):
   `GenericFormatterServiceImpl` handles Page/Region/Label/DropDownOption/result
   tables; `FieldFormatterServiceImpl` handles fields. Templates come from each
@@ -163,7 +180,7 @@ the **Summit IDE** (app -20000) — see `doc/ide-plan.md` for the build order.
 Done + verified: applications list (-21000, t_020), application create/edit form
 (-21100, t_040), pages-in-application report (-20002, t_030), page create/edit
 form (-20102, t_050 — Save INSERTs PAGE + APPLICATION_PAGE via one Postgres
-data-modifying CTE in a dml_modify source), regions-on-page report (-23000) +
+data-modifying CTE), regions-on-page report (-23000) +
 region create/edit form (-23100, t_060 — 4-table Save CTE: REGION + PAGE_REGION
 + SOURCE + REGION_SOURCE; SQL source edited in new textarea template -64),
 fields-on-region report (-24000) + field create/edit form (-24100, t_070 —
@@ -185,8 +202,7 @@ class; plain FieldDto fell into SimpleFieldProcessor which can't run
 `dml_select`). Dropdown recipe + CTE/bind-scraper notes: `doc/ide-plan.md`.
 
 **2026-07-11**: post-POST branching implemented (BRANCH1, see Request flow
-above) and all four IDE forms branch back to their report page on
-Save/Update/Delete. Delete actions added to all four forms — bottom-up only
+above). Delete actions added to all four forms — bottom-up only
 (Delete button hidden while children exist via field conditionals; field
 deletes cascade the field's own child rows in one CTE). Validations +
 success/error messages implemented, APEX-3.2 style (see Request flow above and
@@ -197,9 +213,18 @@ CODE_VALIDATION_TYPE tables + PAGE_PROCESSING.SUCCESS_MESSAGE
 template -100 (summit-error/summit-success styles in main.css), NOT_NULL
 validations gated to Save/Update + success messages on all four IDE forms,
 and a `BindVarMapper` fix so a blank NUMBER field binds as SQL NULL instead
-of crashing. All verified (t_040–t_070; suite green). Next agreed scope: none
-yet — candidates are the deferred items: landing on a NEW row's edit page
-after Save (needs generated-id write-back), JS confirm on Delete, IDE
+of crashing. All verified (t_040–t_070; suite green).
+
+**2026-07-12**: generated-id write-back implemented (APEX "returning into
+item", see Request flow above and the CLOSED entry in `doc/ide-plan.md`):
+POST1 source_select results replace same-named parameter-map entries before
+branches run; the four IDE Save sources became dml_selcel data-modifying CTEs
+ending in `select id from <insert-cte>` with a source_select row mapping the
+id onto :id, and each form gained a Save-gated branch to its own page with
+`?id=:id` (the old report-page branch is re-gated to Update/Delete). Save now
+lands on the new row's edit page with the 'created' flash. All verified
+(t_040–t_070; suite green). Next agreed scope: none yet — candidates are the
+deferred items: JS confirm on Delete (template -80 has no onclick hook), IDE
 maintenance pages for processing/branch/validation/conditional metadata,
 Oracle pagination ordering; `dto/edit` + `PageEditController` are an older
 abandoned approach (`Old*` services too) — ignore them.

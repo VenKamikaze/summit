@@ -43,20 +43,20 @@ select -64, null, 'Input Item - TextArea', 'org.awiki.kamikaze.summit.dto.render
 ---------------------------------------------------------------------------
 
 delete from field_conditional where id in (-23100, -23101, -23102, -23103);
-delete from page_processing_conditional where id in (-23100, -23101, -23102, -23103);
+delete from page_processing_conditional where id in (-23100, -23101, -23102, -23103, -23104);
 delete from validation_conditional where id in (-23100);
 delete from validation where id in (-23100);
-delete from conditional where id in (-23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107);
-delete from page_processing_source_select where id in (-23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108);
-delete from page_processing_source where id in (-23100, -23101, -23102, -23103, -23104);
-delete from page_processing where id in (-23100, -23101, -23102, -23103, -23104);
+delete from conditional where id in (-23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108);
+delete from page_processing_source_select where id in (-23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108, -23109);
+delete from page_processing_source where id in (-23100, -23101, -23102, -23103, -23104, -23105);
+delete from page_processing where id in (-23100, -23101, -23102, -23103, -23104, -23105);
 delete from field_label where id in (-23100, -23101, -23102, -23103, -23104, -23105, -23106);
 delete from label where id in (-23100, -23101, -23102, -23103, -23104, -23105, -23106);
 delete from field_source where id in (-23001, -23002, -23101, -23102, -23103, -23104, -23105);
 delete from region_field where id in (-23000, -23001, -23002, -23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108, -23109, -23110, -23111, -23112);
 delete from field where id in (-23000, -23001, -23002, -23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108, -23109, -23110, -23111, -23112);
 delete from region_source where id in (-23000);
-delete from source where id in (-23000, -23001, -23002, -23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108, -23109, -23110, -23112, -23113, -23114, -23115, -23116, -23117);
+delete from source where id in (-23000, -23001, -23002, -23100, -23101, -23102, -23103, -23104, -23105, -23106, -23107, -23108, -23109, -23110, -23112, -23113, -23114, -23115, -23116, -23117, -23118);
 delete from page_region where id in (-23000, -23100);
 delete from region where id in (-23000, -23100);
 delete from application_page where id in (-23000, -23100);
@@ -244,8 +244,10 @@ values (-23105, -23111, -23110, 'Y');
 
 -- POST: Save = one CTE inserting REGION + PAGE_REGION + SOURCE + REGION_SOURCE,
 --       Update = one CTE updating REGION, PAGE_REGION.region_num and SOURCE.
+-- The Save CTE is run as dml_selcel so the generated region id is selected
+-- back; the source_select row writes it into :id for the Save branch.
 insert into source (id, "source") values
-  (-23105, 'with new_source as (insert into source (id, source) select nextval(''source_seq''), :source returning id), new_region as (insert into region (id, template_id, name, code_region_position, code_region_type, source_type_code) select nextval(''region_seq''), CAST(:template_id as NUMERIC), :name, :code_region_position, :code_region_type, :source_type_code returning id), new_pr as (insert into page_region (id, page_id, region_id, region_num) select nextval(''page_region_seq''), CAST(:pageId as NUMERIC), nr.id, CAST(:region_num as NUMERIC) from new_region nr returning id) insert into region_source (id, region_id, source_id) select nextval(''region_source_seq''), nr.id, ns.id from new_region nr, new_source ns'),
+  (-23105, 'with new_source as (insert into source (id, source) select nextval(''source_seq''), :source returning id), new_region as (insert into region (id, template_id, name, code_region_position, code_region_type, source_type_code) select nextval(''region_seq''), CAST(:template_id as NUMERIC), :name, :code_region_position, :code_region_type, :source_type_code returning id), new_pr as (insert into page_region (id, page_id, region_id, region_num) select nextval(''page_region_seq''), CAST(:pageId as NUMERIC), nr.id, CAST(:region_num as NUMERIC) from new_region nr returning id), new_rs as (insert into region_source (id, region_id, source_id) select nextval(''region_source_seq''), nr.id, ns.id from new_region nr, new_source ns returning id) select id from new_region'),
   (-23106, 'with upd_region as (update region set template_id = CAST(:template_id as NUMERIC), name = :name, code_region_position = :code_region_position, code_region_type = :code_region_type, source_type_code = :source_type_code where CAST(id as VARCHAR) = :id returning id), upd_pr as (update page_region set region_num = CAST(:region_num as NUMERIC) where region_id in (select id from upd_region) returning id) update source set source = :source where id in (select rs.source_id from region_source rs join upd_region ur on rs.region_id = ur.id)');
 
 insert into page_processing (id, page_id, processing_type_code, processing_num, success_message) values
@@ -253,8 +255,11 @@ insert into page_processing (id, page_id, processing_type_code, processing_num, 
   (-23102, -23100, 'POST1', 2, 'Region updated.');
 
 insert into page_processing_source (id, page_processing_id, source_id, source_type_code) values
-  (-23101, -23101, -23105, 'dml_modify'),
+  (-23101, -23101, -23105, 'dml_selcel'),
   (-23102, -23102, -23106, 'dml_modify');
+
+insert into page_processing_source_select (id, page_processing_source_id, field_index, field_name)
+values (-23109, -23101, 0, 'id');
 
 insert into source (id, "source") values
   (-23107, 'select ''true'' where :REQUEST = ''Save'''),
@@ -306,9 +311,10 @@ insert into validation_conditional (id, validation_id, conditional_id)
 values (-23100, -23100, -23107);
 
 ---------------------------------------------------------------------------
--- Branch: after a Save, Update or Delete, land back on the Regions-on-Page
--- report for this page. The :pageId in the static URL template substitutes
--- from the submitted form (the hidden pageId field).
+-- Branches: after a Save, land on the NEW region's edit page (the POST1
+-- write-back replaced :id with the generated id); after an Update or Delete,
+-- land back on the Regions-on-Page report. The :name variables in the static
+-- URL templates substitute from the (post-write-back) submitted form.
 ---------------------------------------------------------------------------
 
 insert into code_processing_type
@@ -316,20 +322,26 @@ select 'BRANCH1', 'Page Branch After Page POST Processing', 3
 where not exists (select 1 from code_processing_type where code = 'BRANCH1');
 
 insert into source (id, "source") values
-  (-23112, 'select ''true'' where :REQUEST in (''Save'', ''Update'', ''Delete'')'),
-  (-23113, '/run/-20000/-23000?pageId=:pageId');
+  (-23112, 'select ''true'' where :REQUEST in (''Update'', ''Delete'')'),
+  (-23113, '/run/-20000/-23000?pageId=:pageId'),
+  (-23118, '/run/-20000/-23100?id=:id');
 
-insert into page_processing (id, page_id, processing_type_code, processing_num)
-values (-23103, -23100, 'BRANCH1', 4);
+insert into page_processing (id, page_id, processing_type_code, processing_num) values
+  (-23105, -23100, 'BRANCH1', 4),
+  (-23103, -23100, 'BRANCH1', 5);
 
-insert into page_processing_source (id, page_processing_id, source_id, source_type_code)
-values (-23103, -23103, -23113, 'static');
+insert into page_processing_source (id, page_processing_id, source_id, source_type_code) values
+  (-23105, -23105, -23118, 'static'),
+  (-23103, -23103, -23113, 'static');
 
-insert into conditional (id, source_id, source_type_code, conditional_type_code)
-values (-23104, -23112, 'dml_selcel', 'TEXT_TRUE');
+-- The Save branch reuses the :REQUEST = 'Save' conditional source (-23107).
+insert into conditional (id, source_id, source_type_code, conditional_type_code) values
+  (-23108, -23107, 'dml_selcel', 'TEXT_TRUE'),
+  (-23104, -23112, 'dml_selcel', 'TEXT_TRUE');
 
-insert into page_processing_conditional (id, page_processing_id, conditional_id)
-values (-23102, -23103, -23104);
+insert into page_processing_conditional (id, page_processing_id, conditional_id) values
+  (-23104, -23105, -23108),
+  (-23102, -23103, -23104);
 
 -- Conditional button display: Save when creating, Update + Fields when editing.
 insert into source (id, "source")

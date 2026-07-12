@@ -58,8 +58,6 @@ http_post_form "${PAGE}" \
   "id=0" "applicationId=-20000" "name=${TEST_NAME}" "page_num=${TEST_NUM}" \
   "template_id=-100" "Save=Save"
 assert_eq "POST Save redirects" "302" "${RESPONSE_CODE}"
-assert_eq "Save branches to the pages report for this application" \
-  "${SUMMIT_URL}/run/-20000/-20002?applicationId=-20000" "${REDIRECT_URL}"
 assert_sql "page row created with the chosen template" "${TEST_NAME}|-100" \
   "select name, template_id from page where name = '${TEST_NAME}'"
 assert_sql "page id came from page_seq (positive, not hand-picked)" "t" \
@@ -68,12 +66,18 @@ assert_sql "application_page row created in the same statement" "-20000|${TEST_N
   "select ap.application_id, ap.page_num from application_page ap join page p on ap.page_id = p.id where p.name = '${TEST_NAME}'"
 assert_sql "application_page id came from application_page_seq" "t" \
   "select ap.id > 0 from application_page ap join page p on ap.page_id = p.id where p.name = '${TEST_NAME}'"
-
-echo "The redirect after Save renders"
-http_get "${REDIRECT_URL#${SUMMIT_URL}}"
-assert_http_ok "GET post-submit redirect target (pages report)"
-
 NEW_ID="$(sql "select id from page where name = '${TEST_NAME}'")"
+assert_eq "Save branches to the new page's edit page (generated-id write-back)" \
+  "${SUMMIT_URL}${PAGE}?id=${NEW_ID}" "${REDIRECT_URL}"
+
+echo "The redirect after Save renders the new row in edit mode"
+http_get "${REDIRECT_URL#${SUMMIT_URL}}"
+assert_http_ok "GET post-submit redirect target (edit form for the new page)"
+assert_contains "success message flashed across the redirect" \
+  '<div class="summit-success">Page created.</div>'
+assert_contains "form populated with new page name" "value=\"${TEST_NAME}\""
+assert_contains "Update button shown for new page" 'name="Update"'
+assert_not_contains "Save button hidden for new page" 'name="Save"'
 
 echo "The page the IDE just created actually renders"
 http_get "/run/-20000/${NEW_ID}"
@@ -83,12 +87,6 @@ echo "The new page appears in the pages-in-application report API"
 http_get_region_json "-20000" "applicationId:-20000"
 assert_json "new page listed in report JSON" \
   ".body[] | select(.cells[0].value == \"${NEW_ID}\") | .cells[1].value" "${TEST_NAME}"
-
-echo "Edit mode for the new page"
-http_get "${PAGE}?pageParams=id:${NEW_ID}"
-assert_http_ok "GET form for new page"
-assert_contains "form populated with new page name" "value=\"${TEST_NAME}\""
-assert_contains "Update button shown for new page" 'name="Update"'
 
 echo "POST Update modifies PAGE and APPLICATION_PAGE via one CTE"
 http_post_form "${PAGE}" \
