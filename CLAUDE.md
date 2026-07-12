@@ -7,8 +7,12 @@ MapStruct. PostgreSQL is the primary database (Oracle aspirational).
 Base package: `org.awiki.kamikaze.summit`.
 
 Companion docs:
+- `doc/metadata-authoring-guide.md` — cookbook for building pages/reports/forms
+  in metadata SQL (patterns + gotcha checklist; READ THIS before writing page SQL).
 - `doc/ide-plan.md` — plan + progress for the in-progress "IDE" builder app, and
-  the full list of metadata-authoring gotchas (READ THIS before writing page SQL).
+  the full list of metadata-authoring gotchas.
+- `doc/claude-prompt.txt` — self-contained project context blurb for pasting
+  into an LLM that can't read this repo.
 - `.junie/guidelines.md` — build/test conventions, default template IDs, ID ranges.
 - `notes.txt` — historical TODOs. Partially stale (e.g. PAGE_PROCESSING
   conditionals ARE implemented and verified).

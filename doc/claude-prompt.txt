@@ -1,60 +1,127 @@
-I'm working with a Java web application called 'Summit' (github.com/VenKamikaze/summit), which is a Rapid Application Development (RAD) framework built on Spring Boot 3.x. It follows a metadata-driven architecture similar to Oracle APEX, where web applications are defined through database structures rather than traditional code.
+I'm working with a Java web application called 'Summit' (github.com/VenKamikaze/summit),
+a FLOSS Rapid Application Development (RAD) framework modelled on Oracle APEX:
+web applications (pages, reports, forms, processing) are defined as rows in
+database metadata tables, not code. Stack: Spring Boot 3.3.x, Java 17, Maven,
+Lombok, MapStruct. PostgreSQL is the primary database (Oracle support is
+aspirational). Base package: org.awiki.kamikaze.summit.
 
-Key architectural components:
+If you have access to the repository, read these before making changes:
+- CLAUDE.md (repo root)          — canonical onboarding: architecture, bind rules, gotchas, current state
+- doc/ide-plan.md                — the in-progress "IDE" builder app plan + hard-won metadata gotchas
+- doc/metadata-authoring-guide.md — cookbook for building pages/reports/forms in metadata SQL
+- .junie/guidelines.md           — build/test conventions, default template IDs, hand-authored ID ranges
 
-Database-Driven Page Definition:
+DATA MODEL (metadata tables)
 
-Applications are composed of hierarchical metadata stored in tables:
+APPLICATION -> APPLICATION_PAGE -> PAGE -> PAGE_REGION -> REGION -> REGION_FIELD -> FIELD
 
-APPLICATION: Top-level container
-APPLICATION_PAGE: Pages within an application
-PAGE: Contains regions and processing instructions
-PAGE_REGION: Defines content areas within pages
-REGION: Contains fields and display logic
-REGION_FIELD: Links regions to their fields
-FIELD: Define form inputs and display elements
-SOURCE: Contains SQL or other data source definitions
-TEMPLATE: HTML/output templates with substitution variables
-PAGE_PROCESSING: Defines request handling logic
-PAGE_PROCESSING_SOURCE: Contains processing instructions (e.g., SQL statements)
-CONDITIONAL: Contains logic for showing/hiding elements or controlling processing flow
+Supporting tables:
+- SOURCE: SQL or static text, linked via REGION_SOURCE / FIELD_SOURCE / PAGE_PROCESSING_SOURCE
+- TEMPLATE: HTML with ##__VAR__## substitution variables, hierarchical via parent_id;
+  template.class_name records which DTO class the template renders
+- LABEL + FIELD_LABEL: field labels
+- PAGE_PROCESSING (+ _SOURCE, + _SOURCE_SELECT, + _CONDITIONAL): render-time population
+  (RENDER_PG1), post-submit DML (POST1), and post-POST redirects (BRANCH1);
+  PAGE_PROCESSING.SUCCESS_MESSAGE is flashed across the post-POST redirect
+- CONDITIONAL + FIELD_CONDITIONAL: show/hide fields and gate processing/validations
+- VALIDATION + VALIDATION_CONDITIONAL: APEX-3.2-style page validations run before POST1
+- CODE_* lookup tables (field types, source types, region types, processing types, ...)
+- Sequences exist for application/page/region/field (+ spare_seq) and for the
+  link/child tables (source, application_page, page_region, region_field, ...)
 
-Template System:
+TEMPLATE SYSTEM
 
-Uses HTML templates with substitution variables (e.g., ##VARIABLE##)
-Common variables include:
+Substitution variables use the form ##__NAME__## (double hash, double underscore).
+Internal variables include ##__DATA__## (child content), ##__REGION-ID__##,
+##__PAGE-ID__##, ##__ID__##, ##__NAME__##, ##__CONTEXTPATH__##, ##__APIPATH__##,
+##__CSRF__## (hidden CSRF input), ##__NOTIFICATION__## (validation errors /
+success messages). See doc/InternalReplacementVariables.txt.
 
-##CONTEXTPATH##
-##APIPATH##
-##REGION-ID##
-##DATA##
-##PAGE-ID##
-##ID##
-##NAME##
+REQUEST HANDLING
 
-Templates can be hierarchical (parent/child relationships)
-Supports multiple output formats (HTML, CSV, etc.)
+GET /run/{applicationId}/{pageId} -> PageRenderController.view() ->
+PageRenderingServiceImpl.renderPageToString: maps ApplicationPage -> PageDto
+(MapStruct PageMapper), runs RENDER_PG1 page processing (populates fields via
+dml_selrow + PAGE_PROCESSING_SOURCE_SELECT column-index -> field-name mapping),
+processes region/field sources, then formatters apply templates. Page parameters
+arrive as ?pageParams=key:value,key2:v2 and as plain query parameters
+(pageParams wins on duplicates).
 
-Request Handling:
+Report regions render their table CLIENT-side: the page embeds JS that calls
+GET/POST /api/filter/json/{regionId} (PageRestController) and mustache-renders
+the JSON into #mustacheReportRegion-<regionId>. Filtering/pagination use
+JSQLParser query rewriting (service/report/).
 
-GET requests:
+POST /run/{applicationId}/{pageId} -> processPageOnSubmit (PageSubmitResult):
+1. The submitted button name (validated against the region's buttons) becomes
+   the reserved :REQUEST bind variable.
+2. Page VALIDATIONs run (each gated by VALIDATION_CONDITIONAL); any failure
+   skips all processing and re-renders the page inline (HTTP 200) with
+   submitted values preserved and errors in ##__NOTIFICATION__##.
+3. POST1 processings run in processing_num order, each gated by
+   PAGE_PROCESSING_CONDITIONAL; passing processings' SUCCESS_MESSAGEs are
+   flashed across the redirect. Values a POST1 processing selects into
+   PAGE_PROCESSING_SOURCE_SELECT rows are written back into the parameter map,
+   replacing same-named submitted params (APEX "returning into item" — e.g. a
+   dml_selcel Save CTE ending in `select id from <insert-cte>` feeds the
+   generated id into :id).
+4. BRANCH1 processings evaluate in processing_num order, first passing branch
+   wins: a 'static' source is a URL template with URL-encoded :param
+   substitution from the (post-write-back) form; a 'dml_selcel' source is a
+   query returning the target URL. No branch -> redirect back to the same page
+   with the form data as query params.
 
-Retrieve application/page metadata
-Process template hierarchy
-Perform variable substitution
-Render final output using StringBuffer
+PROCESSOR / FORMATTER DISPATCH
 
+SOURCE_TYPE_CODE -> processor (ProxySourceProcessorServiceImpl): 'static'
+StaticTextProcessor; 'dml_select'/'dml_selrow' SQLQuerySourceProcessor;
+'dml_selcel' SqlDMLCellProcessor; 'dml_modify' SqlDML batch (via jdbc.update(),
+CANNOT return values — to capture RETURNING output run a data-modifying CTE as
+dml_selcel instead); 'dml_report' report processor; 'ddl_exec' DDL.
+DTO class canonical name -> formatter (ProxyFormatterService). Conditionals
+(ConditionalEvaluatorServiceImpl): source_type dml_selcel (single value) or
+dml_selrow (row count); types TEXT_TRUE / EXISTS / NOTEXISTS.
 
-POST requests:
+BIND VARIABLE RULES (critical — the wrong choice is a runtime 500)
 
-Central controller handles requests via path pattern: /applicationId/pageId
-Actions (INSERT/UPDATE/DELETE) trigger associated PageProcessing
-Conditional objects determine when to apply processing
-Processing sources (typically SQL) execute with form fields as bind variables
+- Report-region sources and FIELD conditional sources get binds from the
+  region's FIELDS, typed by field_type_code (NUMBER -> NUMERIC, else VARCHAR,
+  unpopulated -> NULL). Compare numeric columns directly: col = :bind.
+- Page-processing sources and PAGE_PROCESSING/VALIDATION conditionals get binds
+  from the parameter map / submitted form — ALWAYS VARCHAR. Compare numeric
+  columns with CAST(col as VARCHAR) = :bind; numeric DML values need
+  CAST(:bind as NUMERIC).
+- Every bind in a render-processing source must be present in the parameter
+  map ("create" links pass pageParams=id:0 — id 0 never exists -> blank form).
+- The bind scraper regex skips a bind if a later quoted literal starts with a
+  non-word char: NULLIF(:x, '') hides :x. Avoid '' literals after binds.
+- Fields are only visible as binds to sources in the SAME region.
 
-Security:
+SECURITY: Spring Security currently permits all requests (placeholder). CSRF is
+real: CookieCsrfTokenRepository, token inlined into forms via ##__CSRF__##.
+Sessions via spring-session-jdbc.
 
-Built on Spring Security
-CSRF protection being added.
+BUILD / RUN / VERIFY
 
-What I need help with is: [specific feature/enhancement/issue]"
+- mvn clean package (tests hit the REAL local postgres, not H2 — apply DDL deltas first)
+- java -jar target/summit-sb-*.jar (expects postgres summit/summit_dev@localhost:5432/summit)
+- DB bootstrap: src/main/resources/sql/postgres/ (create.bash, ddl.sql,
+  setup-codetables.sql, setup-backend.sql, then summitdev/*.sql). All summitdev
+  files are re-runnable (delete-own-rows-then-insert).
+- End-to-end verification: ./testing/verify/run-verify.bash (needs running app + DB);
+  every IDE page has a t_*.bash script asserting on HTML, the report JSON API, and DB state.
+
+CURRENT STATE (2026-07-12, branch feature/test_ai_assist)
+
+The active effort is the Summit IDE (application -20000), an APEX-style builder
+app written in Summit's own metadata. Done and verified end-to-end: applications
+list + create/edit form, pages report + page form, regions report + region form,
+fields report + field form — the full APPLICATION -> PAGE -> REGION -> FIELD
+chain is maintainable from the web UI, with validations, success/error messages,
+Delete actions (bottom-up), post-POST branching, and Save landing on the new
+row's edit page via generated-id write-back. Hand-authored metadata IDs live in
+-40000..-20000. Deferred: JS confirm on Delete, IDE maintenance pages for
+processing/branch/validation/conditional metadata, Oracle pagination ordering.
+dto/edit, PageEditController and Old* services are an abandoned approach — ignore them.
+
+What I need help with is: [specific feature/enhancement/issue]
